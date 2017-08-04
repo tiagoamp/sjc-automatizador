@@ -75,7 +75,7 @@ The application was build in two separated projects as follow:
 <b> Why is it published in Github? </b>
 
 The application was published in github to help the company to get knowledge in its source code, since it can be sustained by others developers if it was necessary. 
-It is an open project and there are not confidential information in ths ource code.
+It is an open project and there are not confidential information in this source code.
 
 
 There are some known <b> TO DOs </b> that will be included in this git project (issues).
