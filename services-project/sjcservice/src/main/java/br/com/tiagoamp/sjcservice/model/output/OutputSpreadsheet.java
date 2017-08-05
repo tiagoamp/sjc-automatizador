@@ -45,9 +45,9 @@ public class OutputSpreadsheet {
 	
 	
 	public void loadDataFromInputSpreadSheets(List<InputSpreadsheet> listInputSpreadSheets) {
-		for (InputSpreadsheet inputSpreadsheet : listInputSpreadSheets) {			
+		for (InputSpreadsheet inputSpreadsheet : listInputSpreadSheets) {
 			loadDataFromInputSpreadsheet(inputSpreadsheet);
-			messages.put(inputSpreadsheet.getFileName(), inputSpreadsheet.getMessages());
+			messages.put(inputSpreadsheet.getFileName(), inputSpreadsheet.getMessages());			
 		}	
 	}
 	
@@ -90,6 +90,7 @@ public class OutputSpreadsheet {
 	}
 	
 	private void updateOutputRows(OutSheet outputsheet) {
+		if (outputsheet.getOutputrows().isEmpty()) return;
 		int index = this.getSheetIndexByCode(outputsheet.getCode());
 		if (index >= 0) {
 			sheets.get(index).getOutputrows().addAll(outputsheet.getOutputrows());
@@ -132,6 +133,10 @@ public class OutputSpreadsheet {
 						
 				XSSFSheet xssfsheet = xssfworkbook.getSheet(String.valueOf(code.getCode()));
 				this.fillNewOuputRowsInExcelSheet(xssfsheet, data);
+				
+				for (int j = 0; j < 4; j++) {
+					xssfsheet.autoSizeColumn(j); // column adjusting
+				}
 			}
 			xssfworkbook.write(fos);
 		}
@@ -168,12 +173,8 @@ public class OutputSpreadsheet {
                 	cell.setCellValue((Integer) obj);
                 }	                    
 			}      
-			
-			for (int j = 0; j < 4; j++) {
-				xssfsheet.autoSizeColumn(j); // column adjusting
-    		}
-			
 		}
+				
 	}
 	
 	

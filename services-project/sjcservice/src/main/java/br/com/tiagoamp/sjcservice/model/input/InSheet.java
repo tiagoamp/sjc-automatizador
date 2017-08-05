@@ -65,6 +65,7 @@ public class InSheet {
 		FieldProcessor fieldProcessor;
 		
         Iterator<Row> rowItr = excelsheet.iterator();
+        if (!rowItr.hasNext()) return;
         Row row = rowItr.next();
         while ( rowItr.hasNext() && row.getRowNum() < INDEX_DATA_INIT_ROW - 1 ) {
 			row = rowItr.next();
@@ -112,7 +113,7 @@ public class InSheet {
                 	inrow.setQtdPlantoesExtra(Integer.valueOf(fieldProcessor.process(df.formatCellValue(cell))));
                 	messages.addAll(fieldProcessor.getMessages());
                 	if (Integer.valueOf(inrow.getQtdPlantoesExtra()) != qtdDatasPlantoes) {
-                		messages.add(new ProcessingMessage(MessageType.ALERT, "Planilha contém 'Quantidade de Plantões Extras' diferente do número de datas. Cadastradas '" + qtdDatasPlantoes + " datas, mas quantidade informada é " + inrow.getQtdPlantoesExtra() + "."));
+                		messages.add(new ProcessingMessage(MessageType.ALERT, "Planilha contém na linha " + (row.getRowNum() + 1) +" 'Quantidade de Plantões Extras' diferente do número de datas. Cadastradas '" + qtdDatasPlantoes + "' datas, mas quantidade informada é " + inrow.getQtdPlantoesExtra() + "."));
                 	}
                 } else if ( (code == SjcGeneralCode.OPERACIONAL) && 
                 		   (cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_01 || 
@@ -122,7 +123,7 @@ public class InSheet {
                 		    cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_05) 
                 		   ) { 
                 	String dataPlantaoExtra = df.formatCellValue(cell);
-                	if (dataPlantaoExtra != null && !dataPlantaoExtra.isEmpty()) {
+                	if (dataPlantaoExtra != null && !dataPlantaoExtra.isEmpty() && !hasNoNumbers(dataPlantaoExtra)) {                		
                 		qtdDatasPlantoes++;                		
                 	}
                 }                

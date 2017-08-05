@@ -43,6 +43,7 @@ public class InputSpreadsheet {
 	            	InSheet sheet = new InSheet(code);
 	            	if (lotacao == null) lotacao = sheet.loadLotacaoFrom(xssfsheet);	            	
 	            	sheet.loadDataFrom(xssfsheet);
+	            	if (sheet.getInputrows().isEmpty()) continue;
 	            	messages.addAll(sheet.getMessages());
 	            	sheets.add(sheet);
 	            }
