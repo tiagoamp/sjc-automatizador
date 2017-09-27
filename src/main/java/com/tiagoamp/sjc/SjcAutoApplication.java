@@ -11,7 +11,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SjcAutoApplication {
 
-	public static Path UPLOAD_DIR = Paths.get("/home/d333280/Ti/proj/SJC/sjc-automatizador/upload/");
+	
+	//FIXME
+	public static Path UPLOAD_DIR = Paths.get("DIR/TO/UPLOAD");
 	
 	
 	public static void main(String[] args) {
