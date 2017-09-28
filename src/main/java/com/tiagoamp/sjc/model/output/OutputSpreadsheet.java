@@ -38,7 +38,6 @@ public class OutputSpreadsheet {
 	}
 	
 	
-	private String lotacao;
 	private List<OutSheet> sheets;
 	private Map<String,List<ProcessingMessage>> messages;
 	
@@ -179,12 +178,6 @@ public class OutputSpreadsheet {
 	}
 	
 	
-	public String getLotacao() {
-		return lotacao;
-	}
-	public void setLotacao(String lotacao) {
-		this.lotacao = lotacao;
-	}
 	public List<OutSheet> getSheets() {
 		return sheets;
 	}

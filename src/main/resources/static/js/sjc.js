@@ -1,45 +1,49 @@
 $(document).ready(function () {
-
-    $("#div-result").hide();
-	
-    $("#btn-validar").on('click', function (e) {
-        $("#div-result").hide();
-        validate();
-        $("#btn-salvar-saida").hide();
-	});
     
-    $("#btn-processar").on('click', function (e) {
+    $("#div-result").hide();
+
+    $("#btn-clean-upload").on('click', function (e) {
         $("#div-result").hide();
-
+        cleanUploads();        
+	});
+	
+    $("#btn-processar").on('click', function (e) {        
+        $("#div-result").hide();
         process();
-
-        $("#btn-salvar-saida").show();
-	});    
-					
+        $(this).attr("disabled",true);
+    });    
+    
+    $("#btn-salvar-saida").on('click', function (e) {        
+        generateOutputSpreadsheet();
+    });
+    					
 });
 
-function validate() {
-    getNumberOfUploadedSpreadsheets( loadSpreadsheets );    
+function cleanUploads() {
+    $.ajax({
+        url:"http://localhost:8080/sjc/upload",
+        type:"DELETE",
+        success: function (data){
+            showSuccessMessage("Arquivos do diretório apagados!");            
+            window.location.reload(false);
+        },
+        error: function (data){
+            showErrorMessage("Falha ao deletar arquivos!") ;        
+        }
+  });
 }
 
 function process() {
-
-    // clean upload directory at the end
-
-    console.log("processar");
+    getNumberOfUploadedSpreadsheets( loadSpreadsheets );    
 }
-
 
 function getNumberOfUploadedSpreadsheets( callback ) {
     $.get("http://localhost:8080/sjc/upload/total", function( data ) {
-
-        console.log("Number of files = " + data);
-
         if (data == 0) {
             showErrorMessage("Não foram encontrados arquivos no diretório de uploads!");
+            $("#btn-processar").attr("disabled",false);
             return;
         }
-
         $("#div-result").show();
         callback(data);
 	})
@@ -60,7 +64,7 @@ function loadSpreadsheetAtIndex( i ) {
             showErrorMessage("Erro ao acessar o arquivo nro " + i + ".");
             return;
         }
-        showSuccessMessage("Planilha processada: " + data.fileName);
+        showSuccessMessage("Planilha processada: " + data.fileName);                
         createMessagesPanels(data);
 	})
 	.fail( function() { showErrorMessage("Falha no acesso ao arquivo.") } );
@@ -116,6 +120,25 @@ function createMessagesPanels( file ) {
         $("#div-panel-warnings").append(panelWarnDiv);
     }
     
+}
+
+function generateOutputSpreadsheet() {
+
+    console.log ("Gerando saída...");
+
+    $.get("http://localhost:8080/sjc/output", function( data ) {
+		if (data == null) { 
+            showErrorMessage("Erro ao acessar o arquivo nro " + i + ".");
+            return;
+        }
+        showSuccessMessage("Download!!");
+	})
+    .fail( function() { showErrorMessage("Falha no download do arquivo.") } );
+    
+
+
+    // clean upload directory at the end
+
 }
 
 function showErrorMessage(msg) {

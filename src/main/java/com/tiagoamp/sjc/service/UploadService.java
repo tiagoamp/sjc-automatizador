@@ -26,4 +26,14 @@ public class UploadService {
 		return Files.list(uploadDir).collect(Collectors.toList());
 	}
 	
+	public void cleanUploadDirectory(Path uploadDir) throws IOException {
+		Files.newDirectoryStream(uploadDir).forEach( f -> {
+			try {
+				Files.delete(f);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+	
 }

@@ -29,7 +29,6 @@ public class SjcServicesFacade {
 		return spreadsheet;
 	}
 	
-	@Deprecated
 	public List<InputSpreadsheet> loadInputSpreadsheetsFromDirectory(Path directory) throws IOException {
 		if (Files.notExists(directory)) throw new IllegalArgumentException("Diretório inexistente!");
 		List<InputSpreadsheet> inputList = new ArrayList<>();
