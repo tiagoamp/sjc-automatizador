@@ -10,7 +10,8 @@
 	<link href="vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 	<link href="vendors/nprogress/nprogress.css" rel="stylesheet">
 	<link href="vendors/dropzone/dist/min/dropzone.min.css" rel="stylesheet">
-	
+	<link href="css/pnotify.custom.min.css" rel="stylesheet">
+		
 </head>
 <body>
 
@@ -27,13 +28,13 @@
 
 	<div class="row">
 		<div class="col-xs-10 col-md-offset-1">
-		    <div class="panel panel-default">
-				<div class="panel-heading">
-			       <h4>Upload dos arquivos de entrada</h4>
+		    <div class="panel panel-primary">
+				<div class="panel-heading text-center">
+			       <h4><strong>Entrada do Processamento</strong></h4>
 				</div>
 				<div class="panel-body">
 					<p>Arraste os arquivos para o quadro abaixo ou click para selecioná-los:</p>
-				    <form action="sjc/upload" class="dropzone" id="form-upload-dropzone" method="POST">
+				    <form action="sjc/upload" class="dropzone" id="form-upload-dropzone" method="POST" style="background-color: #e6f9ff">
 						<div class="fallback">
 							<input name="file" type="file" multiple />
 						</div>						
@@ -42,16 +43,52 @@
 					<p class="text-muted">** Diretório de upload configurado: <span id="dir-upload">Não especificado!</span></p>
 					<br />
 					<div class="text-center">
-						<button type="button" class="btn btn-info btn-lg" id="btn-validar">Validar</button>
-						<button type="button" class="btn btn-info btn-lg" id="btn-processar">Processar</button>						
+						<button type="button" class="btn btn-info btn-lg" id="btn-validar" style="width: 300px">Validar</button>
+						&nbsp;&nbsp;&nbsp;
+						<button type="button" class="btn btn-info btn-lg" id="btn-processar" style="width: 300px">Processar</button>						
 					</div>
 				</div>
 			 </div>
 		</div>
 	</div>
 
+	<hr />
+
+	<div class="row" id="div-result">
+		<div class="col-xs-10 col-md-offset-1">
+			<div class="panel panel-primary">
+				<div class="panel-heading text-center">
+				   <h4><strong>Resultado</strong></h4>
+				</div>
+				<div class="panel-body">
+					<div class="text-center" id="div-result-buttons">
+						<button type="button" class="btn btn-info btn-lg" id="btn-salvar-pdf" style="width: 300px">Salvar PDF</button>
+						&nbsp;&nbsp;&nbsp;
+						<button type="button" class="btn btn-info btn-lg" id="btn-salvar-saida" style="width: 300px">Donwload Planilha</button>						
+					</div>
+					<hr />
+					<div class="alert alert-danger text-center">
+						<strong>Mensagens de Erro</strong>
+					</div>
+
+					<div id="div-panel-errors">
+						
+					</div>
+
+					<div class="alert alert-warning text-center">
+						<strong>Mensagens de Alerta</strong>
+					</div>
+					<div id="div-panel-warnings">
+						
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>	
+
 	<footer>
-		<p class="text-right text-muted"><small>SJC-Automtizador | by @tiagoamp | 2017 &nbsp;&nbsp;&nbsp;</small></p>		
+		<p class="text-right text-muted"><small>SJC-Automtizador | by @tiagoamp | v.2.0.0 | 2017 &nbsp;&nbsp;&nbsp;</small></p>		
 	</footer>
 
 <script src="js/jquery-3.2.1.min.js"></script>
@@ -59,6 +96,8 @@
 <script src="vendors/fastclick/lib/fastclick.js"></script>
 <script src="vendors/nprogress/nprogress.js"></script>
 <script src="vendors/dropzone/dist/min/dropzone.min.js"></script>
+<script src="js/pnotify.custom.min.js"></script>
+<script src="js/sjc.js"></script>
 
 </body>
 </html>
