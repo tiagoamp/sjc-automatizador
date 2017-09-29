@@ -14,6 +14,7 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.ListItem;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.tiagoamp.sjc.model.MessageType;
@@ -40,16 +41,21 @@ public class PDFGenerator {
 			document.add(getSheetNameParagraph(sheetName));
 			document.add(new Paragraph(""));
 			List<ProcessingMessage> sheetMessages = messages.get(sheetName);
-			for (ProcessingMessage msg : sheetMessages) {
+			com.itextpdf.text.List unorderedList = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
+			for (ProcessingMessage msg : sheetMessages) {				
 				if (msg.getType() == MessageType.ERROR) {
-					document.add(getErrorMessageParagraph(msg.getText()));
+					unorderedList.add(getErrorMessageItem(msg.getText()));
 				} else {
-					document.add(getAlertMessageParagraph(msg.getText()));
+					unorderedList.add(getAlertMessageItem(msg.getText()));
 				}
 			}
+			document.add(unorderedList);
+			
 			document.add(new Paragraph(""));
 			document.add(new Paragraph(""));
 		}
+		
+		
 		
 		document.add(new Paragraph(""));
 		document.add(getFooterParagraph());
@@ -79,22 +85,22 @@ public class PDFGenerator {
 		return p;
 	}
 	
-	private Paragraph getErrorMessageParagraph(String msgTxt) {
+	private ListItem getErrorMessageItem(String msgTxt) {
 		Font font = new Font();
 		font.setSize(12);
 		font.setStyle(Font.ITALIC);
 		font.setColor(BaseColor.RED);
-		Paragraph p = new Paragraph(msgTxt, font);
-		return p;
+		ListItem l = new ListItem(msgTxt, font);
+		return l;
 	}
 	
-	private Paragraph getAlertMessageParagraph(String msgTxt) {
+	private ListItem getAlertMessageItem(String msgTxt) {
 		Font font = new Font();
 		font.setSize(12);
 		font.setStyle(Font.ITALIC);
 		font.setColor(BaseColor.YELLOW);
-		Paragraph p = new Paragraph(msgTxt, font);
-		return p;
+		ListItem l = new ListItem(msgTxt, font);
+		return l;
 	}
 	
 	private Paragraph getFooterParagraph() {
