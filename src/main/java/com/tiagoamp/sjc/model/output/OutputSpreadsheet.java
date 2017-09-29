@@ -24,7 +24,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.tiagoamp.sjc.model.input.InRow;
 import com.tiagoamp.sjc.model.input.InSheet;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
-
+import com.tiagoamp.sjc.service.PDFGenerator;
+import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.LotacaoComparator;
 import com.tiagoamp.sjc.model.ProcessingMessage;
 import com.tiagoamp.sjc.model.SjcItemType;
@@ -56,10 +57,10 @@ public class OutputSpreadsheet {
 		populateOutputFile(outputFile);
 	}
 	
-	public void generateOutputMessagesPage(Path outputFile) throws IOException {
-		String htmlCode = new HtmlMessagePage().generate(messages);
-		createOutputMessageFileInSystem(outputFile, htmlCode);
-	}	
+	public void generateOutputMessageFile(Path outputFile) throws FileNotFoundException, DocumentException {
+		PDFGenerator pdfGen = new PDFGenerator();
+		pdfGen.generateMessagesPdfFile(messages, outputFile);
+	}
 	
 	private void loadDataFromInputSpreadsheet(InputSpreadsheet inputSpreadsheet) {
 		for (SjcSpecificCode code : SjcSpecificCode.values()) {
@@ -108,12 +109,6 @@ public class OutputSpreadsheet {
 	
 	private void createOutputFileInSystem(Path outputFile, Path templateFile) throws IOException {
 		Files.copy(templateFile, outputFile, StandardCopyOption.REPLACE_EXISTING);
-	}
-	
-	private void createOutputMessageFileInSystem(Path outputFile, String htmlCode) throws IOException {
-		try (FileOutputStream fos = new FileOutputStream(outputFile.toFile());) {
-			fos.write(htmlCode.getBytes());
-		} 
 	}
 	
 	private void populateOutputFile(Path outputFile) throws FileNotFoundException, IOException {

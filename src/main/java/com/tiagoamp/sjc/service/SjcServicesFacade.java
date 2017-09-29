@@ -1,5 +1,6 @@
 package com.tiagoamp.sjc.service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
 
@@ -51,9 +53,8 @@ public class SjcServicesFacade {
 		outputSpreadsheet.generateOuputSpreadsheetFile(outputFile);
 	}
 	
-	@Deprecated
-	public void generateOutputMessagesFile(Path outputFile, OutputSpreadsheet outputSpreadsheet) throws IOException {
-		outputSpreadsheet.generateOutputMessagesPage(outputFile);
+	public void generateOutputMessagesFile(Path outputFile, OutputSpreadsheet outputSpreadsheet) throws FileNotFoundException, DocumentException  {
+		outputSpreadsheet.generateOutputMessageFile(outputFile);
 	}
 	
 }

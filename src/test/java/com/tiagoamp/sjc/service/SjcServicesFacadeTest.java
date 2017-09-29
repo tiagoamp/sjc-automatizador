@@ -57,14 +57,5 @@ public class SjcServicesFacadeTest {
 		facade.generateOuputSpreadsheetFile(outputfile, outspreadsheet);
 		assertTrue("Must generate output spreadsheet file.", Files.exists(outputfile));
 	}
-
-	@Test
-	public void testGenerateOutputMessagesFile_shouldGenerateValidOutput() throws IOException {
-		List<InputSpreadsheet> inputlist = facade.loadInputSpreadsheetsFromDirectory(Paths.get("testfiles", "entrada"));
-		OutputSpreadsheet outspreadsheet = facade.generateOutputSpreadSheet(inputlist);
-		Path outputfile = Paths.get("testfiles", "saida", "MensagensProcessamento.html");
-		facade.generateOutputMessagesFile(outputfile, outspreadsheet);
-		assertTrue("Must generate messages html file.", Files.exists(outputfile));
-	}
 	
 }

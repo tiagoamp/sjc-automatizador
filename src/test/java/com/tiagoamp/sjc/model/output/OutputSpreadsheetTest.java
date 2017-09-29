@@ -3,6 +3,7 @@ package com.tiagoamp.sjc.model.output;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
-
+import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.SjcGeneralCode;
 
 public class OutputSpreadsheetTest {
@@ -73,14 +74,13 @@ public class OutputSpreadsheetTest {
 	}
 	
 	@Test
-	public void testGenerateOutputMessagesFile() throws IOException {
+	public void testGenerateOutputMessageFile_shouldGenerateFileInSystem() throws FileNotFoundException, DocumentException {
 		List<InputSpreadsheet> inputlist = getInputSpreadsheetForTests();
 		outputSpreadsheet.loadDataFromInputSpreadSheets(inputlist);
-		Path outputFile = Paths.get("testfiles", "saida", "MensagensProcessamento.html");
+		Path outputTestFile = Paths.get("testfiles", "saida", "testOutMessageFromSpreadSheetTest.pdf");
 		
-		outputSpreadsheet.generateOutputMessagesPage(outputFile);
-		assertEquals("Must generate 1 alert message", 1, outputSpreadsheet.getMessages().size());
-		assertTrue("File should be created in filesystem.", Files.exists(outputFile));
+		outputSpreadsheet.generateOutputMessageFile(outputTestFile);
+		assertTrue("File should be created in filesystem.", Files.exists(outputTestFile));
 	}
-
+		
 }
