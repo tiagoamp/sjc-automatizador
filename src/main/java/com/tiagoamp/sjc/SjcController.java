@@ -1,9 +1,7 @@
 package com.tiagoamp.sjc;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Iterator;
@@ -16,11 +14,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,8 +100,24 @@ public class SjcController {
 		return insheet;
 	}
 	
-	@RequestMapping(value = "output", method = RequestMethod.GET, produces = MediaType.MULTIPART_FORM_DATA)
-	public @ResponseBody HttpEntity<byte[]> getOutputSpreadsheet() {
+	@RequestMapping(value = "output", method = RequestMethod.GET)
+	public Response generateOutputSpreadsheet() {
+		try {
+			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(UPLOAD_DIR);
+			OutputSpreadsheet outsheet = sjcService.generateOutputSpreadSheet(list);
+			
+			LocalDate now = LocalDate.now();
+			Path resultFile = RESULT_DIR.resolve("Resultado_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".xls");
+			sjcService.generateOuputSpreadsheetFile(resultFile, outsheet);			
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new ResponseProcessingException(Response.serverError().build(),e);
+		}
+		return Response.ok().build();
+	}
+	
+	@RequestMapping(value = "output2", method = RequestMethod.GET, produces = "application/vnd.ms-excel")
+	public @ResponseBody HttpEntity<byte[]> getOutputSpreadsheet2() {
 		OutputSpreadsheet outsheet = null;
 		try {
 			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(UPLOAD_DIR);
@@ -149,38 +160,5 @@ public class SjcController {
 		}		
 	}
 	
-	 // Download a file
-/*    @RequestMapping(
-        value = "/download",
-        method = RequestMethod.GET
-    )
-    public ResponseEntity downloadFile(@RequestParam("filename") String filename) {
-
-        FileUpload fileUpload = fileUploadService.findByFilename(filename);
-
-        // No file found based on the supplied filename
-        if (fileUpload == null) {
-            return new ResponseEntity<>("{}", HttpStatus.NOT_FOUND);
-        }
-
-        // Generate the http headers with the file properties
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("content-disposition", "attachment; filename=" + fileUpload.getFilename());
-
-        // Split the mimeType into primary and sub types
-        String primaryType, subType;
-        try {
-            primaryType = fileUpload.getMimeType().split("/")[0];
-            subType = fileUpload.getMimeType().split("/")[1];
-        }
-            catch (IndexOutOfBoundsException | NullPointerException ex) {
-            return new ResponseEntity<>("{}", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        headers.setContentType( new MediaType(primaryType, subType) );
-
-        return new ResponseEntity<>(fileUpload.getFile(), headers, HttpStatus.OK);
-    }
-}*/
 	
 }

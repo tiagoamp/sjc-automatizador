@@ -13,7 +13,7 @@ $(document).ready(function () {
         $(this).attr("disabled",true);
     });    
     
-    $("#btn-salvar-saida").on('click', function (e) {        
+    $("#btn-gerar-saida").on('click', function (e) {        
         generateOutputSpreadsheet();
     });
     					
@@ -71,21 +71,22 @@ function loadSpreadsheetAtIndex( i ) {
 }
 
 function createMessagesPanels( file ) {
-    var msgs = file.messages;
-    if (msgs == null) return;
+    if (file.messages == null) return;
+    createErrorPanel(file);    
+    createAlertPanel(file);    
+}
 
-    // ERRORS
+function createErrorPanel( file ) {
+    var msgs = file.messages;
     var msgsErrorsUl = $("<ul>").addClass("text-danger");
 
-    var count = 0;
     for (i=0; i < msgs.length; i++) {
         if (msgs[i].type == "ERROR") {
             msgsErrorsUl.append( $("<li>").text(msgs[i].text) );
-            count++;
         }        
     }
-   
-    if (count > 0) {
+
+    if (msgsErrorsUl.children().length > 0) {
         var panelErrorDiv = $("<div>").addClass("panel panel-danger");
         var headErrorDiv = $("<div>").addClass("panel-heading");
         headErrorDiv.text(file.fileName);
@@ -96,50 +97,42 @@ function createMessagesPanels( file ) {
         panelErrorDiv.append(bodyErrorDiv);    
         $("#div-panel-errors").append(panelErrorDiv);
     }
+}
 
-    // WARNINGS
+function createAlertPanel( file ) {
+    var msgs = file.messages;
     var msgsWarnsUl = $("<ul>").addClass("text-warning");
-
-    count = 0;
+    
     for (i=0; i < msgs.length; i++) {
         if (msgs[i].type == "ALERT") {
             msgsWarnsUl.append( $("<li>").text(msgs[i].text) );
-            count++;
-        }        
+        }
     }
-   
-    if (count > 0) {
+
+    if (msgsWarnsUl.children().length > 0) {
         var panelWarnDiv = $("<div>").addClass("panel panel-warning");
         var headWarnDiv = $("<div>").addClass("panel-heading");
         headWarnDiv.text(file.fileName);
         var bodyWarnDiv = $("<div>").addClass("panel-body");
-
+    
         bodyWarnDiv.append(msgsWarnsUl);
         panelWarnDiv.append(headWarnDiv);
         panelWarnDiv.append(bodyWarnDiv);    
         $("#div-panel-warnings").append(panelWarnDiv);
     }
-    
 }
 
 function generateOutputSpreadsheet() {
-
-    console.log ("Gerando saída...");
-
     $.get("http://localhost:8080/sjc/output", function( data ) {
 		if (data == null) { 
             showErrorMessage("Erro ao acessar o arquivo nro " + i + ".");
             return;
         }
-        showSuccessMessage("Download!!");
+        showSuccessMessage("Planilha de saída gerada no diretório de 'resultado'!");
 	})
-    .fail( function() { showErrorMessage("Falha no download do arquivo.") } );
-    
-
-
-    // clean upload directory at the end
-
+    .fail( function() { showErrorMessage("Falha na geração da planilha de saída.") } );    
 }
+
 
 function showErrorMessage(msg) {
 	return new PNotify({
