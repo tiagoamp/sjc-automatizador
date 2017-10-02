@@ -16,6 +16,10 @@ $(document).ready(function () {
     $("#btn-gerar-saida").on('click', function (e) {        
         generateOutputSpreadsheet();
     });
+
+    $("#btn-salvar-pdf").on('click', function (e) {        
+        generateOutputMessageFile();
+    });    
     					
 });
 
@@ -123,14 +127,43 @@ function createAlertPanel( file ) {
 }
 
 function generateOutputSpreadsheet() {
-    $.get("http://localhost:8080/sjc/output", function( data ) {
-		if (data == null) { 
-            showErrorMessage("Erro ao acessar o arquivo nro " + i + ".");
-            return;
-        }
-        showSuccessMessage("Planilha de saída gerada no diretório de 'resultado'!");
-	})
-    .fail( function() { showErrorMessage("Falha na geração da planilha de saída.") } );    
+    // $.get("http://localhost:8080/sjc/output", function( data ) {
+	// 	if (data == null) { 
+    //         showErrorMessage("Erro ao acessar o arquivo nro " + i + ".");
+    //         return;
+    //     }
+    //     showSuccessMessage("Planilha de saída gerada no diretório de 'resultado'!");
+	// })
+    // .fail( function() { showErrorMessage("Falha na geração da planilha de saída.") } );    
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'http://localhost:8080/sjc/output', true);
+    xhr.responseType = 'arraybuffer';
+    xhr.onload = function(e) {
+       if (this.status == 200) {
+          var blob=new Blob([this.response], {type:"application/vnd.ms-excel"});
+          var link=document.createElement('a');
+          link.href=window.URL.createObjectURL(blob);
+          link.download="saida.xls";
+          link.click();
+       }
+    };
+    xhr.send();
+}
+
+function generateOutputMessageFile() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'http://localhost:8080/sjc/output/messages', true);
+    xhr.responseType = 'arraybuffer';
+    xhr.onload = function(e) {
+       if (this.status == 200) {
+          var blob=new Blob([this.response], {type:"application/pdf"});
+          var link=document.createElement('a');
+          link.href=window.URL.createObjectURL(blob);
+          link.download="mensagens.pdf";
+          link.click();
+       }
+    };
+    xhr.send();
 }
 
 

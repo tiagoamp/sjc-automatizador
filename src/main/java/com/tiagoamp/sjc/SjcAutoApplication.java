@@ -13,9 +13,8 @@ public class SjcAutoApplication {
 
 	
 	//FIXME
-	public static Path UPLOAD_DIR = Paths.get("DIR/TO/UPLOAD");
-	
-	
+	public static Path BASE_DIR = Paths.get("/home/d333280/Ti/proj/SJC/sjc-automatizador/");
+		
 	public static void main(String[] args) {
 		
 		try {
@@ -31,7 +30,7 @@ public class SjcAutoApplication {
 
 	
 	private static void cleanUploadDirectory() throws IOException {
-		Files.newDirectoryStream(UPLOAD_DIR).forEach( f -> {
+		Files.newDirectoryStream(BASE_DIR.resolve("upload/")).forEach( f -> {
 			try {
 				Files.delete(f);
 			} catch (IOException e) {

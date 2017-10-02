@@ -1,6 +1,7 @@
 package com.tiagoamp.sjc;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -14,17 +15,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.util.FileCopyUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
 import com.tiagoamp.sjc.service.SjcServicesFacade;
@@ -92,7 +94,7 @@ public class SjcController {
 		try {
 			List<Path> list = uploadService.getUploadedFilesPath(UPLOAD_DIR);
 			Path filepath = list.get(Integer.valueOf(index));
-			insheet = sjcService.loadInputSpreadsheet(filepath);
+			insheet = sjcService.loadInputSpreadsheet(filepath);			
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new ResponseProcessingException(Response.serverError().build(),e);
@@ -101,58 +103,28 @@ public class SjcController {
 	}
 	
 	@RequestMapping(value = "output", method = RequestMethod.GET)
-	public Response generateOutputSpreadsheet() {
+	@Produces( {"application/vnd.ms-excel"} )
+	public ResponseEntity<InputStreamResource> generateOutputSpreadsheet() {
 		try {
 			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(UPLOAD_DIR);
 			OutputSpreadsheet outsheet = sjcService.generateOutputSpreadSheet(list);
 			
 			LocalDate now = LocalDate.now();
 			Path resultFile = RESULT_DIR.resolve("Resultado_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".xls");
-			sjcService.generateOuputSpreadsheetFile(resultFile, outsheet);			
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new ResponseProcessingException(Response.serverError().build(),e);
-		}
-		return Response.ok().build();
-	}
-	
-	@RequestMapping(value = "output2", method = RequestMethod.GET, produces = "application/vnd.ms-excel")
-	public @ResponseBody HttpEntity<byte[]> getOutputSpreadsheet2() {
-		OutputSpreadsheet outsheet = null;
-		try {
-			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(UPLOAD_DIR);
-			outsheet = sjcService.generateOutputSpreadSheet(list);
-			
-			LocalDate now = LocalDate.now();
-			Path resultFile = RESULT_DIR.resolve("Resultado_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".xls");
 			sjcService.generateOuputSpreadsheetFile(resultFile, outsheet);
 			
-			byte[] document = FileCopyUtils.copyToByteArray(resultFile.toFile());
-		    HttpHeaders header = new HttpHeaders();
-		    header.setContentType(new org.springframework.http.MediaType("application", "vnd.ms-excel"));
-		    header.set("Content-Disposition", "inline; filename=" + resultFile.getFileName());
-		    header.setContentLength(document.length);
-		    return new HttpEntity<byte[]>(document, header);
-			
-			//return new FileSystemResource(resultFile.toFile()); 
-			
-			// Generate the http headers with the file properties
-	        /*HttpHeaders headers = new HttpHeaders();
-	        headers.add("content-disposition", "attachment; filename=" + resultFile.toString());
-
-	        // Split the mimeType into primary and sub types
-	        String primaryType, subType;
-	        try {
-	            primaryType = "application";
-	            subType = "vnd.ms-excel";
-	        }
-	            catch (IndexOutOfBoundsException | NullPointerException ex) {
-	            return new ResponseEntity<>("{}", HttpStatus.INTERNAL_SERVER_ERROR);
-	        }
-
-	        headers.setContentType( new org.springframework.http.MediaType(primaryType, subType) );
-
-	        return new ResponseEntity<>(resultFile.toFile(), headers, HttpStatus.OK);*/
+			HttpHeaders headers = new HttpHeaders();
+		    headers.setContentType(org.springframework.http.MediaType.parseMediaType("application/vnd.ms-excel"));
+		    headers.add("Access-Control-Allow-Origin", "*");
+		    headers.add("Access-Control-Allow-Methods", "GET, POST, PUT");
+		    headers.add("Access-Control-Allow-Headers", "Content-Type");
+		    headers.add("Content-Disposition", "filename=" + resultFile.getFileName());
+		    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		    headers.add("Pragma", "no-cache");
+		    headers.add("Expires", "0");
+		    
+		    ResponseEntity<InputStreamResource> response = new ResponseEntity<InputStreamResource>(new InputStreamResource(new FileInputStream(resultFile.toFile())), headers, HttpStatus.OK);
+		    return response;
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -160,5 +132,34 @@ public class SjcController {
 		}		
 	}
 	
-	
+	@RequestMapping(value = "output/messages", method = RequestMethod.GET)
+	@Produces( {"application/pdf"} )
+	public ResponseEntity<InputStreamResource> getOutputMessagesFile() {
+		OutputSpreadsheet outsheet = null;
+		try {
+			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(UPLOAD_DIR);
+			outsheet = sjcService.generateOutputSpreadSheet(list);
+			
+			LocalDate now = LocalDate.now();
+			Path resultFile = RESULT_DIR.resolve("Mensagens_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".pdf");
+			sjcService.generateOutputMessagesFile(resultFile, outsheet);
+			
+			HttpHeaders headers = new HttpHeaders();
+		    headers.setContentType(org.springframework.http.MediaType.parseMediaType("application/pdf"));
+		    headers.add("Access-Control-Allow-Origin", "*");
+		    headers.add("Access-Control-Allow-Methods", "GET, POST, PUT");
+		    headers.add("Access-Control-Allow-Headers", "Content-Type");
+		    headers.add("Content-Disposition", "filename=" + resultFile.getFileName());
+		    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		    headers.add("Pragma", "no-cache");
+		    headers.add("Expires", "0");
+		    
+		    ResponseEntity<InputStreamResource> response = new ResponseEntity<InputStreamResource>(new InputStreamResource(new FileInputStream(resultFile.toFile())), headers, HttpStatus.OK);
+		    return response;
+		} catch (IOException | DocumentException e) {
+			e.printStackTrace();
+			throw new ResponseProcessingException(Response.serverError().build(),e);
+		}		
+	}
+		
 }
