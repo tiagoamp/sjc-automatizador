@@ -71,7 +71,7 @@ function loadSpreadsheetAtIndex( i ) {
         showSuccessMessage("Planilha processada: " + data.fileName);                
         createMessagesPanels(data);
 	})
-	.fail( function() { showErrorMessage("Falha no acesso ao arquivo.") } );
+	.fail( function() { showErrorMessage("Falha no acesso ao arquivo (Índice = " + i + ").") } );
 }
 
 function createMessagesPanels( file ) {
