@@ -13,9 +13,12 @@ public class SjcAutoApplication {
 
 	
 	//FIXME
-	public static Path BASE_DIR = Paths.get("/home/d333280/Ti/proj/SJC/sjc-automatizador/");
+	public static Path BASE_DIR = null;
 		
 	public static void main(String[] args) {
+		
+		String userDirectory = System.getProperty("user.dir");
+		BASE_DIR = Paths.get(userDirectory);
 		
 		try {
 			cleanUploadDirectory();
@@ -24,8 +27,8 @@ public class SjcAutoApplication {
 			System.out.println("Erro ao limpar diretório de uploads!!!");
 			System.exit(1);
 		}
-		
-		SpringApplication.run(SjcAutoApplication.class, args);
+				
+		SpringApplication.run(SjcAutoApplication.class, args);		
 	}
 
 	

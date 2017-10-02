@@ -79,7 +79,8 @@ public class SjcController {
 	@RequestMapping(value = "upload", method = RequestMethod.DELETE)
 	public Response cleanUploadDirectory() {
 		try {
-			uploadService.cleanUploadDirectory(UPLOAD_DIR);
+			uploadService.cleanDirectory(UPLOAD_DIR);
+			uploadService.cleanDirectory(RESULT_DIR);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new ResponseProcessingException(Response.serverError().build(),e);
@@ -124,8 +125,7 @@ public class SjcController {
 		    headers.add("Expires", "0");
 		    
 		    ResponseEntity<InputStreamResource> response = new ResponseEntity<InputStreamResource>(new InputStreamResource(new FileInputStream(resultFile.toFile())), headers, HttpStatus.OK);
-		    return response;
-			
+		    return response;			
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new ResponseProcessingException(Response.serverError().build(),e);
