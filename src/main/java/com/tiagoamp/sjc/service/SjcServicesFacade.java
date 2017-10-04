@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +50,9 @@ public class SjcServicesFacade {
 		return outputSpreadSheet;
 	}
 	
-	public void generateOuputSpreadsheetFile(Path outputFile, OutputSpreadsheet outputSpreadsheet) throws IOException {
-		outputSpreadsheet.generateOuputSpreadsheetFile(outputFile);
+	public void generateOuputSpreadsheetFile(Path outputFile, OutputSpreadsheet outputSpreadsheet, Path templateFile) throws IOException {
+		if (templateFile == null) templateFile = Paths.get("resources","template_output.xlsx");		
+		outputSpreadsheet.generateOuputSpreadsheetFile(outputFile, templateFile);
 	}
 	
 	public void generateOutputMessagesFile(Path outputFile, OutputSpreadsheet outputSpreadsheet) throws FileNotFoundException, DocumentException  {

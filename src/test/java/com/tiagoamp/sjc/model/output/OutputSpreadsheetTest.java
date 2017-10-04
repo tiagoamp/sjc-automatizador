@@ -65,10 +65,10 @@ public class OutputSpreadsheetTest {
 	public void testGenerateOuputSpreadSheet_shouldGenerateFileInSystem() throws IOException {
 		List<InputSpreadsheet> inputlist = getInputSpreadsheetForTests();
 		outputSpreadsheet.loadDataFromInputSpreadSheets(inputlist);
-		Path templateFile = Paths.get("src","main","resources","sjc","template_output.xlsx");
+		Path templateFile = Paths.get("resources","template_output.xlsx");
 		Path outputTestFile = Paths.get("testfiles", "saida", "testOutFromSpreadSheetTest.xlsx");
 		
-		outputSpreadsheet.generateOuputSpreadsheetFile(outputTestFile);
+		outputSpreadsheet.generateOuputSpreadsheetFile(outputTestFile, templateFile);
 		assertTrue("File should be created in filesystem.", Files.exists(outputTestFile));
 		assertTrue("Output file must be bigger than original template file.", Files.size(outputTestFile) > Files.size(templateFile) );
 	}

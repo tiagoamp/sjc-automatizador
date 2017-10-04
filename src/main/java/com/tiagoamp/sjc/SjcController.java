@@ -45,6 +45,7 @@ public class SjcController {
 	
 	private final Path UPLOAD_DIR = SjcAutoApplication.BASE_DIR.resolve("upload/");
 	private final Path RESULT_DIR = SjcAutoApplication.BASE_DIR.resolve("resultado/");
+	private final Path RESOURCES_DIR = SjcAutoApplication.BASE_DIR.resolve("resources/");
 	
 		
 	@RequestMapping(value = "upload", method = RequestMethod.POST)
@@ -112,7 +113,8 @@ public class SjcController {
 			
 			LocalDate now = LocalDate.now();
 			Path resultFile = RESULT_DIR.resolve("Resultado_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".xls");
-			sjcService.generateOuputSpreadsheetFile(resultFile, outsheet);
+			Path templateFile = RESOURCES_DIR.resolve("template_output.xlsx");
+			sjcService.generateOuputSpreadsheetFile(resultFile, outsheet, templateFile);
 			
 			HttpHeaders headers = new HttpHeaders();
 		    headers.setContentType(org.springframework.http.MediaType.parseMediaType("application/vnd.ms-excel"));

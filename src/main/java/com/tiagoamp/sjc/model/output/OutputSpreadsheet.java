@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,15 +20,15 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.tiagoamp.sjc.model.input.InRow;
-import com.tiagoamp.sjc.model.input.InSheet;
-import com.tiagoamp.sjc.model.input.InputSpreadsheet;
-import com.tiagoamp.sjc.service.PDFGenerator;
 import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.LotacaoComparator;
 import com.tiagoamp.sjc.model.ProcessingMessage;
 import com.tiagoamp.sjc.model.SjcItemType;
 import com.tiagoamp.sjc.model.SjcSpecificCode;
+import com.tiagoamp.sjc.model.input.InRow;
+import com.tiagoamp.sjc.model.input.InSheet;
+import com.tiagoamp.sjc.model.input.InputSpreadsheet;
+import com.tiagoamp.sjc.service.PDFGenerator;
 
 public class OutputSpreadsheet {
 	
@@ -42,8 +41,6 @@ public class OutputSpreadsheet {
 	private List<OutSheet> sheets;
 	private Map<String,List<ProcessingMessage>> messages;
 	
-	private Path templateFile = Paths.get("src","main","resources","sjc","template_output.xlsx");
-	
 	
 	public void loadDataFromInputSpreadSheets(List<InputSpreadsheet> listInputSpreadSheets) {
 		for (InputSpreadsheet inputSpreadsheet : listInputSpreadSheets) {
@@ -52,7 +49,7 @@ public class OutputSpreadsheet {
 		}	
 	}
 	
-	public void generateOuputSpreadsheetFile(Path outputFile) throws IOException  {
+	public void generateOuputSpreadsheetFile(Path outputFile, Path templateFile) throws IOException  {		
 		createOutputFileInSystem(outputFile, templateFile);
 		populateOutputFile(outputFile);
 	}

@@ -1,5 +1,6 @@
 package com.tiagoamp.sjc.model;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,7 +12,7 @@ import com.tiagoamp.sjc.SjcAutoApplication;
 
 public class ExpirationManager {
 	
-	private final Path CONFIG_FILE = SjcAutoApplication.BASE_DIR.resolve("conf.dat");
+	private final Path CONFIG_FILE = SjcAutoApplication.BASE_DIR.resolve("resources" + File.separator + "conf.dat");
 	
 	public Boolean checkExpiration() throws ConfigurationException, IOException {
 		byte[] bytesArr = Files.readAllBytes(CONFIG_FILE);

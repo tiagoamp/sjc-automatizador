@@ -54,7 +54,7 @@ public class SjcServicesFacadeTest {
 		List<InputSpreadsheet> inputlist = facade.loadInputSpreadsheetsFromDirectory(Paths.get("testfiles", "entrada"));
 		OutputSpreadsheet outspreadsheet = facade.generateOutputSpreadSheet(inputlist);
 		Path outputfile = Paths.get("testfiles", "saida", "testOutFromFacadeTest.xlsx");
-		facade.generateOuputSpreadsheetFile(outputfile, outspreadsheet);
+		facade.generateOuputSpreadsheetFile(outputfile, outspreadsheet, null);
 		assertTrue("Must generate output spreadsheet file.", Files.exists(outputfile));
 	}
 	
