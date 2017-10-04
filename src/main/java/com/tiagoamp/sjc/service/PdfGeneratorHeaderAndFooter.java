@@ -1,6 +1,7 @@
 package com.tiagoamp.sjc.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import com.itextpdf.text.Chunk;
@@ -26,7 +27,7 @@ public class PdfGeneratorHeaderAndFooter extends PdfPageEventHelper{
 		fontHeader.setSize(14);
 		fontHeader.setStyle(Font.BOLD);
 		fontHeader.setStyle(Font.UNDERLINE);
-		header = new Paragraph(headerText, fontHeader);
+		header = new Paragraph(headerText  + " [ " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + " hrs ]", fontHeader);
         
 		Font fontFooter = new Font();
 		fontFooter.setSize(12);

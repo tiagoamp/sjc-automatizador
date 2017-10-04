@@ -69,27 +69,30 @@ public class PDFGenerator {
     }
     
     private PdfPTable addRows(PdfPTable table, String filename, List<ProcessingMessage> list) throws DocumentException {
-    	Font font = new Font();
-		font.setSize(14);
-		
-        for (ProcessingMessage msg : list) {
-        	table.addCell(filename);
+    	for (ProcessingMessage msg : list) {
+    		table.addCell(filename);
         	
-        	Phrase pMsgType = null;
-        	Phrase pMsgText = null;
-        	if (msg.getType() == MessageType.ALERT) {
-        		font.setColor(218, 165, 32);
-        		pMsgType = new Phrase("ALERTA",font);        		
-        		pMsgText = new Phrase(msg.getText(), font);        		
-        	} else {
-        		font.setColor(255, 55, 0);
-        		pMsgType = new Phrase("ERRO",font);
-        		pMsgText = new Phrase(msg.getText(), font);
-        	}
+    		Font font = getFont(msg.getType());
+    		String typeText = msg.getType() == MessageType.ALERT ? "ALERTA" : "ERROR";
+        	
+    		Phrase pMsgType = new Phrase(typeText,font);
+        	Phrase pMsgText = new Phrase(msg.getText(), font);
+        	
         	table.addCell(pMsgType);
             table.addCell(pMsgText);
 		}
     	return table;        
+    }
+    
+    private Font getFont(MessageType type) {
+    	Font font = new Font();
+    	font.setSize(14);
+    	if (type == MessageType.ALERT) {
+    		font.setColor(218, 165, 32);
+    	} else {
+    		font.setColor(255, 55, 0);
+    	}
+    	return font;
     }
         
 }

@@ -30,7 +30,7 @@ public class InputSpreadsheetTest {
 	
 	@Test
 	public void testLoadFromFile_directory_shouldReturnErrorProcessingMessage() throws IOException {
-		Path directoryFile = Paths.get("testfiles","entrada","dummyDirectory");
+		Path directoryFile = Paths.get("testfiles","entrada","dummyDirectory");		
 		inputSpreadsheet.loadFromFile(directoryFile);
 		assertTrue("Processing messages must not be empty", !inputSpreadsheet.getMessages().isEmpty());
 		assertEquals("Must have directory error message", MessageType.ERROR, inputSpreadsheet.getMessages().get(0).getType());
