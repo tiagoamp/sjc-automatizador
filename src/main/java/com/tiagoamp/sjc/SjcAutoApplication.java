@@ -53,7 +53,10 @@ public class SjcAutoApplication {
 		}
 		
 		// Up the Web App
-		SpringApplication.run(SjcAutoApplication.class, args);		
+		SpringApplication.run(SjcAutoApplication.class, args);	
+		
+		System.out.println("---");
+		System.out.println("*** System deployed ==> http://localhost:8090/");
 	}
 	 
 }

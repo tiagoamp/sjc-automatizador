@@ -25,7 +25,7 @@ $(document).ready(function () {
 
 function cleanUploads() {
     $.ajax({
-        url:"http://localhost:8080/sjc/upload",
+        url:"http://localhost:8090/sjc/upload",
         type:"DELETE",
         success: function (data){
             showSuccessMessage("Arquivos do diretório apagados!");            
@@ -42,7 +42,7 @@ function process() {
 }
 
 function getNumberOfUploadedSpreadsheets( callback ) {
-    $.get("http://localhost:8080/sjc/upload/total", function( data ) {
+    $.get("http://localhost:8090/sjc/upload/total", function( data ) {
         if (data == 0) {
             showErrorMessage("Não foram encontrados arquivos no diretório de uploads!");
             $("#btn-processar").attr("disabled",false);
@@ -63,7 +63,7 @@ function loadSpreadsheets(total) {
 function loadSpreadsheetAtIndex( i ) {
     var input = { index: i };
 	
-	$.get("http://localhost:8080/sjc/input", input, function( data ) {
+	$.get("http://localhost:8090/sjc/input", input, function( data ) {
 		if (data == null) { 
             showErrorMessage("Erro ao acessar o arquivo nro " + i + ".");
             return;
@@ -127,16 +127,8 @@ function createAlertPanel( file ) {
 }
 
 function generateOutputSpreadsheet() {
-    // $.get("http://localhost:8080/sjc/output", function( data ) {
-	// 	if (data == null) { 
-    //         showErrorMessage("Erro ao acessar o arquivo nro " + i + ".");
-    //         return;
-    //     }
-    //     showSuccessMessage("Planilha de saída gerada no diretório de 'resultado'!");
-	// })
-    // .fail( function() { showErrorMessage("Falha na geração da planilha de saída.") } );    
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'http://localhost:8080/sjc/output', true);
+    xhr.open('GET', 'http://localhost:8090/sjc/output', true);
     xhr.responseType = 'arraybuffer';
     xhr.onload = function(e) {
        if (this.status == 200) {
@@ -152,7 +144,7 @@ function generateOutputSpreadsheet() {
 
 function generateOutputMessageFile() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'http://localhost:8080/sjc/output/messages', true);
+    xhr.open('GET', 'http://localhost:8090/sjc/output/messages', true);
     xhr.responseType = 'arraybuffer';
     xhr.onload = function(e) {
        if (this.status == 200) {
