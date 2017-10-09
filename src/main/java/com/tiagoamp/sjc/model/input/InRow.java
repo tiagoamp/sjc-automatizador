@@ -7,6 +7,7 @@ public class InRow {
 	private Integer qtdHoraExtra;
 	private Integer qtdAdicionalNoturno;
 	private Integer qtdPlantoesExtra;
+	private String[] dtPlantoesExtras = new String[5];
 	
 	
 	@Override
@@ -45,6 +46,12 @@ public class InRow {
 	}
 	public void setQtdPlantoesExtra(Integer qtdPlantoesExtra) {
 		this.qtdPlantoesExtra = qtdPlantoesExtra;
-	}	
+	}
+	public String[] getDtPlantoesExtras() {
+		return dtPlantoesExtras;
+	}
+	public void setDtPlantoesExtras(String[] dtPlantoesExtras) {
+		this.dtPlantoesExtras = dtPlantoesExtras;
+	}
 	
 }

@@ -11,9 +11,10 @@ public class OutRow {
 		this.matricula = matricula;
 	}
 	
-	public OutRow(String lotacao, String nome, String matricula, Integer quantidade) {
+	public OutRow(String lotacao, String nome, String matricula, Integer quantidade, String[] dtPlantoesEstras) {
 		this(lotacao, nome, matricula);
 		this.quantidade = quantidade;
+		this.dtPlantoesExtras = dtPlantoesEstras;
 	}
 	
 	
@@ -21,6 +22,7 @@ public class OutRow {
 	private String nome;
 	private String matricula;
 	private Integer quantidade;
+	private String[] dtPlantoesExtras = new String[5];
 	
 	
 	public String getLotacao() {
@@ -46,6 +48,12 @@ public class OutRow {
 	}
 	public void setQuantidade(Integer quantidade) {
 		this.quantidade = quantidade;
+	}
+	public String[] getDtPlantoesExtras() {
+		return dtPlantoesExtras;
+	}
+	public void setDtPlantoesExtras(String[] dtPlantoesExtras) {
+		this.dtPlantoesExtras = dtPlantoesExtras;
 	}
 
 }

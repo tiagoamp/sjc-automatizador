@@ -83,6 +83,7 @@ public class OutputSpreadsheet {
 			outRow.setQuantidade(inRow.getQtdAdicionalNoturno());
 		} else if (code.getType() == SjcItemType.PLANTAO_EXTRA) {
 			outRow.setQuantidade(inRow.getQtdPlantoesExtra());
+			outRow.setDtPlantoesExtras(inRow.getDtPlantoesExtras());
 		}
 		return outRow;
 	}
@@ -126,7 +127,7 @@ public class OutputSpreadsheet {
 				XSSFSheet xssfsheet = xssfworkbook.getSheet(String.valueOf(code.getCode()));
 				this.fillNewOuputRowsInExcelSheet(xssfsheet, data);
 				
-				for (int j = 0; j < 4; j++) {
+				for (int j = 0; j < 9; j++) {
 					xssfsheet.autoSizeColumn(j); // column adjusting
 				}
 			}
@@ -138,7 +139,9 @@ public class OutputSpreadsheet {
 		Map<Integer, Object[]> data = new HashMap<>();
 		Integer counter = 0;	         
 		for (OutRow outRow : sheet.getOutputrows()) {
-			data.put(counter, new Object[] {outRow.getLotacao(), outRow.getNome(), outRow.getMatricula(), outRow.getQuantidade()});
+			data.put(counter, new Object[] {outRow.getLotacao(), outRow.getNome(), outRow.getMatricula(), outRow.getQuantidade(), 
+					outRow.getDtPlantoesExtras()[0], outRow.getDtPlantoesExtras()[1], outRow.getDtPlantoesExtras()[2], 
+					outRow.getDtPlantoesExtras()[3], outRow.getDtPlantoesExtras()[4]});
 			counter++;
     	}
 		return data;

@@ -121,12 +121,18 @@ public class InSheet {
                 		    cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_03 || 
                 		    cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_04 || 
                 		    cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_05) 
-                		   ) { 
+                		   ) {
+                	int indexPlantao = cell.getColumnIndex() - INDEX_COLUMN_PLANTOESEXTRAS_01; // getting index of 'plantao' from 0 to 4 (there may be 5 plantoes
+                	if (!df.formatCellValue(cell).isEmpty()) {
+                		inrow.getDtPlantoesExtras()[indexPlantao] = df.formatCellValue(cell);
+                	}
+                	
                 	String dataPlantaoExtra = df.formatCellValue(cell);
                 	if (dataPlantaoExtra != null && !dataPlantaoExtra.isEmpty() && !hasNoNumbers(dataPlantaoExtra)) {                		
                 		qtdDatasPlantoes++;                		
                 	}
-                }                
+                }
+                
             } 
             
             if (!endOfData && StringUtils.isNotEmpty(inrow.getNome())) {
