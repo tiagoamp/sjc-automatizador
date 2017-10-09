@@ -29,12 +29,13 @@ public class ExpirationManager {
 	}
 	
 	private Integer computeExpirationNumber() {
-		int year = LocalDate.now().getYear();
+		LocalDate now = LocalDate.now();
+		int yearmonth = now.getYear() + now.getMonthValue();
 		Integer result = null;
-		if (year % 2 == 0) {
-			result = year * 30;
+		if (now.getMonthValue() % 2 == 0) {
+			result = yearmonth * 30;
 		} else {
-			result = year * 40;
+			result = yearmonth * 40;
 		}
 		return result;
 	}
