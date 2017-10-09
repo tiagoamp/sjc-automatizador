@@ -4,8 +4,8 @@ public enum SjcSpecificCode {
 
 	ADMINISTRATIVO_ADICIONALNOTURNO(1033, "Administrativo - Adicional Noturno", SjcGeneralCode.ADMINISTRATIVO, SjcItemType.ADICIONAL_NOTURNO),
 	ADMINISTRATIVO_HORAEXTRA(1075,"Administrativo - Hora Extra", SjcGeneralCode.ADMINISTRATIVO, SjcItemType.HORA_EXTRA),
-	OPERACIONAL_ADICIONALNOTURNO(1078,"Operacional - Adicional Noturno", SjcGeneralCode.OPERACIONAL, SjcItemType.ADICIONAL_NOTURNO),
-	OPERACIONAL_HORAEXTRA(1035,"Operacional - Hora Extra", SjcGeneralCode.OPERACIONAL, SjcItemType.HORA_EXTRA),
+	OPERACIONAL_ADICIONALNOTURNO(1178,"Operacional - Adicional Noturno", SjcGeneralCode.OPERACIONAL, SjcItemType.ADICIONAL_NOTURNO),
+	OPERACIONAL_HORAEXTRA(1135,"Operacional - Hora Extra", SjcGeneralCode.OPERACIONAL, SjcItemType.HORA_EXTRA),
 	OPERACIONAL_PLANTOESEXTRA(1003,"Operacional - Plantao Extra", SjcGeneralCode.OPERACIONAL, SjcItemType.PLANTAO_EXTRA);
 		
 	

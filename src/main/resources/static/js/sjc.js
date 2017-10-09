@@ -9,15 +9,19 @@ $(document).ready(function () {
 	
     $("#btn-processar").on('click', function (e) {        
         $("#div-result").hide();
+        $("#spin-div").spin();
         process();
         $(this).attr("disabled",true);
+        $("#spin-div").spin(false);
     });    
     
-    $("#btn-gerar-saida").on('click', function (e) {        
+    $("#btn-gerar-saida").on('click', function (e) {
+        $("#spin-div").spin();
         generateOutputSpreadsheet();
     });
 
-    $("#btn-salvar-pdf").on('click', function (e) {        
+    $("#btn-salvar-pdf").on('click', function (e) {
+        $("#spin-div").spin();
         generateOutputMessageFile();
     });    
     					
@@ -57,7 +61,7 @@ function getNumberOfUploadedSpreadsheets( callback ) {
 function loadSpreadsheets(total) {
     for (i=0; i < total; i++) {
         loadSpreadsheetAtIndex(i);
-    }
+    }    
 }
 
 function loadSpreadsheetAtIndex( i ) {
@@ -137,6 +141,7 @@ function generateOutputSpreadsheet() {
           link.href=window.URL.createObjectURL(blob);
           link.download="saida.xls";
           link.click();
+          $("#spin-div").spin(false);
        }
     };
     xhr.send();
@@ -153,6 +158,7 @@ function generateOutputMessageFile() {
           link.href=window.URL.createObjectURL(blob);
           link.download="mensagens.pdf";
           link.click();
+          $("#spin-div").spin(false);
        }
     };
     xhr.send();
