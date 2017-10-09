@@ -1,6 +1,7 @@
 package com.tiagoamp.sjc;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -22,7 +23,7 @@ public class SjcAutoApplication {
 		
 		String userDirectory = System.getProperty("user.dir");
 		BASE_DIR = Paths.get(userDirectory);
-		
+				
 		ExpirationManager config = new ExpirationManager();		
 		try {
 			boolean isValid = config.checkExpiration();
@@ -35,20 +36,20 @@ public class SjcAutoApplication {
 				System.exit(1);
 			}
 			System.out.println("Configuration ok!");
-		} catch (ConfigurationException | IOException e1) {			
+			
+			createMissingDirectories(BASE_DIR.resolve("upload/"), BASE_DIR.resolve("resultado/"));
+			
+			UploadService uploadService = new UploadService();
+			uploadService.cleanDirectory(BASE_DIR.resolve("upload/"));
+			
+		} catch (ConfigurationException e) {			
 			System.out.println(" =========================================== ");
 			System.out.println(" !!! Arquivo de configuração corrompido !!!");
 			System.out.println(" =========================================== ");
 			System.exit(1);
-		}
-		
-		try {
-			UploadService uploadService = new UploadService();
-			uploadService.cleanDirectory(BASE_DIR.resolve("upload/"));
-			
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Erro ao limpar diretório de uploads!!!");
+			System.out.println("Erro ao acessar diretórios ('uploads' e/ou 'resultados') !!!");
 			System.exit(1);
 		}
 		
@@ -57,6 +58,15 @@ public class SjcAutoApplication {
 		
 		System.out.println("---");
 		System.out.println("*** System deployed ==> http://localhost:8090/");
+	}
+	
+	
+	private static void createMissingDirectories(Path... paths) throws IOException {
+		for (int i = 0; i < paths.length; i++) {
+			if (Files.notExists(paths[i])) {
+				Files.createDirectories(paths[i]);
+			}
+		}		
 	}
 	 
 }
