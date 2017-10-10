@@ -31,21 +31,33 @@ public class DataPlantaoFieldProcessorTest {
 	}
 	
 	@Test
+	public void testProcess_emptyValue_shouldReturnEmptyString() {
+		String result = inputFieldProcessor.process("");
+		assertEquals("Result should be empty string for empty input", "", result);		
+	}
+	
+	@Test
 	public void testProcess_onlyDayInput_shouldReturnCompletedValue() {
 		String result = inputFieldProcessor.process("12");
-		assertEquals("Result should contains month and year concat.", "12/OUTUBRO/2017", result);		
+		assertEquals("Result should contains month and year concat.", "12/10/2017", result);		
 	}
 	
 	@Test
 	public void testProcess_dayMonthInput_shouldReturnCompletedValue() {
 		String result = inputFieldProcessor.process("12/jun");
-		assertEquals("Result should contains year concat.", "12/jun/2017", result);		
+		assertEquals("Result should contains year concat.", "12/06/2017", result);		
 	}
 	
 	@Test
 	public void testProcess_dayMonthYearInput_shouldReturnSameValue() {
 		String result = inputFieldProcessor.process("12/12/2012");
 		assertEquals("Result should return same full input date.", "12/12/2012", result);		
+	}
+	
+	@Test
+	public void testProcess_dateSeparatedByDotInput_shouldReturnSameValue() {
+		String result = inputFieldProcessor.process("12.12.2012");
+		assertEquals("Result should return same full input date with slashs.", "12/12/2012", result);		
 	}
 	
 }

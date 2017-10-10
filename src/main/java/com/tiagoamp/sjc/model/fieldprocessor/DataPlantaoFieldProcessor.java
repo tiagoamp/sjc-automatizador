@@ -1,5 +1,7 @@
 package com.tiagoamp.sjc.model.fieldprocessor;
 
+import java.time.LocalDate;
+
 public class DataPlantaoFieldProcessor extends FieldProcessor {
 	
 	private String month;
@@ -13,6 +15,11 @@ public class DataPlantaoFieldProcessor extends FieldProcessor {
 	public DataPlantaoFieldProcessor(String month, String year) {
 		this.month = month;
 		this.year = year;
+		
+		if (this.month == null) this.month = String.valueOf(LocalDate.now().minusMonths(1).getMonthValue());
+		if (this.year == null) this.year = String.valueOf(LocalDate.now().getYear());
+		
+		this.month = this.month.toLowerCase();
 	}
 	
 	
@@ -21,16 +28,19 @@ public class DataPlantaoFieldProcessor extends FieldProcessor {
 			return "";
 		}
 		
+		inputValue = inputValue.replace("-", "/").replace(".", "/").toLowerCase();
+		
 		if ( inputValue.matches(REGEX_FULL_DATE) ) {
-			return inputValue;
+			return inputValue.replace("[-]", "/").replace(".", "/");
 		}
 		
 		if ( inputValue.matches(REGEX_DAY_MONTH) ) {
-			return inputValue + "/" + year;
+			String str[] = inputValue.split("/");
+			return str[0] + "/" + MonthConverter.getConvertedMonthValue(str[1]) + "/" + year;
 		}
 		
 		if ( inputValue.matches(REGEX_DAY_ONLY) ) {
-			return inputValue + "/" + month + "/" + year;
+			return inputValue + "/" + MonthConverter.getConvertedMonthValue(month) + "/" + year;
 		}
 		
 		return "";
