@@ -11,7 +11,7 @@ public abstract class FieldProcessor {
 	protected List<ProcessingMessage> messages = new ArrayList<>();
 
 	public static final Pattern nonNumericPattern = Pattern.compile("[^0-9]");
-	public static final Pattern NumericPattern = Pattern.compile("[0-9]");
+	public static final Pattern numericPattern = Pattern.compile("[0-9]");
     
     public abstract String process(String inputValue);
 	

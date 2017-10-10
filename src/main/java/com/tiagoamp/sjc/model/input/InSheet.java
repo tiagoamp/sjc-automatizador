@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellAddress;
@@ -16,6 +17,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import com.tiagoamp.sjc.model.MessageType;
 import com.tiagoamp.sjc.model.ProcessingMessage;
 import com.tiagoamp.sjc.model.SjcGeneralCode;
+import com.tiagoamp.sjc.model.fieldprocessor.DataPlantaoFieldProcessor;
 import com.tiagoamp.sjc.model.fieldprocessor.FieldProcessor;
 import com.tiagoamp.sjc.model.fieldprocessor.MatriculaFieldProcessor;
 import com.tiagoamp.sjc.model.fieldprocessor.NumericFieldProcessor;
@@ -31,6 +33,8 @@ public class InSheet {
 	private SjcGeneralCode code;
 	private List<InRow> inputrows;
 	private List<ProcessingMessage> messages;
+	private String monthRef;
+	private String yearRef;
 	
 	
 	@Override
@@ -39,26 +43,26 @@ public class InSheet {
 	}
 	
 	
-	public String loadLotacaoFrom(XSSFSheet xssfsheet) {
-		CellAddress lotacaoCellAddress = getLotacaoFieldCellAddress(xssfsheet.getSheetName());
-		
+	@SuppressWarnings("deprecation")
+	public String loadCellValueFrom(XSSFSheet xssfsheet, CellAddress cellAddress) {
 		Iterator<Row> rowItr = xssfsheet.iterator(); // Setting row
 		if (!rowItr.hasNext()) return null;
 		Row row = rowItr.next();
-		while ( rowItr.hasNext() && row.getRowNum() < lotacaoCellAddress.getRow() ) {
+		while ( rowItr.hasNext() && row.getRowNum() < cellAddress.getRow() ) {
 			row = rowItr.next();
 		}
 		
 		Iterator<Cell> cellIterator = row.cellIterator(); // Setting column
 		while (cellIterator.hasNext()) {
 			Cell cell = cellIterator.next();
-			if ( cell.getAddress().compareTo(lotacaoCellAddress) == 0 ) {
-				return cell.getStringCellValue();
+			if ( cell.getAddress().compareTo(cellAddress) == 0 ) {
+				if (CellType.STRING.compareTo(cell.getCellTypeEnum()) == 0) return cell.getStringCellValue();
+				if (CellType.NUMERIC.compareTo(cell.getCellTypeEnum()) == 0) return String.valueOf(Integer.valueOf((int) cell.getNumericCellValue()));
 			}					
 		}
 		return null;
 	}
-	
+				
 	public void loadDataFrom(XSSFSheet excelsheet) {
 		Boolean endOfData = false;
 		DataFormatter df = new DataFormatter();
@@ -123,13 +127,11 @@ public class InSheet {
                 		    cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_05) 
                 		   ) {
                 	int indexPlantao = cell.getColumnIndex() - INDEX_COLUMN_PLANTOESEXTRAS_01; // getting index of 'plantao' from 0 to 4 (there may be 5 plantoes
-                	if (!df.formatCellValue(cell).isEmpty()) {
-                		inrow.getDtPlantoesExtras()[indexPlantao] = df.formatCellValue(cell);
-                	}
-                	
                 	String dataPlantaoExtra = df.formatCellValue(cell);
                 	if (dataPlantaoExtra != null && !dataPlantaoExtra.isEmpty() && !hasNoNumbers(dataPlantaoExtra)) {                		
                 		qtdDatasPlantoes++;                		
+                		fieldProcessor = new DataPlantaoFieldProcessor(monthRef, yearRef);
+                		inrow.getDtPlantoesExtras()[indexPlantao] = fieldProcessor.process(dataPlantaoExtra);
                 	}
                 }
                 
@@ -142,21 +144,12 @@ public class InSheet {
         }        
 	}
 	
-	private CellAddress getLotacaoFieldCellAddress(String sheetName) {
-		if (sheetName.equals(SjcGeneralCode.OPERACIONAL.getDescription().toUpperCase())) {
-			return new CellAddress(CELL_ADDRESS_LOTACAO_OPERACIONAL);
-		} else if (sheetName.equals(SjcGeneralCode.ADMINISTRATIVO.getDescription().toUpperCase())) {
-			return new CellAddress(CELL_ADDRESS_LOTACAO_ADMISTRATIVO);
-		}
-		return null;
-	}
-	
 	private boolean isEndOfData(String value) {
 		return value.startsWith("Tipos de afastamentos");
 	}
 
 	private boolean hasNoNumbers(String value) {    	 
-    	return !FieldProcessor.NumericPattern.matcher(value).find();
+    	return !FieldProcessor.numericPattern.matcher(value).find();
     }
 		
 	public void print() {
@@ -184,6 +177,18 @@ public class InSheet {
 	}
 	public void setMessages(List<ProcessingMessage> messages) {
 		this.messages = messages;
+	}
+	public String getMonthRef() {
+		return monthRef;
+	}
+	public void setMonthRef(String monthRef) {
+		this.monthRef = monthRef;
+	}
+	public String getYearRef() {
+		return yearRef;
+	}
+	public void setYearRef(String yearRef) {
+		this.yearRef = yearRef;
 	}
 		
 }

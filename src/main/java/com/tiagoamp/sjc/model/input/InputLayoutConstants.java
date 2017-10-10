@@ -17,5 +17,11 @@ public abstract class InputLayoutConstants {
 	
 	public static final String CELL_ADDRESS_LOTACAO_OPERACIONAL = "E3";
 	public static final String CELL_ADDRESS_LOTACAO_ADMISTRATIVO = "B3";
+	
+	public static final String CELL_ADDRESS_MES_OPERACIONAL = "I3";
+	public static final String CELL_ADDRESS_MES_ADMISTRATIVO = "G3";
 
+	public static final String CELL_ADDRESS_ANO_OPERACIONAL = "K3";
+	public static final String CELL_ADDRESS_ANO_ADMISTRATIVO = "J3";
+	
 }

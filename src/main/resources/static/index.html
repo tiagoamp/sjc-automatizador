@@ -12,6 +12,29 @@
 	<link href="vendors/dropzone/dist/min/dropzone.min.css" rel="stylesheet">
 	<link href="css/pnotify.custom.min.css" rel="stylesheet">
 		
+	<style>
+		.loader {
+		  border: 16px solid #f3f3f3;
+		  border-radius: 50%;
+		  border-top: 16px solid #3498db;
+		  width: 120px;
+		  height: 120px;
+		  -webkit-animation: spin 2s linear infinite;
+		  animation: spin 2s linear infinite;
+		  margin: auto;
+		}
+		
+		@-webkit-keyframes spin {
+		  0% { -webkit-transform: rotate(0deg); }
+		  100% { -webkit-transform: rotate(360deg); }
+		}
+		
+		@keyframes spin {
+		  0% { transform: rotate(0deg); }
+		  100% { transform: rotate(360deg); }
+		}
+	</style>
+
 </head>
 <body>
 
@@ -49,7 +72,7 @@
 
 	<hr />
 
-	<div id="spin-div"></div>
+	<div class="loader"></div>
 
 	<div class="row" id="div-result">
 		<div class="col-xs-10 col-md-offset-1">
@@ -90,13 +113,11 @@
 
 <script src="js/jquery-3.2.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
+<script src="js/download.js"></script>
 <script src="vendors/fastclick/lib/fastclick.js"></script>
 <script src="vendors/nprogress/nprogress.js"></script>
 <script src="vendors/dropzone/dist/min/dropzone.min.js"></script>
 <script src="js/pnotify.custom.min.js"></script>
-<script src="js/download.js"></script>
-<script src="js/spin.js"></script>
-<script src="js/jquery.spin.js"></script>
 <script src="js/sjc.js"></script>
 
 </body>

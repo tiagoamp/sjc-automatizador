@@ -73,7 +73,7 @@ public class PDFGenerator {
     		table.addCell(filename);
         	
     		Font font = getFont(msg.getType());
-    		String typeText = msg.getType() == MessageType.ALERT ? "ALERTA" : "ERROR";
+    		String typeText = msg.getType() == MessageType.ALERT ? "ALERTA" : "ERRO";
         	
     		Phrase pMsgType = new Phrase(typeText,font);
         	Phrase pMsgText = new Phrase(msg.getText(), font);

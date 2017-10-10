@@ -1,5 +1,12 @@
 package com.tiagoamp.sjc.model.input;
 
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.CELL_ADDRESS_ANO_ADMISTRATIVO;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.CELL_ADDRESS_ANO_OPERACIONAL;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.CELL_ADDRESS_LOTACAO_ADMISTRATIVO;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.CELL_ADDRESS_LOTACAO_OPERACIONAL;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.CELL_ADDRESS_MES_ADMISTRATIVO;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.CELL_ADDRESS_MES_OPERACIONAL;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,6 +14,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -25,6 +33,8 @@ public class InputSpreadsheet {
 	private String lotacao;
 	private List<InSheet> sheets;
 	private List<ProcessingMessage> messages;
+	private String monthRef;
+	private String yearRef;
 	
 	
 	public void loadFromFile(Path inputFile) throws IOException {
@@ -41,7 +51,20 @@ public class InputSpreadsheet {
 	            	messages.add(new ProcessingMessage(MessageType.ERROR, "Aba '" + code.getDescription().toUpperCase() +"' não encontrada na planilha."));
 	            } else {
 	            	InSheet sheet = new InSheet(code);
-	            	if (lotacao == null) lotacao = sheet.loadLotacaoFrom(xssfsheet);	            	
+	            	if (lotacao == null) {
+	            		CellAddress lotacaoCellAddress = getLotacaoFieldCellAddress(xssfsheet.getSheetName());
+	            		lotacao = sheet.loadCellValueFrom(xssfsheet, lotacaoCellAddress);
+	            	}
+	            	if (monthRef == null) {
+	            		CellAddress mesCellAddress = getMesReferenciaFieldCellAddress(xssfsheet.getSheetName());
+	            		monthRef = sheet.loadCellValueFrom(xssfsheet, mesCellAddress);
+	            	}
+	            	if (yearRef == null) {
+	            		CellAddress anoCellAddress = getAnoReferenciaFieldCellAddress(xssfsheet.getSheetName());
+	            		yearRef = sheet.loadCellValueFrom(xssfsheet, anoCellAddress);	            		
+	            	}
+	            	sheet.setMonthRef(monthRef);
+	            	sheet.setYearRef(yearRef);
 	            	sheet.loadDataFrom(xssfsheet);
 	            	if (sheet.getInputrows().isEmpty()) continue;
 	            	messages.addAll(sheet.getMessages());
@@ -74,6 +97,33 @@ public class InputSpreadsheet {
 		}
 		return result;
 	}
+	
+	private CellAddress getLotacaoFieldCellAddress(String sheetName) {
+		if (sheetName.equals(SjcGeneralCode.OPERACIONAL.getDescription().toUpperCase())) {
+			return new CellAddress(CELL_ADDRESS_LOTACAO_OPERACIONAL);
+		} else if (sheetName.equals(SjcGeneralCode.ADMINISTRATIVO.getDescription().toUpperCase())) {
+			return new CellAddress(CELL_ADDRESS_LOTACAO_ADMISTRATIVO);
+		}
+		return null;
+	}
+	
+	private CellAddress getMesReferenciaFieldCellAddress(String sheetName) {
+		if (sheetName.equals(SjcGeneralCode.OPERACIONAL.getDescription().toUpperCase())) {
+			return new CellAddress(CELL_ADDRESS_MES_OPERACIONAL);
+		} else if (sheetName.equals(SjcGeneralCode.ADMINISTRATIVO.getDescription().toUpperCase())) {
+			return new CellAddress(CELL_ADDRESS_MES_ADMISTRATIVO);
+		}
+		return null;
+	}
+	
+	private CellAddress getAnoReferenciaFieldCellAddress(String sheetName) {
+		if (sheetName.equals(SjcGeneralCode.OPERACIONAL.getDescription().toUpperCase())) {
+			return new CellAddress(CELL_ADDRESS_ANO_OPERACIONAL);
+		} else if (sheetName.equals(SjcGeneralCode.ADMINISTRATIVO.getDescription().toUpperCase())) {
+			return new CellAddress(CELL_ADDRESS_ANO_ADMISTRATIVO);
+		}
+		return null;
+	}
 		
 	
 	public List<InSheet> getSheets() {
@@ -99,6 +149,18 @@ public class InputSpreadsheet {
 	}
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+	public String getMonthRef() {
+		return monthRef;
+	}
+	public void setMonthRef(String monthRef) {
+		this.monthRef = monthRef;
+	}
+	public String getYearRef() {
+		return yearRef;
+	}
+	public void setYearRef(String yearRef) {
+		this.yearRef = yearRef;
 	}
 	
 }

@@ -1,6 +1,7 @@
 $(document).ready(function () {
     
     $("#div-result").hide();
+    $(".loader").hide();
 
     $("#btn-clean-upload").on('click', function (e) {
         $("#div-result").hide();
@@ -9,19 +10,19 @@ $(document).ready(function () {
 	
     $("#btn-processar").on('click', function (e) {        
         $("#div-result").hide();
-        $("#spin-div").spin();
+        $(".loader").show();
         process();
-        $(this).attr("disabled",true);
-        $("#spin-div").spin(false);
+        $(this).attr("disabled",true);        
+        $(".loader").hide();
     });    
     
     $("#btn-gerar-saida").on('click', function (e) {
-        $("#spin-div").spin();
+        $(".loader").show();
         generateOutputSpreadsheet();
     });
 
     $("#btn-salvar-pdf").on('click', function (e) {
-        $("#spin-div").spin();
+        $(".loader").show();
         generateOutputMessageFile();
     });    
     					
@@ -61,7 +62,7 @@ function getNumberOfUploadedSpreadsheets( callback ) {
 function loadSpreadsheets(total) {
     for (i=0; i < total; i++) {
         loadSpreadsheetAtIndex(i);
-    }    
+    }            
 }
 
 function loadSpreadsheetAtIndex( i ) {
@@ -140,9 +141,9 @@ function generateOutputSpreadsheet() {
           var link=document.createElement('a');
           link.href=window.URL.createObjectURL(blob);
           link.download="saida.xls";
-          link.click();
-          $("#spin-div").spin(false);
-       }
+          link.click();  
+          $(".loader").hide();        
+       }       
     };
     xhr.send();
 }
@@ -157,8 +158,8 @@ function generateOutputMessageFile() {
           var link=document.createElement('a');
           link.href=window.URL.createObjectURL(blob);
           link.download="mensagens.pdf";
-          link.click();
-          $("#spin-div").spin(false);
+          link.click(); 
+          $(".loader").hide();         
        }
     };
     xhr.send();
