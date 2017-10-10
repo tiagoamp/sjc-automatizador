@@ -3,8 +3,6 @@ var port = window.location.port;
 
 $(document).ready(function () {
     
-    console.log(hostname + " - " + port);
-    
     $("#div-result").hide();
     $(".loader").hide();
 
