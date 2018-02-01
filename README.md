@@ -25,15 +25,9 @@ O fluxo de processo é algo assim:
 
 <b> Arquitetura e Tecnologia </b>
 
-Aplicação desktop implementada em linguagem Java.
-Utilizada bibliotecas 'apache poi' para manipulação das planilhas Excel, e 'JSoup' para manipulação da página html. Interface gráfica utilizando Java Swing.
-
-O sistema foi feito em dois projetos separados:
-
-1)<b> Projeto 'sjc-services' </b>: implementa os serviços (regras de negócio), gerando uma biblioteca (jar). Este projeto foi feito na IDE Eclipse (maven project).
-
-2)<b> Projeto 'SJC-FOLHA-UI' </b> contém a interface gráfica para o usuário. Importa como biblioteca o 'jar' gerado pelo primeiro projeto. Foi implementado na IDE Netbeans (standard project).
-
+Aplicação implementada em linguagem Java, com interface usando html/javascript acessando serviços REST.
+Utilizada bibliotecas 'apache poi' para manipulação das planilhas Excel.
+Utiliza Spring Boot para implementação web, rodando servidor local.
 
 <b> Por que publicado no Github? </b>
 
@@ -62,15 +56,9 @@ The workflow is like this:
 
 <b> Architecture and Technology </b>
 
-Desktop application build in Java.
-It was used 'apache poi' library to handle Excel spreadsheets, and 'JSoup' library to manipulate and parse html page. Graphical interface build with Java Swing framework.
-
-The application was build in two separated projects as follow:
-
-1)<b> Project 'sjc-services' </b>: implements services (requirements), generating an output library ('jar' file). Implemented in Eclipse IDE (Maven project).
-
-2)<b> Project 'SJC-FOLHA-UI' </b> contains the graphical interface to end user. This project imports/uses the 'jar' lib from the services project. It was implemented in Netbeans IDE (standard project).
-
+Application built in Java, UI build with html/javascript accessing REST services.
+It was used 'apache poi' library to handle Excel spreadsheets.
+Uses Spring Boot for this web version, running on local server.
 
 <b> Why is it published in Github? </b>
 
