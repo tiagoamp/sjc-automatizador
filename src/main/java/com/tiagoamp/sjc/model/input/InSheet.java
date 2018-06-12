@@ -1,6 +1,16 @@
 package com.tiagoamp.sjc.model.input;
 
-import static com.tiagoamp.sjc.model.input.InputLayoutConstants.*;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_ADICIONAL_NOTURNO;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_HORA_EXTRA;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_MATRICULA;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_NOME;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_01;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_02;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_03;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_04;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_05;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_PLANTOES_EXTRAS;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_DATA_INIT_ROW;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,10 +18,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 import com.tiagoamp.sjc.model.MessageType;
@@ -24,17 +32,24 @@ import com.tiagoamp.sjc.model.fieldprocessor.NumericFieldProcessor;
 
 public class InSheet {
 	
+	private SjcGeneralCode code;
+	private List<InRow> inputrows;
+	private List<ProcessingMessage> messages;
+	private String monthRef;
+	private String yearRef;
+	
+	
 	public InSheet(SjcGeneralCode code) {
 		this.code = code;
 		this.messages = new ArrayList<>();
 		this.inputrows = new ArrayList<>();
 	}
 	
-	private SjcGeneralCode code;
-	private List<InRow> inputrows;
-	private List<ProcessingMessage> messages;
-	private String monthRef;
-	private String yearRef;
+	public InSheet(SjcGeneralCode code, String monthRef, String yearRef) {
+		this(code);
+		this.monthRef = monthRef;
+		this.yearRef = yearRef;
+	}
 	
 	
 	@Override
@@ -43,26 +58,6 @@ public class InSheet {
 	}
 	
 	
-	@SuppressWarnings("deprecation")
-	public String loadCellValueFrom(XSSFSheet xssfsheet, CellAddress cellAddress) {
-		Iterator<Row> rowItr = xssfsheet.iterator(); // Setting row
-		if (!rowItr.hasNext()) return null;
-		Row row = rowItr.next();
-		while ( rowItr.hasNext() && row.getRowNum() < cellAddress.getRow() ) {
-			row = rowItr.next();
-		}
-		
-		Iterator<Cell> cellIterator = row.cellIterator(); // Setting column
-		while (cellIterator.hasNext()) {
-			Cell cell = cellIterator.next();
-			if ( cell.getAddress().compareTo(cellAddress) == 0 ) {
-				if (CellType.STRING.compareTo(cell.getCellTypeEnum()) == 0) return cell.getStringCellValue();
-				if (CellType.NUMERIC.compareTo(cell.getCellTypeEnum()) == 0) return String.valueOf(Integer.valueOf((int) cell.getNumericCellValue()));
-			}					
-		}
-		return null;
-	}
-				
 	public void loadDataFrom(XSSFSheet excelsheet) {
 		Boolean endOfData = false;
 		DataFormatter df = new DataFormatter();
@@ -78,7 +73,7 @@ public class InSheet {
         while (rowItr.hasNext() && !endOfData) {  // for each row
         	row = rowItr.next();
             InRow inrow = new InRow();
-            int qtdDatasPlantoes = 0;
+            int qtdDatasPlantoesPreenchidas = 0;
                              
             Iterator<Cell> cellIterator = row.cellIterator();
             while (cellIterator.hasNext()) {  // for each cell/column
@@ -86,13 +81,12 @@ public class InSheet {
                 
                 if (cell.getColumnIndex() == INDEX_COLUMN_MATRICULA) {
                 	String value = df.formatCellValue(cell);
-                	if (StringUtils.isEmpty(value)) break; // to next row
                 	
+                	if (StringUtils.isEmpty(value)) break; // to next row                	
                 	if (isEndOfData(value)) {
                 		endOfData = true;
                 		break;
-                	}
-                	                	
+                	}                	                	
                 	if (hasNoNumbers(value)) {
                 		messages.add(new ProcessingMessage(MessageType.ALERT, "Planilha contém linha com dados inválidos (linha " + (row.getRowNum() + 1) + "). Processamento prosseguiu após estas linhas."));
                 		break; // break column loop and go to next row loop                		
@@ -116,8 +110,8 @@ public class InSheet {
                 	fieldProcessor = new NumericFieldProcessor("Plantão Extra");
                 	inrow.setQtdPlantoesExtra(Integer.valueOf(fieldProcessor.process(df.formatCellValue(cell))));
                 	messages.addAll(fieldProcessor.getMessages());
-                	if (Integer.valueOf(inrow.getQtdPlantoesExtra()) != qtdDatasPlantoes) {
-                		messages.add(new ProcessingMessage(MessageType.ALERT, "Planilha contém na linha " + (row.getRowNum() + 1) +" 'Quantidade de Plantões Extras' diferente do número de datas. Cadastradas '" + qtdDatasPlantoes + "' datas, mas quantidade informada é " + inrow.getQtdPlantoesExtra() + "."));
+                	if (Integer.valueOf(inrow.getQtdPlantoesExtra()) != qtdDatasPlantoesPreenchidas) {
+                		messages.add(new ProcessingMessage(MessageType.ALERT, "Planilha contém na linha " + (row.getRowNum() + 1) +" 'Quantidade de Plantões Extras' diferente do número de datas. Cadastradas '" + qtdDatasPlantoesPreenchidas + "' datas, mas quantidade informada é " + inrow.getQtdPlantoesExtra() + "."));
                 	}
                 } else if ( (code == SjcGeneralCode.OPERACIONAL) && 
                 		   (cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_01 || 
@@ -126,10 +120,10 @@ public class InSheet {
                 		    cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_04 || 
                 		    cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_05) 
                 		   ) {
-                	int indexPlantao = cell.getColumnIndex() - INDEX_COLUMN_PLANTOESEXTRAS_01; // getting index of 'plantao' from 0 to 4 (there may be 5 plantoes
+                	int indexPlantao = cell.getColumnIndex() - INDEX_COLUMN_PLANTOESEXTRAS_01; // getting index of 'plantao' from 0 to 4 (there may be 5 plantoes)
                 	String dataPlantaoExtra = df.formatCellValue(cell);
                 	if (dataPlantaoExtra != null && !dataPlantaoExtra.isEmpty() && !hasNoNumbers(dataPlantaoExtra)) {                		
-                		qtdDatasPlantoes++;                		
+                		qtdDatasPlantoesPreenchidas++;                		
                 		fieldProcessor = new DataPlantaoFieldProcessor(monthRef, yearRef);
                 		inrow.getDtPlantoesExtras()[indexPlantao] = fieldProcessor.process(dataPlantaoExtra);
                 	}
@@ -154,9 +148,7 @@ public class InSheet {
 		
 	public void print() {
 		System.out.println(this.toString());
-		for (InRow row : inputrows) {
-			System.out.println(row.toString());
-		}		
+		inputrows.forEach(System.out::println);				
 	}
 		
 	

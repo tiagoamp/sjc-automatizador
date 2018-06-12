@@ -13,7 +13,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -43,10 +45,10 @@ public class OutputSpreadsheet {
 	
 	
 	public void loadDataFromInputSpreadSheets(List<InputSpreadsheet> listInputSpreadSheets) {
-		for (InputSpreadsheet inputSpreadsheet : listInputSpreadSheets) {
+		listInputSpreadSheets.forEach(inputSpreadsheet -> {
 			loadDataFromInputSpreadsheet(inputSpreadsheet);
-			messages.put(inputSpreadsheet.getFileName(), inputSpreadsheet.getMessages());			
-		}	
+			messages.put(inputSpreadsheet.getFileName(), inputSpreadsheet.getMessages());
+		});			
 	}
 	
 	public void generateOuputSpreadsheetFile(Path outputFile, Path templateFile) throws IOException  {		
@@ -62,14 +64,24 @@ public class OutputSpreadsheet {
 	private void loadDataFromInputSpreadsheet(InputSpreadsheet inputSpreadsheet) {
 		for (SjcSpecificCode code : SjcSpecificCode.values()) {
 			OutSheet outSheet = new OutSheet(code);
-			InSheet inSheet = inputSpreadsheet.getInpuSheetFromGenericCode(code.getGenericCode());
-			if (inSheet != null && inSheet.getInputrows().size() != 0) {
-				for (InRow inrow : inSheet.getInputrows()) { // for each input row
+			
+			Optional<InSheet> inSheet = inputSpreadsheet.getInpuSheetFromGenericCode(code.getGenericCode());
+			if (inSheet.isPresent() && inSheet.get().getInputrows().size() != 0) {
+				
+				InSheet sheet = inSheet.get();
+				List<OutRow> outRows = sheet.getInputrows().stream()
+					.map(inrow ->  this.fillRow(inrow, inputSpreadsheet.getLotacao(), code))
+					.filter(outRow -> outRow.getQuantidade() != 0)
+					.collect(Collectors.toList());
+				
+				outSheet.getOutputrows().addAll(outRows);
+				
+				/*for (InRow inrow : inSheet.get().getInputrows()) { // for each input row
 					OutRow outRow = this.fillRow(inrow, inputSpreadsheet.getLotacao(), code);
 					if (outRow.getQuantidade() != 0) {
 						outSheet.getOutputrows().add(outRow);
 					}
-				}					
+				}*/					
 			}
 			this.updateOutputRows(outSheet);
 		}

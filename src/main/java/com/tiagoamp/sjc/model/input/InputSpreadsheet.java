@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -47,29 +48,22 @@ public class InputSpreadsheet {
 			{
 			for (SjcGeneralCode code : SjcGeneralCode.values()) {
 				XSSFSheet xssfsheet = xssworkbook.getSheet(code.getDescription().toUpperCase());
+				
 				if (xssfsheet == null) {
-	            	messages.add(new ProcessingMessage(MessageType.ERROR, "Aba '" + code.getDescription().toUpperCase() +"' não encontrada na planilha."));
-	            } else {
-	            	InSheet sheet = new InSheet(code);
-	            	if (lotacao == null) {
-	            		CellAddress lotacaoCellAddress = getLotacaoFieldCellAddress(xssfsheet.getSheetName());
-	            		lotacao = sheet.loadCellValueFrom(xssfsheet, lotacaoCellAddress);
-	            	}
-	            	if (monthRef == null) {
-	            		CellAddress mesCellAddress = getMesReferenciaFieldCellAddress(xssfsheet.getSheetName());
-	            		monthRef = sheet.loadCellValueFrom(xssfsheet, mesCellAddress);
-	            	}
-	            	if (yearRef == null) {
-	            		CellAddress anoCellAddress = getAnoReferenciaFieldCellAddress(xssfsheet.getSheetName());
-	            		yearRef = sheet.loadCellValueFrom(xssfsheet, anoCellAddress);	            		
-	            	}
-	            	sheet.setMonthRef(monthRef);
-	            	sheet.setYearRef(yearRef);
-	            	sheet.loadDataFrom(xssfsheet);
-	            	if (sheet.getInputrows().isEmpty()) continue;
-	            	messages.addAll(sheet.getMessages());
-	            	sheets.add(sheet);
-	            }
+	            	messages.add(new ProcessingMessage(MessageType.ERROR, "Aba com nome '" + code.getDescription().toUpperCase() +"' não encontrada na planilha."));
+	            	continue;
+	            } 
+				
+            	loadLotacao(xssfsheet, code);
+            	loadMesReferencia(xssfsheet, code);
+            	loadAnoReferencia(xssfsheet, code);
+            	
+            	InSheet sheet = new InSheet(code, monthRef, yearRef);            	
+            	sheet.loadDataFrom(xssfsheet);
+            	
+            	if (sheet.getInputrows().isEmpty()) continue;
+            	messages.addAll(sheet.getMessages());
+            	sheets.add(sheet);	            
 			}
 			
             if (lotacao == null) {
@@ -79,50 +73,38 @@ public class InputSpreadsheet {
 		} 			
 	}
 	
-	public InSheet getInpuSheetFromGenericCode(SjcGeneralCode gCode) {
-		for (InSheet inSheet : sheets) {
-			if (inSheet.getCode() == gCode) return inSheet;					
-		}
-		return null;
+	public Optional<InSheet> getInpuSheetFromGenericCode(SjcGeneralCode code) {
+		return sheets.stream().filter(sheet -> sheet.getCode() == code).findFirst();		
 	}
+	
 	
 	private boolean validate(Path inputFile) {
-		boolean result = true;
+		List<ProcessingMessage> validationMsgs = new ArrayList<>();
 		if (Files.isDirectory(inputFile)) {
-			messages.add(new ProcessingMessage(MessageType.ERROR, "Arquivo de origem é um diretório e não será considerado no processamento."));
-			result = false;
+			validationMsgs.add(new ProcessingMessage(MessageType.ERROR, "Arquivo de origem é um diretório e não será considerado no processamento."));
 		} else if (!inputFile.getFileName().toString().endsWith(".xlsx")) {
-			messages.add(new ProcessingMessage(MessageType.ERROR, "Arquivo de origem não tem extensão '.xlsx'. e não será considerado no processamento."));
-			result = false;
+			validationMsgs.add(new ProcessingMessage(MessageType.ERROR, "Arquivo de origem não tem extensão '.xlsx'. e não será considerado no processamento."));
 		}
-		return result;
+		boolean hasValidationMessages = messages.addAll(validationMsgs);
+		return !hasValidationMessages;
 	}
 	
-	private CellAddress getLotacaoFieldCellAddress(String sheetName) {
-		if (sheetName.equals(SjcGeneralCode.OPERACIONAL.getDescription().toUpperCase())) {
-			return new CellAddress(CELL_ADDRESS_LOTACAO_OPERACIONAL);
-		} else if (sheetName.equals(SjcGeneralCode.ADMINISTRATIVO.getDescription().toUpperCase())) {
-			return new CellAddress(CELL_ADDRESS_LOTACAO_ADMISTRATIVO);
-		}
-		return null;
+	private void loadLotacao(XSSFSheet xssfsheet, SjcGeneralCode code) {
+		if (lotacao != null) return;
+		CellAddress cellAddr = code == SjcGeneralCode.OPERACIONAL ? new CellAddress(CELL_ADDRESS_LOTACAO_OPERACIONAL) : new CellAddress(CELL_ADDRESS_LOTACAO_ADMISTRATIVO);
+		lotacao = xssfsheet.getRow(cellAddr.getRow()).getCell(cellAddr.getColumn()).getStringCellValue();
 	}
 	
-	private CellAddress getMesReferenciaFieldCellAddress(String sheetName) {
-		if (sheetName.equals(SjcGeneralCode.OPERACIONAL.getDescription().toUpperCase())) {
-			return new CellAddress(CELL_ADDRESS_MES_OPERACIONAL);
-		} else if (sheetName.equals(SjcGeneralCode.ADMINISTRATIVO.getDescription().toUpperCase())) {
-			return new CellAddress(CELL_ADDRESS_MES_ADMISTRATIVO);
-		}
-		return null;
+	private void loadMesReferencia(XSSFSheet xssfsheet, SjcGeneralCode code) {
+		if (lotacao != null) return;
+		CellAddress cellAddr = code == SjcGeneralCode.OPERACIONAL ? new CellAddress(CELL_ADDRESS_MES_OPERACIONAL) : new CellAddress(CELL_ADDRESS_MES_ADMISTRATIVO);
+		monthRef = xssfsheet.getRow(cellAddr.getRow()).getCell(cellAddr.getColumn()).getStringCellValue();
 	}
 	
-	private CellAddress getAnoReferenciaFieldCellAddress(String sheetName) {
-		if (sheetName.equals(SjcGeneralCode.OPERACIONAL.getDescription().toUpperCase())) {
-			return new CellAddress(CELL_ADDRESS_ANO_OPERACIONAL);
-		} else if (sheetName.equals(SjcGeneralCode.ADMINISTRATIVO.getDescription().toUpperCase())) {
-			return new CellAddress(CELL_ADDRESS_ANO_ADMISTRATIVO);
-		}
-		return null;
+	private void loadAnoReferencia(XSSFSheet xssfsheet, SjcGeneralCode code) {
+		if (lotacao != null) return;
+		CellAddress cellAddr = code == SjcGeneralCode.OPERACIONAL ? new CellAddress(CELL_ADDRESS_ANO_OPERACIONAL) : new CellAddress(CELL_ADDRESS_ANO_ADMISTRATIVO);
+		yearRef = xssfsheet.getRow(cellAddr.getRow()).getCell(cellAddr.getColumn()).getStringCellValue();
 	}
 		
 	

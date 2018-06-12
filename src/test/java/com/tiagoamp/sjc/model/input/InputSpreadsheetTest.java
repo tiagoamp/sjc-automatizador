@@ -67,7 +67,7 @@ public class InputSpreadsheetTest {
 		inputSpreadsheet.getSheets().add(sheetAdm);
 		inputSpreadsheet.getSheets().add(sheetOp);
 		
-		result = inputSpreadsheet.getInpuSheetFromGenericCode(SjcGeneralCode.OPERACIONAL);
+		result = inputSpreadsheet.getInpuSheetFromGenericCode(SjcGeneralCode.OPERACIONAL).get();
 		assertEquals("Should return 'OPERACIONAL' sheet.", SjcGeneralCode.OPERACIONAL, result.getCode());
 	}
 	
@@ -79,7 +79,7 @@ public class InputSpreadsheetTest {
 		inputSpreadsheet.getSheets().add(sheetAdm);
 		inputSpreadsheet.getSheets().add(sheetOp);		
 		
-		result = inputSpreadsheet.getInpuSheetFromGenericCode(SjcGeneralCode.ADMINISTRATIVO);
+		result = inputSpreadsheet.getInpuSheetFromGenericCode(SjcGeneralCode.ADMINISTRATIVO).get();
 		assertEquals("Should return 'ADMINISTRATIVO' sheet.", SjcGeneralCode.ADMINISTRATIVO, result.getCode());
 	}
 

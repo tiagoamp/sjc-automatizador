@@ -43,6 +43,7 @@ public class SjcController {
 	@Autowired
 	private UploadService uploadService;
 	
+	
 	private final Path UPLOAD_DIR = SjcAutoApplication.BASE_DIR.resolve("upload/");
 	private final Path RESULT_DIR = SjcAutoApplication.BASE_DIR.resolve("resultado/");
 	private final Path RESOURCES_DIR = SjcAutoApplication.BASE_DIR.resolve("resources/");
