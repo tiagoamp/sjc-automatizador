@@ -7,14 +7,15 @@ import com.tiagoamp.sjc.model.SjcSpecificCode;
 
 public class OutSheet {
 	
+	private SjcSpecificCode code;
+	private List<OutRow> outputrows;
+
+	
 	public OutSheet(SjcSpecificCode code) {
 		this.code = code;
 		outputrows = new ArrayList<>();
 	}
 	
-	private SjcSpecificCode code;
-	private List<OutRow> outputrows;
-
 	
 	public SjcSpecificCode getCode() {
 		return code;

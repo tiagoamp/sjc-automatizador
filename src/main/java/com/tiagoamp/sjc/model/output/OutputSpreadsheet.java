@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -70,24 +71,17 @@ public class OutputSpreadsheet {
 				
 				InSheet sheet = inSheet.get();
 				List<OutRow> outRows = sheet.getInputrows().stream()
-					.map(inrow ->  this.fillRow(inrow, inputSpreadsheet.getLotacao(), code))
+					.map(inrow -> this.fillOutputRow(inrow, inputSpreadsheet.getLotacao(), code))
 					.filter(outRow -> outRow.getQuantidade() != 0)
 					.collect(Collectors.toList());
 				
-				outSheet.getOutputrows().addAll(outRows);
-				
-				/*for (InRow inrow : inSheet.get().getInputrows()) { // for each input row
-					OutRow outRow = this.fillRow(inrow, inputSpreadsheet.getLotacao(), code);
-					if (outRow.getQuantidade() != 0) {
-						outSheet.getOutputrows().add(outRow);
-					}
-				}*/					
+				outSheet.getOutputrows().addAll(outRows);									
 			}
 			this.updateOutputRows(outSheet);
 		}
 	}
 	
-	private OutRow fillRow(InRow inRow, String lotacao, SjcSpecificCode code) {
+	private OutRow fillOutputRow(InRow inRow, String lotacao, SjcSpecificCode code) {
 		OutRow outRow = new OutRow(lotacao, inRow.getNome(), inRow.getMatricula());
 		if (code.getType() == SjcItemType.HORA_EXTRA) {
 			outRow.setQuantidade(inRow.getQtdHoraExtra());
@@ -102,19 +96,25 @@ public class OutputSpreadsheet {
 	
 	private void updateOutputRows(OutSheet outputsheet) {
 		if (outputsheet.getOutputrows().isEmpty()) return;
+		
 		int index = this.getSheetIndexByCode(outputsheet.getCode());
 		if (index >= 0) {
-			sheets.get(index).getOutputrows().addAll(outputsheet.getOutputrows());
+			sheets.get(index).getOutputrows().addAll(outputsheet.getOutputrows());			
 		} else {
 			sheets.add(outputsheet);
 		}		
 	}
-	
+		
 	private int getSheetIndexByCode(SjcSpecificCode code) {
-		for(int index=0; index < sheets.size(); index++) {
+		return IntStream.range(0, sheets.size())
+				.filter(index -> sheets.get(index).getCode() == code)
+				.findFirst()
+				.orElse(-1);
+		
+		/*for(int index=0; index < sheets.size(); index++) {
 			if (sheets.get(index).getCode() == code) return index;
 		}
-		return -1;
+		return -1;*/
 	}
 	
 	private void createOutputFileInSystem(Path outputFile, Path templateFile) throws IOException {

@@ -26,6 +26,9 @@ public class OutputSpreadsheetTest {
 	@Before
 	public void setUp() throws Exception {
 		outputSpreadsheet = new OutputSpreadsheet();
+		
+		Path outDir =  Paths.get("testfiles", "saida");
+		if (Files.notExists(outDir)) Files.createDirectories(outDir);
 	}
 
 	@After
