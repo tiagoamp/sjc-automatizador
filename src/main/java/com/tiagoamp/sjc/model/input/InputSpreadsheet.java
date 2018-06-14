@@ -11,9 +11,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -22,20 +28,20 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.tiagoamp.sjc.model.MessageType;
 import com.tiagoamp.sjc.model.ProcessingMessage;
 import com.tiagoamp.sjc.model.SjcGeneralCode;
+import com.tiagoamp.sjc.model.fieldprocessor.MonthConverter;
 
 public class InputSpreadsheet {
 	
 	public InputSpreadsheet() {
 		messages = new ArrayList<>();
-		sheets = new ArrayList<>();
+		sheets = new HashMap<>();
 	}
 	
 	private String fileName;
 	private String lotacao;
-	private List<InSheet> sheets;
-	private List<ProcessingMessage> messages;
-	private String monthRef;
-	private String yearRef;
+	private YearMonth yearMonthRef;
+	private Map<SjcGeneralCode, InSheet> sheets;
+	private List<ProcessingMessage> messages;	
 	
 	
 	public void loadFromFile(Path inputFile) throws IOException {
@@ -55,15 +61,14 @@ public class InputSpreadsheet {
 	            } 
 				
             	loadLotacao(xssfsheet, code);
-            	loadMesReferencia(xssfsheet, code);
-            	loadAnoReferencia(xssfsheet, code);
+            	loadYearMonthReference(xssfsheet, code);
             	
-            	InSheet sheet = new InSheet(code, monthRef, yearRef);            	
+            	InSheet sheet = new InSheet(code, yearMonthRef);            	
             	sheet.loadDataFrom(xssfsheet);
             	
-            	if (sheet.getInputrows().isEmpty()) continue;
+            	if (sheet.getRows().isEmpty()) continue;
             	messages.addAll(sheet.getMessages());
-            	sheets.add(sheet);	            
+            	sheets.put(sheet.getCode(), sheet);
 			}
 			
             if (lotacao == null) {
@@ -71,10 +76,6 @@ public class InputSpreadsheet {
             	messages.add(new ProcessingMessage(MessageType.ERROR, "Não foi identificado o campo 'NOME DA UNIDADE'(no lugar previsto) na planilha."));
             }            
 		} 			
-	}
-	
-	public Optional<InSheet> getInpuSheetFromGenericCode(SjcGeneralCode code) {
-		return sheets.stream().filter(sheet -> sheet.getCode() == code).findFirst();		
 	}
 	
 	
@@ -95,23 +96,32 @@ public class InputSpreadsheet {
 		lotacao = xssfsheet.getRow(cellAddr.getRow()).getCell(cellAddr.getColumn()).getStringCellValue();
 	}
 	
-	private void loadMesReferencia(XSSFSheet xssfsheet, SjcGeneralCode code) {
-		if (lotacao != null) return;
-		CellAddress cellAddr = code == SjcGeneralCode.OPERACIONAL ? new CellAddress(CELL_ADDRESS_MES_OPERACIONAL) : new CellAddress(CELL_ADDRESS_MES_ADMISTRATIVO);
-		monthRef = xssfsheet.getRow(cellAddr.getRow()).getCell(cellAddr.getColumn()).getStringCellValue();
-	}
-	
-	private void loadAnoReferencia(XSSFSheet xssfsheet, SjcGeneralCode code) {
-		if (lotacao != null) return;
-		CellAddress cellAddr = code == SjcGeneralCode.OPERACIONAL ? new CellAddress(CELL_ADDRESS_ANO_OPERACIONAL) : new CellAddress(CELL_ADDRESS_ANO_ADMISTRATIVO);
-		yearRef = xssfsheet.getRow(cellAddr.getRow()).getCell(cellAddr.getColumn()).getStringCellValue();
-	}
+	private void loadYearMonthReference(XSSFSheet xssfsheet, SjcGeneralCode code) {
+		CellAddress yearCellAddr = code == SjcGeneralCode.OPERACIONAL ? new CellAddress(CELL_ADDRESS_ANO_OPERACIONAL) : new CellAddress(CELL_ADDRESS_ANO_ADMISTRATIVO);
+		String yearStr = xssfsheet.getRow(yearCellAddr.getRow()).getCell(yearCellAddr.getColumn()).getStringCellValue();
+		CellAddress monthCellAddr = code == SjcGeneralCode.OPERACIONAL ? new CellAddress(CELL_ADDRESS_MES_OPERACIONAL) : new CellAddress(CELL_ADDRESS_MES_ADMISTRATIVO);
+		String monthStr = xssfsheet.getRow(monthCellAddr.getRow()).getCell(monthCellAddr.getColumn()).getStringCellValue();
 		
+		LocalDate prevMonthDate = LocalDate.now().minusMonths(1);
+		
+		int year = prevMonthDate.getYear();
+		Pattern nonNumericPattern = Pattern.compile("[^0-9]");
+		if (yearStr == null || yearStr.isEmpty() || nonNumericPattern.matcher(yearStr).find()) {
+			messages.add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'ANO'(no lugar previsto) na planilha. Assumido ano ref. mês passado."));			
+		}
+		
+		Optional<Month> convertedMonth = MonthConverter.getConvertedMonth(monthStr);
+		if (!convertedMonth.isPresent()) messages.add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'MÊS'(no lugar previsto) na planilha. Assumido como mês passado."));
+		Month month = convertedMonth.orElse(prevMonthDate.getMonth());
+		
+		yearMonthRef = YearMonth.of(year, month);
+	}
 	
-	public List<InSheet> getSheets() {
+	
+	public Map<SjcGeneralCode, InSheet> getSheets() {
 		return sheets;
 	}
-	public void setSheets(List<InSheet> sheets) {
+	public void setSheets(Map<SjcGeneralCode, InSheet> sheets) {
 		this.sheets = sheets;
 	}
 	public String getLotacao() {
@@ -132,17 +142,11 @@ public class InputSpreadsheet {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	public String getMonthRef() {
-		return monthRef;
+	public YearMonth getYearMonthRef() {
+		return yearMonthRef;
 	}
-	public void setMonthRef(String monthRef) {
-		this.monthRef = monthRef;
-	}
-	public String getYearRef() {
-		return yearRef;
-	}
-	public void setYearRef(String yearRef) {
-		this.yearRef = yearRef;
+	public void setYearMonthRef(YearMonth yearMonthRef) {
+		this.yearMonthRef = yearMonthRef;
 	}
 	
 }

@@ -2,6 +2,9 @@ package com.tiagoamp.sjc.model.input;
 
 import static org.junit.Assert.assertEquals;
 
+import java.time.Month;
+import java.time.YearMonth;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +18,8 @@ public class DataPlantaoFieldProcessorTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		inputFieldProcessor = new DataPlantaoFieldProcessor("OUTUBRO", "2017");
+		YearMonth yearMonth = YearMonth.of(2017, Month.OCTOBER);
+		inputFieldProcessor = new DataPlantaoFieldProcessor(yearMonth);
 	}
 
 	@After

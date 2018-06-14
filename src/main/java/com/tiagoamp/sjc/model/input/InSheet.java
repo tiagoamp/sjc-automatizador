@@ -12,6 +12,7 @@ import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_PLA
 import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_PLANTOES_EXTRAS;
 import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_DATA_INIT_ROW;
 
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,28 +34,40 @@ import com.tiagoamp.sjc.model.fieldprocessor.NumericFieldProcessor;
 public class InSheet {
 	
 	private SjcGeneralCode code;
-	private List<InRow> inputrows;
+	private YearMonth yearMonthRef;
+	private List<InRow> rows;
 	private List<ProcessingMessage> messages;
-	private String monthRef;
-	private String yearRef;
-	
+		
 	
 	public InSheet(SjcGeneralCode code) {
 		this.code = code;
 		this.messages = new ArrayList<>();
-		this.inputrows = new ArrayList<>();
+		this.rows = new ArrayList<>();
 	}
 	
-	public InSheet(SjcGeneralCode code, String monthRef, String yearRef) {
+	public InSheet(SjcGeneralCode code, YearMonth yearMonthRef) {
 		this(code);
-		this.monthRef = monthRef;
-		this.yearRef = yearRef;
+		this.yearMonthRef = yearMonthRef;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		return ((obj instanceof InSheet)) && (((InSheet)obj).getCode() == this.code) ;		
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.code.getCode();
+	}
 	
 	@Override
 	public String toString() {
-		return String.format("Código: %s | Linhas: %d | Mensagens: %s", code, inputrows.size(), messages.size());		 
+		return String.format("Código: %s | Linhas: %d | Mensagens: %s", code, rows.size(), messages.size());		 
+	}
+	
+	public void print() {
+		System.out.println(this.toString());
+		rows.forEach(System.out::println);				
 	}
 	
 	
@@ -124,7 +137,7 @@ public class InSheet {
                 	String dataPlantaoExtra = df.formatCellValue(cell);
                 	if (dataPlantaoExtra != null && !dataPlantaoExtra.isEmpty() && !hasNoNumbers(dataPlantaoExtra)) {                		
                 		qtdDatasPlantoesPreenchidas++;                		
-                		fieldProcessor = new DataPlantaoFieldProcessor(monthRef, yearRef);
+                		fieldProcessor = new DataPlantaoFieldProcessor(yearMonthRef);
                 		inrow.getDtPlantoesExtras()[indexPlantao] = fieldProcessor.process(dataPlantaoExtra);
                 	}
                 }
@@ -132,7 +145,7 @@ public class InSheet {
             } 
             
             if (!endOfData && StringUtils.isNotEmpty(inrow.getNome())) {
-            	this.inputrows.add(inrow);
+            	this.rows.add(inrow);
             }
             
         }        
@@ -146,17 +159,12 @@ public class InSheet {
     	return !FieldProcessor.numericPattern.matcher(value).find();
     }
 		
-	public void print() {
-		System.out.println(this.toString());
-		inputrows.forEach(System.out::println);				
-	}
-		
 	
-	public List<InRow> getInputrows() {
-		return inputrows;
+	public List<InRow> getRows() {
+		return rows;
 	}
-	public void setInputrows(List<InRow> inputrows) {
-		this.inputrows = inputrows;
+	public void setRows(List<InRow> inputrows) {
+		this.rows = inputrows;
 	}
 	public SjcGeneralCode getCode() {
 		return code;
@@ -170,17 +178,11 @@ public class InSheet {
 	public void setMessages(List<ProcessingMessage> messages) {
 		this.messages = messages;
 	}
-	public String getMonthRef() {
-		return monthRef;
+	public YearMonth getYearMonthRef() {
+		return yearMonthRef;
 	}
-	public void setMonthRef(String monthRef) {
-		this.monthRef = monthRef;
-	}
-	public String getYearRef() {
-		return yearRef;
-	}
-	public void setYearRef(String yearRef) {
-		this.yearRef = yearRef;
+	public void setYearMonthRef(YearMonth yearMonthRef) {
+		this.yearMonthRef = yearMonthRef;
 	}
 		
 }

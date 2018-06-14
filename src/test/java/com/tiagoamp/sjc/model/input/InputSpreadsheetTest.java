@@ -1,6 +1,7 @@
 package com.tiagoamp.sjc.model.input;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -11,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.tiagoamp.sjc.model.MessageType;
-import com.tiagoamp.sjc.model.SjcGeneralCode;
 
 public class InputSpreadsheetTest {
 	
@@ -59,28 +59,4 @@ public class InputSpreadsheetTest {
 		
 	}
 	
-	@Test
-	public void testGetInpuSheetFromGenericCode_shouldReturnOperacionalSheet() {
-		InSheet sheetAdm = new InSheet(SjcGeneralCode.ADMINISTRATIVO);
-		InSheet sheetOp = new InSheet(SjcGeneralCode.OPERACIONAL);
-		InSheet result = null;
-		inputSpreadsheet.getSheets().add(sheetAdm);
-		inputSpreadsheet.getSheets().add(sheetOp);
-		
-		result = inputSpreadsheet.getInpuSheetFromGenericCode(SjcGeneralCode.OPERACIONAL).get();
-		assertEquals("Should return 'OPERACIONAL' sheet.", SjcGeneralCode.OPERACIONAL, result.getCode());
-	}
-	
-	@Test
-	public void testGetInpuSheetFromGenericCode_shouldReturnAdministrativoSheet() {
-		InSheet sheetAdm = new InSheet(SjcGeneralCode.ADMINISTRATIVO);
-		InSheet sheetOp = new InSheet(SjcGeneralCode.OPERACIONAL);
-		InSheet result = null;
-		inputSpreadsheet.getSheets().add(sheetAdm);
-		inputSpreadsheet.getSheets().add(sheetOp);		
-		
-		result = inputSpreadsheet.getInpuSheetFromGenericCode(SjcGeneralCode.ADMINISTRATIVO).get();
-		assertEquals("Should return 'ADMINISTRATIVO' sheet.", SjcGeneralCode.ADMINISTRATIVO, result.getCode());
-	}
-
 }

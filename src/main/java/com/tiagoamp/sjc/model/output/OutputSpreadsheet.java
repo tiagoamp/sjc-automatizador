@@ -66,11 +66,11 @@ public class OutputSpreadsheet {
 		for (SjcSpecificCode code : SjcSpecificCode.values()) {
 			OutSheet outSheet = new OutSheet(code);
 			
-			Optional<InSheet> inSheet = inputSpreadsheet.getInpuSheetFromGenericCode(code.getGenericCode());
-			if (inSheet.isPresent() && inSheet.get().getInputrows().size() != 0) {
+			Optional<InSheet> inSheet = Optional.of(inputSpreadsheet.getSheets().get(code.getGenericCode()));
+			if (inSheet.isPresent() && inSheet.get().getRows().size() != 0) {
 				
 				InSheet sheet = inSheet.get();
-				List<OutRow> outRows = sheet.getInputrows().stream()
+				List<OutRow> outRows = sheet.getRows().stream()
 					.map(inrow -> this.fillOutputRow(inrow, inputSpreadsheet.getLotacao(), code))
 					.filter(outRow -> outRow.getQuantidade() != 0)
 					.collect(Collectors.toList());
@@ -110,11 +110,6 @@ public class OutputSpreadsheet {
 				.filter(index -> sheets.get(index).getCode() == code)
 				.findFirst()
 				.orElse(-1);
-		
-		/*for(int index=0; index < sheets.size(); index++) {
-			if (sheets.get(index).getCode() == code) return index;
-		}
-		return -1;*/
 	}
 	
 	private void createOutputFileInSystem(Path outputFile, Path templateFile) throws IOException {

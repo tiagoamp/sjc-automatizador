@@ -48,7 +48,7 @@ public class InSheetTest {
 		sheet = new InSheet(tipo);
 		sheet.loadDataFrom(xssfsheet);
 		int invalidRowNum = 21;
-		assertEquals("'Operacional' sheet must have 17 rows", 17, sheet.getInputrows().size());
+		assertEquals("'Operacional' sheet must have 17 rows", 17, sheet.getRows().size());
 		assertTrue("Alert message (invalid row) should be generated.", sheet.getMessages().size() > 0);
 		assertTrue("Alert message about invalid row number '" + invalidRowNum + "' should be generated.", 
 				sheet.getMessages().get(0).getText().contains(String.valueOf(invalidRowNum)));
@@ -60,7 +60,7 @@ public class InSheetTest {
 		XSSFSheet xssfsheet = this.getExcelSheetForTest(tipo);
 		sheet = new InSheet(tipo);
 		sheet.loadDataFrom(xssfsheet);
-		assertEquals("'Administrativo' sheet must have 9 rows", 9, sheet.getInputrows().size());
+		assertEquals("'Administrativo' sheet must have 9 rows", 9, sheet.getRows().size());
 	}
 	
 }

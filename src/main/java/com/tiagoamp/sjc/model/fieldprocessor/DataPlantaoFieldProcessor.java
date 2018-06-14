@@ -1,25 +1,20 @@
 package com.tiagoamp.sjc.model.fieldprocessor;
 
-import java.time.LocalDate;
+import java.time.Month;
+import java.time.YearMonth;
+import java.util.Optional;
 
 public class DataPlantaoFieldProcessor extends FieldProcessor {
 	
-	private String month;
-	private String year;
+	private YearMonth yearMonth;
 	
 	private final String REGEX_FULL_DATE = "\\d{1,2}[-|\\/]{1}[\\w]+[-|\\/]\\d+";
 	private final String REGEX_DAY_MONTH = "\\d{1,2}[-|\\/]{1}[\\w]+";
 	private final String REGEX_DAY_ONLY = "\\d{1,2}";
 	
 	
-	public DataPlantaoFieldProcessor(String month, String year) {
-		this.month = month;
-		this.year = year;
-		
-		if (this.month == null) this.month = String.valueOf(LocalDate.now().minusMonths(1).getMonthValue());
-		if (this.year == null) this.year = String.valueOf(LocalDate.now().getYear());
-		
-		this.month = this.month.toLowerCase();
+	public DataPlantaoFieldProcessor(YearMonth yearMonthParam) {
+		this.yearMonth = yearMonthParam;
 	}
 	
 	
@@ -36,11 +31,13 @@ public class DataPlantaoFieldProcessor extends FieldProcessor {
 		
 		if ( inputValue.matches(REGEX_DAY_MONTH) ) {
 			String str[] = inputValue.split("/");
-			return str[0] + "/" + MonthConverter.getConvertedMonthValue(str[1]) + "/" + year;
+			Optional<Month> convertedMonth = MonthConverter.getConvertedMonth(str[1].toLowerCase());
+			Month month = convertedMonth.orElse(yearMonth.getMonth());
+			return str[0] + "/" + String.format("%02d", month.getValue()) + "/" + yearMonth.getYear();
 		}
 		
 		if ( inputValue.matches(REGEX_DAY_ONLY) ) {
-			return inputValue + "/" + MonthConverter.getConvertedMonthValue(month) + "/" + year;
+			return inputValue + "/" + yearMonth.getMonthValue() + "/" + yearMonth.getYear();
 		}
 		
 		return "";
