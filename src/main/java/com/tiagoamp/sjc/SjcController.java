@@ -29,7 +29,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
-import com.tiagoamp.sjc.service.SjcServicesFacade;
+import com.tiagoamp.sjc.service.SpreadsheetServices;
 import com.tiagoamp.sjc.service.UploadService;
 
 @CrossOrigin
@@ -38,7 +38,7 @@ import com.tiagoamp.sjc.service.UploadService;
 public class SjcController {
 	
 	@Autowired
-	private SjcServicesFacade sjcService;
+	private SpreadsheetServices sjcService;
 	
 	@Autowired
 	private UploadService uploadService;
