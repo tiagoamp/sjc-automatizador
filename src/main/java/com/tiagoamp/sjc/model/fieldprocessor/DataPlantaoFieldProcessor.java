@@ -40,7 +40,7 @@ public class DataPlantaoFieldProcessor extends FieldProcessor {
 			return inputValue + "/" + yearMonth.getMonthValue() + "/" + yearMonth.getYear();
 		}
 		
-		return "";
+		return "Padrão de data não reconhecido";
 	}
 		
 }

@@ -7,6 +7,8 @@ public class MonthConverter {
 	
 	public static Optional<Month> getConvertedMonth(String input) {
 		Optional<Month> month = Optional.empty();
+		if (input == null) return month;
+		input = input.toLowerCase();
 		if (input.equals("1") || input.equals("janeiro") || input.equals("jan") || input.equals("january") ) month = Optional.of(Month.JANUARY);
 		if (input.equals("2") || input.equals("fevereiro") || input.equals("fev") || input.equals("feb") || input.equals("february") ) month = Optional.of(Month.FEBRUARY);
 		if (input.equals("3") || input.equals("março") || input.equals("mar") || input.equals("march") ) month = Optional.of(Month.MARCH);

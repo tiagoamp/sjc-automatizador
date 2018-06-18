@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -69,7 +70,13 @@ public class InputExcelSpreadsheet {
             if (spreadsheet.getLotacao() == null) {
             	spreadsheet.setLotacao("!NOME DA UNIDADE NÃO IDENTIFICADO NA PLANILHA!");
             	spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ERROR, "Não foi identificado o campo 'NOME DA UNIDADE'(no lugar previsto) na planilha."));
-            }            
+            }
+            
+            if (spreadsheet.getYearMonthRef() == null) {
+        		YearMonth prevYearMonth = YearMonth.now().minusMonths(1);
+        		spreadsheet.setYearMonthRef(prevYearMonth);
+        		spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado 'ANO' e 'MÊS' (no lugar previsto) em nenhuma das abas. Assumido como mês passado."));
+            }
 		}
 		return spreadsheet;
 	}
@@ -89,32 +96,46 @@ public class InputExcelSpreadsheet {
 	private void loadLotacao(XSSFSheet xssfsheet, SjcGeneralCode code) {
 		if (spreadsheet.getLotacao() != null) return;
 		CellAddress cellAddr = code == SjcGeneralCode.OPERACIONAL ? new CellAddress(CELL_ADDRESS_LOTACAO_OPERACIONAL) : new CellAddress(CELL_ADDRESS_LOTACAO_ADMISTRATIVO);
-		String lotacao = xssfsheet.getRow(cellAddr.getRow()).getCell(cellAddr.getColumn()).getStringCellValue();
-		spreadsheet.setLotacao(lotacao);
-		
+		DataFormatter df = new DataFormatter();
+		String lotacao = df.formatCellValue(xssfsheet.getRow(cellAddr.getRow()).getCell(cellAddr.getColumn()));
+		spreadsheet.setLotacao(lotacao);		
 	}
 	
 	private void loadYearMonthReference(XSSFSheet xssfsheet, SjcGeneralCode code) {
+		DataFormatter df = new DataFormatter();
 		CellAddress yearCellAddr = code == SjcGeneralCode.OPERACIONAL ? new CellAddress(CELL_ADDRESS_ANO_OPERACIONAL) : new CellAddress(CELL_ADDRESS_ANO_ADMISTRATIVO);
-		String yearStr = xssfsheet.getRow(yearCellAddr.getRow()).getCell(yearCellAddr.getColumn()).getStringCellValue();
 		CellAddress monthCellAddr = code == SjcGeneralCode.OPERACIONAL ? new CellAddress(CELL_ADDRESS_MES_OPERACIONAL) : new CellAddress(CELL_ADDRESS_MES_ADMISTRATIVO);
-		String monthStr = xssfsheet.getRow(monthCellAddr.getRow()).getCell(monthCellAddr.getColumn()).getStringCellValue();
 		
-		YearMonth prevYearMonth = YearMonth.now().minusMonths(1);
+		boolean existsYearAndMonthRowsInSheet = xssfsheet.getRow(yearCellAddr.getRow()) != null && xssfsheet.getRow(monthCellAddr.getRow()) != null; 
 		
-		int year = prevYearMonth.getYear();
+		String yearStr = null;
+		String monthStr = null;
+		if (existsYearAndMonthRowsInSheet) {
+			yearStr = df.formatCellValue(xssfsheet.getRow(yearCellAddr.getRow()).getCell(yearCellAddr.getColumn()));
+			monthStr = df.formatCellValue(xssfsheet.getRow(monthCellAddr.getRow()).getCell(monthCellAddr.getColumn()));
+		}
+				
 		Pattern nonNumericPattern = Pattern.compile("[^0-9]");
-		if (yearStr == null || yearStr.isEmpty() || nonNumericPattern.matcher(yearStr).find()) {
-			spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'ANO'(no lugar previsto) na planilha. Assumido ano ref. mês passado."));			
-		}
-		
+		boolean isValidYear = yearStr == null || yearStr.isEmpty() || nonNumericPattern.matcher(yearStr).find();
+		if (!isValidYear) {
+			spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'ANO' (no lugar previsto) na planilha na aba '" + code.getDescription() + "'. Assumido ano ref mês passado."));			
+		}		
 		Optional<Month> convertedMonth = MonthConverter.getConvertedMonth(monthStr);
-		if (!convertedMonth.isPresent()) {
-			spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'MÊS'(no lugar previsto) na planilha. Assumido como mês passado."));
+		boolean isValidMonth = convertedMonth.isPresent(); 
+		if (!isValidMonth) {
+			spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'MÊS' (no lugar previsto) na planilha na aba '" + code.getDescription() + "'. Assumido como mês passado."));			
 		}
-		Month month = convertedMonth.orElse(prevYearMonth.getMonth());
 		
-		spreadsheet.setYearMonthRef(YearMonth.of(year, month));
+		if (!isValidYear || !isValidMonth) {
+			YearMonth prevYearMonth = YearMonth.now().minusMonths(1);		
+        	spreadsheet.setYearMonthRef(prevYearMonth);
+        	spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado 'ANO' e/ou 'MÊS' (no lugar previsto) em nenhuma das abas. Assumido datas do mês passado."));
+        	return;
+		}
+		
+		int year = Integer.parseInt(yearStr);
+		Month month = convertedMonth.get();
+		spreadsheet.setYearMonthRef(YearMonth.of(year, month));		
 	}
 
 }
