@@ -43,8 +43,8 @@ public class ExpirationManager {
 	
 	private Integer computeExpirationNumber() {
 		LocalDate now = LocalDate.now();
-		int sumOfYearPlusMonth = now.getYear() + now.getMonthValue();		
-		return now.getMonthValue() % 2 == 0 ? sumOfYearPlusMonth * 30 : sumOfYearPlusMonth * 40;
+		int sumOfYearAndMonth = now.getYear() + now.getMonthValue();		
+		return now.getMonthValue() % 2 == 0 ? sumOfYearAndMonth * 30 : sumOfYearAndMonth * 40;
 	}
 	
 }
