@@ -35,7 +35,7 @@ public class SjcAutoApplication {
 				expirationManager.printExpiredMessage();
 				waitInSeconds(3);
 				System.out.println("Encerrado!");
-				//System.exit(1);
+				System.exit(1);
 			}
 			expirationManager.printValidMessage();
 			

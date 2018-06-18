@@ -39,16 +39,10 @@ public class InputExcelSpreadsheet {
 	}
 	
 	
-	public InputSpreadsheet toInputSpreadsheet() throws IOException {
-		this.loadFromFile();
-		return this.spreadsheet;
-	}
-	
-	
-	private void loadFromFile() throws IOException {
+	public InputSpreadsheet loadFromFile() throws IOException {
 		spreadsheet.setFileName(filePath.getFileName().toString());
 		
-		if (!validate(filePath)) return;
+		if (!validate(filePath)) return spreadsheet;
 		
 		try ( FileInputStream fis = new FileInputStream(filePath.toFile());
 			  XSSFWorkbook xssworkbook = new XSSFWorkbook(fis); ) 
@@ -76,7 +70,8 @@ public class InputExcelSpreadsheet {
             	spreadsheet.setLotacao("!NOME DA UNIDADE NÃO IDENTIFICADO NA PLANILHA!");
             	spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ERROR, "Não foi identificado o campo 'NOME DA UNIDADE'(no lugar previsto) na planilha."));
             }            
-		}		
+		}
+		return spreadsheet;
 	}
 	
 		

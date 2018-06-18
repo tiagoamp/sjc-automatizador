@@ -29,7 +29,7 @@ public class InputExcelSpreadsheetTest {
 	public void testLoadFromFile_directory_shouldReturnErrorProcessingMessage() throws IOException {
 		Path directoryFile = Paths.get("testfiles","entrada","dummyDirectory");
 		inputExcelSpreadsheet = new InputExcelSpreadsheet(directoryFile);
-		InputSpreadsheet spreadsheet = inputExcelSpreadsheet.toInputSpreadsheet();
+		InputSpreadsheet spreadsheet = inputExcelSpreadsheet.loadFromFile();
 		assertTrue("Processing messages must not be empty", !spreadsheet.getMessages().isEmpty());
 		assertEquals("Must error message type", MessageType.ERROR, spreadsheet.getMessages().get(0).getType());
 		assertTrue("Must have directory error message", spreadsheet.getMessages().get(0).getText().contains("diretório"));
@@ -39,7 +39,7 @@ public class InputExcelSpreadsheetTest {
 	public void testLoadFromFile_notXLSXfile_shouldReturnErrorProcessingMessage() throws IOException {
 		Path dummyFile = Paths.get("testfiles","entrada","dummyFile.dmp");
 		inputExcelSpreadsheet = new InputExcelSpreadsheet(dummyFile);
-		InputSpreadsheet spreadsheet = inputExcelSpreadsheet.toInputSpreadsheet();
+		InputSpreadsheet spreadsheet = inputExcelSpreadsheet.loadFromFile();
 		assertTrue("Processing messages must not be empty", !spreadsheet.getMessages().isEmpty());
 		assertEquals("Must have error message", MessageType.ERROR, spreadsheet.getMessages().get(0).getType());
 		assertTrue("Must have xlsx error message", spreadsheet.getMessages().get(0).getText().contains("xlsx"));
@@ -49,7 +49,7 @@ public class InputExcelSpreadsheetTest {
 	public void testLoadFromFile_emptySheet_shouldReturnErrorProcessingMessage() throws IOException {
 		Path inputFile = Paths.get("testfiles","entrada","blank_sheet.xlsx");
 		inputExcelSpreadsheet = new InputExcelSpreadsheet(inputFile);
-		InputSpreadsheet spreadsheet = inputExcelSpreadsheet.toInputSpreadsheet();
+		InputSpreadsheet spreadsheet = inputExcelSpreadsheet.loadFromFile();
 		assertTrue("Processing messages must not be empty", !spreadsheet.getMessages().isEmpty());
 		assertEquals("Must have 3 errors message", 3, spreadsheet.getMessages().size());
 		assertTrue("Must have sheet not found error message (1st)", spreadsheet.getMessages().get(0).getText().contains("não encontrada"));
