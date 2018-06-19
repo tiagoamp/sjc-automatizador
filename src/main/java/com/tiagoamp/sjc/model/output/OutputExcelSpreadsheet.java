@@ -34,7 +34,7 @@ public class OutputExcelSpreadsheet {
 		
 		for (SjcSpecificCode code : SjcSpecificCode.values()) {
 			OutSheet outSheet = new OutSheet(code);			
-			Optional<InSheet> optInSheet = Optional.of(inputSpreadsheet.getSheets().get(code.getGenericCode()));
+			Optional<InSheet> optInSheet = Optional.ofNullable(inputSpreadsheet.getSheets().get(code.getGenericCode()));
 			if (optInSheet.isPresent() && optInSheet.get().getRows().size() != 0) {				
 				InSheet sheet = optInSheet.get();
 				List<OutRow> outRows = sheet.getRows().stream()
