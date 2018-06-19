@@ -60,24 +60,19 @@ public class InputExcelSpreadsheet {
             	loadYearMonthReference(xssfsheet, code);
             	
             	InExcelSheet excelSheet = new InExcelSheet(code, spreadsheet.getYearMonthRef());
-            	excelSheet.loadDataFrom(xssfsheet);
-            	InSheet sheet = excelSheet.toInSheet();            	 
+            	InSheet sheet = excelSheet.loadDataFrom(xssfsheet);
             	if (sheet.getRows().isEmpty()) continue;
             	
-            	spreadsheet.getSheets().put(code, sheet);            	
+            	spreadsheet.getSheets().put(code, sheet);
+            	spreadsheet.getMessages().addAll(sheet.getMessages());            	
 			}
 			
             if (spreadsheet.getLotacao() == null) {
             	spreadsheet.setLotacao("!NOME DA UNIDADE NÃO IDENTIFICADO NA PLANILHA!");
             	spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ERROR, "Não foi identificado o campo 'NOME DA UNIDADE'(no lugar previsto) na planilha."));
             }
-            
-            if (spreadsheet.getYearMonthRef() == null) {
-        		YearMonth prevYearMonth = YearMonth.now().minusMonths(1);
-        		spreadsheet.setYearMonthRef(prevYearMonth);
-        		spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado 'ANO' e 'MÊS' (no lugar previsto) em nenhuma das abas. Assumido como mês passado."));
-            }
 		}
+		
 		return spreadsheet;
 	}
 	
@@ -129,7 +124,7 @@ public class InputExcelSpreadsheet {
 		if (!isValidYear || !isValidMonth) {
 			YearMonth prevYearMonth = YearMonth.now().minusMonths(1);		
         	spreadsheet.setYearMonthRef(prevYearMonth);
-        	spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado 'ANO' e/ou 'MÊS' (no lugar previsto) em nenhuma das abas. Assumido datas do mês passado."));
+        	spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado 'ANO' e/ou 'MÊS' (no lugar previsto) na aba '" + code.getDescription() + "'. Assumido como planilha do mês passado."));
         	return;
 		}
 		

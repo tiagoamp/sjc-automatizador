@@ -12,6 +12,7 @@ import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_PLA
 import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_PLANTOES_EXTRAS;
 import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_DATA_INIT_ROW;
 
+import java.time.DateTimeException;
 import java.time.YearMonth;
 import java.util.Iterator;
 
@@ -42,19 +43,14 @@ public class InExcelSheet {
 		this.yearMonthRef = yearMonthRef;
 	}
 	
-	
-	public InSheet toInSheet() {
-		return sheet;
-	}
-	
-	public void loadDataFrom(XSSFSheet excelsheet) {
+	public InSheet loadDataFrom(XSSFSheet excelsheet) {
 		sheet = new InSheet(code, yearMonthRef);				
 				
 		Boolean endOfData = false;
 		FieldProcessor fieldProcessor;
 		
         Iterator<Row> rowItr = excelsheet.iterator();
-        if (!rowItr.hasNext()) return;
+        if (!rowItr.hasNext()) return sheet;
         Row row = goToInitialDataRow(rowItr);
         
         while (rowItr.hasNext() && !endOfData) {  // for each row
@@ -110,9 +106,17 @@ public class InExcelSheet {
                 	int indexPlantao = cell.getColumnIndex() - INDEX_COLUMN_PLANTOESEXTRAS_01; // getting index of 'plantao' from 0 to 4 (there may be 5 plantoes)
                 	String dataPlantaoExtra = df.formatCellValue(cell);
                 	if (dataPlantaoExtra != null && !dataPlantaoExtra.isEmpty() && !hasNoNumbers(dataPlantaoExtra)) {                		
-                		qtdDatasPlantoesPreenchidas++;                		
-                		fieldProcessor = new DataPlantaoFieldProcessor(yearMonthRef);
-                		inrow.getDtPlantoesExtras()[indexPlantao] = fieldProcessor.process(dataPlantaoExtra);                		                		
+                		qtdDatasPlantoesPreenchidas++; 
+                		try {
+                			fieldProcessor = new DataPlantaoFieldProcessor(yearMonthRef);
+                    		inrow.getDtPlantoesExtras()[indexPlantao] = fieldProcessor.process(dataPlantaoExtra);
+                		} catch (DateTimeException e) {
+                			//e.printStackTrace();
+                			sheet.getMessages().add(new ProcessingMessage(MessageType.ERROR, "Planilha contém na linha " + (row.getRowNum() + 1) +" "
+                					+ "'Data de Plantão Extra' com formato não reconhecido: '" + dataPlantaoExtra + "'. Formato recomendado = 'dd/mm/aaaa'."));
+                			inrow.getDtPlantoesExtras()[indexPlantao] = dataPlantaoExtra;
+                		}
+                		                		                		
                 	}
                 }
                 
@@ -121,8 +125,10 @@ public class InExcelSheet {
             if (!endOfData && StringUtils.isNotEmpty(inrow.getNome())) {
             	sheet.getRows().add(inrow);
             }            
-        } 
+        }
+        return sheet;
 	}
+	
 		
 	private Row goToInitialDataRow(Iterator<Row> rowItr) {
 		Row row = rowItr.next();

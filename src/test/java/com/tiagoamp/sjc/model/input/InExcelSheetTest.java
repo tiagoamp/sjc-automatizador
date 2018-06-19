@@ -51,8 +51,7 @@ public class InExcelSheetTest {
 		
 		// when
 		excelsheet = new InExcelSheet(code, YearMonth.now());
-		excelsheet.loadDataFrom(xssfsheet);
-		InSheet sheet = excelsheet.toInSheet();
+		InSheet sheet = excelsheet.loadDataFrom(xssfsheet);
 		
 		// then
 		final int invalidRowNum = 21;
@@ -66,13 +65,10 @@ public class InExcelSheetTest {
 	public void testLoadDataFrom_AdministrativoSheet_shouldReturnData() {
 		// given
 		SjcGeneralCode code = SjcGeneralCode.ADMINISTRATIVO;
-		XSSFSheet xssfsheet = this.getExcelSheetForTest(code);
-		
+		XSSFSheet xssfsheet = this.getExcelSheetForTest(code);		
 		// when
 		excelsheet = new InExcelSheet(code, YearMonth.now());
-		excelsheet.loadDataFrom(xssfsheet);
-		InSheet sheet = excelsheet.toInSheet();
-		
+		InSheet sheet = excelsheet.loadDataFrom(xssfsheet);		
 		// then
 		assertEquals("'Administrativo' sheet must have 9 rows", 9, sheet.getRows().size());
 	}

@@ -2,6 +2,7 @@ package com.tiagoamp.sjc.model.input;
 
 import static org.junit.Assert.assertEquals;
 
+import java.time.DateTimeException;
 import java.time.Month;
 import java.time.YearMonth;
 
@@ -28,10 +29,9 @@ public class DataPlantaoFieldProcessorTest {
 	}
 
 	
-	@Test
+	@Test(expected=DateTimeException.class)
 	public void testProcess_invalidValue_shouldReturnEmptyString() {
-		String result = inputFieldProcessor.process("1x");
-		assertEquals("Result should be empty string for invalid input", "", result);		
+		inputFieldProcessor.process("1x");		
 	}
 	
 	@Test
@@ -62,6 +62,11 @@ public class DataPlantaoFieldProcessorTest {
 	public void testProcess_dateSeparatedByDotInput_shouldReturnSameValue() {
 		String result = inputFieldProcessor.process("12.12.2012");
 		assertEquals("Result should return same full input date with slashs.", "12/12/2012", result);		
+	}
+	
+	@Test(expected=DateTimeException.class)
+	public void testProcess_invalidMonthValue_shouldReturnEmptyString() {
+		inputFieldProcessor.process("27/072017");		
 	}
 	
 }

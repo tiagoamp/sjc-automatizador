@@ -20,23 +20,12 @@ public class InputSpreadsheet {
 	private String lotacao;
 	private YearMonth yearMonthRef;
 	private Map<SjcGeneralCode, InSheet> sheets;
-	private List<ProcessingMessage> messages;	
+	private List<ProcessingMessage> messages;
 	
 	
 	public List<ProcessingMessage> getMessages() {
-		List<ProcessingMessage> allMessages = messages;
-		
-		List<ProcessingMessage> sheetsMessages = sheets.keySet().stream()
-			.map(key -> sheets.get(key).getMessages())
-			.reduce(new ArrayList<ProcessingMessage>(), (acc, curr) -> {
-				acc.addAll(curr);
-				return acc;
-			});
-		
-		allMessages.addAll(sheetsMessages);
-		
-		return allMessages;		
-	}	
+		return messages;
+	}
 	public void setMessages(List<ProcessingMessage> messages) {
 		this.messages = messages;
 	}
@@ -64,5 +53,5 @@ public class InputSpreadsheet {
 	public void setYearMonthRef(YearMonth yearMonthRef) {
 		this.yearMonthRef = yearMonthRef;
 	}
-	
+		
 }
