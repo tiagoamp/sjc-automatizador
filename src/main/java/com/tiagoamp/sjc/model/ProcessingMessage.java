@@ -15,6 +15,12 @@ public class ProcessingMessage {
 	private String text;
 	
 	
+	@Override
+	public String toString() {
+		return type + " - " + text;
+	}
+	
+	
 	public MessageType getType() {
 		return type;
 	}
