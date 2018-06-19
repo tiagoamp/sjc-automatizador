@@ -1,8 +1,10 @@
 package com.tiagoamp.sjc.model.fieldprocessor;
 
+import java.time.DateTimeException;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class DataPlantaoFieldProcessor extends FieldProcessor {
 	
@@ -30,17 +32,22 @@ public class DataPlantaoFieldProcessor extends FieldProcessor {
 		}
 		
 		if ( inputValue.matches(REGEX_DAY_MONTH) ) {
-			String str[] = inputValue.split("/");
-			Optional<Month> convertedMonth = MonthConverter.getConvertedMonth(str[1].toLowerCase());
-			Month month = convertedMonth.orElse(yearMonth.getMonth());
-			return str[0] + "/" + String.format("%02d", month.getValue()) + "/" + yearMonth.getYear();
+			String str[] = inputValue.split("/");			
+			String intentedMonth = str[1].toLowerCase();			
+			boolean isNumericMonth = Pattern.compile("\\d+").matcher(intentedMonth).matches();
+			boolean isMonthLengthWithNoMoreThanTwoChars = intentedMonth.length() <= 2;			
+			if ( !isNumericMonth || (isNumericMonth && isMonthLengthWithNoMoreThanTwoChars) ) {
+				Optional<Month> convertedMonth = MonthConverter.getConvertedMonth(str[1].toLowerCase());
+				Month month = convertedMonth.orElse(yearMonth.getMonth());
+				return str[0] + "/" + String.format("%02d", month.getValue()) + "/" + yearMonth.getYear();
+			}
 		}
 		
 		if ( inputValue.matches(REGEX_DAY_ONLY) ) {
 			return inputValue + "/" + yearMonth.getMonthValue() + "/" + yearMonth.getYear();
 		}
 		
-		return "Padrão de data não reconhecido";
+		throw new DateTimeException("Formato de data não reconhecido");
 	}
 		
 }
