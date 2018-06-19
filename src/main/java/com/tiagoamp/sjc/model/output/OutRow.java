@@ -2,6 +2,13 @@ package com.tiagoamp.sjc.model.output;
 
 public class OutRow {
 	
+	private String lotacao;
+	private String nome;
+	private String matricula;
+	private Integer quantidade;
+	private String[] dtPlantoesExtras = new String[5];
+	
+	
 	public OutRow() {		
 	}
 	
@@ -16,13 +23,6 @@ public class OutRow {
 		this.quantidade = quantidade;
 		this.dtPlantoesExtras = dtPlantoesEstras;
 	}
-	
-	
-	private String lotacao;
-	private String nome;
-	private String matricula;
-	private Integer quantidade;
-	private String[] dtPlantoesExtras = new String[5];
 	
 	
 	public String getLotacao() {
