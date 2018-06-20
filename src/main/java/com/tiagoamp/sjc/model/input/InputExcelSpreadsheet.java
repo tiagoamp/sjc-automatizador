@@ -81,7 +81,7 @@ public class InputExcelSpreadsheet {
 		List<ProcessingMessage> validationMsgs = new ArrayList<>();
 		if (Files.isDirectory(inputFile)) {
 			validationMsgs.add(new ProcessingMessage(MessageType.ERROR, "Arquivo de origem é um diretório e não será considerado no processamento."));
-		} else if (!inputFile.getFileName().toString().endsWith(".xlsx")) {
+		} else if (!inputFile.getFileName().toString().toLowerCase().endsWith(".xlsx")) {
 			validationMsgs.add(new ProcessingMessage(MessageType.ERROR, "Arquivo de origem não tem extensão '.xlsx'. e não será considerado no processamento."));
 		}
 		boolean hasValidationMessages = spreadsheet.getMessages().addAll(validationMsgs);
@@ -113,12 +113,12 @@ public class InputExcelSpreadsheet {
 		Pattern nonNumericPattern = Pattern.compile("[^0-9]");
 		boolean isValidYear = yearStr == null || yearStr.isEmpty() || nonNumericPattern.matcher(yearStr).find();
 		if (!isValidYear) {
-			spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'ANO' (no lugar previsto) na planilha na aba '" + code.getDescription() + "'. Assumido ano ref mês passado."));			
+			spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'ANO' (no lugar previsto, célula '" + yearCellAddr.formatAsString() + "') na planilha na aba '" + code.getDescription() + "'. Assumido ano ref mês passado."));			
 		}		
 		Optional<Month> convertedMonth = MonthConverter.getConvertedMonth(monthStr);
 		boolean isValidMonth = convertedMonth.isPresent(); 
 		if (!isValidMonth) {
-			spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'MÊS' (no lugar previsto) na planilha na aba '" + code.getDescription() + "'. Assumido como mês passado."));			
+			spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'MÊS' (no lugar previsto, célula '" + monthCellAddr.formatAsString() + "') na planilha na aba '" + code.getDescription() + "'. Assumido como mês passado."));			
 		}
 		
 		if (!isValidYear || !isValidMonth) {
