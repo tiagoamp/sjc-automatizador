@@ -25,6 +25,12 @@ public class OutRow {
 	}
 	
 	
+	@Override
+	public String toString() {
+		return String.format("%s | %s | %s", matricula, nome, lotacao);
+	}
+	
+	
 	public String getLotacao() {
 		return lotacao;
 	}

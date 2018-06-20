@@ -23,12 +23,12 @@ public class OutputFilesGenerator {
 	public void generateOuputSpreadsheetFile(Path outputFile, OutputSpreadsheet spreadsheet) throws IOException  {		
 		try (XSSFWorkbook workbook = new XSSFWorkbook();
 			 FileOutputStream fos = new FileOutputStream(outputFile.toFile());  
-			) 
-			{
+			) {
 			for (SjcSpecificCode code : SjcSpecificCode.values()) {
 				OutSheet sheet = spreadsheet.getSheets().get(code);
-				if (sheet == null || sheet.getOutputrows() == null || sheet.getOutputrows().size() == 0) continue; 
-				sheet.getOutputrows().sort((r1,r2) -> r1.getLotacao().compareTo(r2.getLotacao()));
+				if (sheet == null || sheet.getOutputrows() == null || sheet.getOutputrows().size() == 0) continue;
+				
+				sheet.sortRows();
 						    		
 				Map<Integer, Object[]> data = this.createOutputDataMap(sheet);
 				
