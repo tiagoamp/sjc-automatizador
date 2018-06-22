@@ -11,16 +11,17 @@ import com.tiagoamp.sjc.model.SjcGeneralCode;
 
 public class InputSpreadsheet {
 	
-	public InputSpreadsheet() {
-		messages = new ArrayList<>();
-		sheets = new HashMap<>();
-	}
-	
 	private String fileName;
 	private String lotacao;
 	private YearMonth yearMonthRef;
 	private Map<SjcGeneralCode, InSheet> sheets;
 	private List<ProcessingMessage> messages;
+	
+	
+	public InputSpreadsheet() {
+		messages = new ArrayList<>();
+		sheets = new HashMap<>();
+	}
 	
 	
 	public List<ProcessingMessage> getMessages() {
