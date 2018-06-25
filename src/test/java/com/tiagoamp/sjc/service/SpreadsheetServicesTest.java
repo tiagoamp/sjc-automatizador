@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.tiagoamp.sjc.model.input.HistoricoAfastamentos;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
 
@@ -49,6 +50,12 @@ public class SpreadsheetServicesTest {
 	public void testLoadInputSpreadsheetsFromDirectory_shouldLoadFiles() throws IOException {
 		List<InputSpreadsheet> result = service.loadInputSpreadsheetsFromDirectory(inputDir);
 		assertNotNull("Must generate list of input spreadsheets.", result);
+	}
+	
+	@Test
+	public void testLoadAfastamentosSpreadSheet_shouldLoadFile() throws IOException {
+		HistoricoAfastamentos result = service.loadAfastamentosSpreadsheet(inputDir.resolve("template_HistoricoAfastamento.xlsx"));
+		assertNotNull("Must generate the 'afastamentos' spreadsheet.", result);
 	}
 
 	@Test

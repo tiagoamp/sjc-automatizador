@@ -11,6 +11,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.text.DocumentException;
+import com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet;
+import com.tiagoamp.sjc.model.input.HistoricoAfastamentos;
 import com.tiagoamp.sjc.model.input.InputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputExcelSpreadsheet;
@@ -35,6 +37,12 @@ public class SpreadsheetServices {
 			inputList.add(spreadsheet);				
 		}		
 		return inputList;
+	}
+	
+	public HistoricoAfastamentos loadAfastamentosSpreadsheet(Path filepath) throws IOException {
+		if (Files.notExists(filepath)) throw new IllegalArgumentException("Arquivo inexistente!");
+		AfastamentosExcelSpreadsheet spreadsheet = new AfastamentosExcelSpreadsheet(filepath);
+		return spreadsheet.loadFromFile();
 	}
 	
 	public OutputSpreadsheet generateOutputSpreadSheet(List<InputSpreadsheet> inputSpreadSheets) {
