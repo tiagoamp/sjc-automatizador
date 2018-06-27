@@ -61,7 +61,7 @@ public class SpreadsheetServicesTest {
 	@Test
 	public void testGenerateOutputSpreadSheet_shouldGenerateValidOutput() throws IOException {
 		List<InputSpreadsheet> inputlist = service.loadInputSpreadsheetsFromDirectory(inputDir);
-		OutputSpreadsheet result = service.generateOutputSpreadSheet(inputlist);
+		OutputSpreadsheet result = service.generateOutputSpreadSheet(inputlist, null);
 		assertNotNull("Must generate output spreadsheet.", result);		
 	}
 
@@ -69,7 +69,7 @@ public class SpreadsheetServicesTest {
 	public void testGenerateOuputSpreadsheetFile_shouldGenerateValidOutput() throws IOException {
 		// given
 		List<InputSpreadsheet> inputlist = service.loadInputSpreadsheetsFromDirectory(inputDir);
-		OutputSpreadsheet outspreadsheet = service.generateOutputSpreadSheet(inputlist);
+		OutputSpreadsheet outspreadsheet = service.generateOutputSpreadSheet(inputlist, null);
 		Path outputfile = outputDir.resolve("testOutFromFacadeTest.xlsx");		
 		// when
 		service.generateOuputSpreadsheetFile(outputfile, outspreadsheet);		

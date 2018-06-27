@@ -28,7 +28,12 @@ public class DataPlantaoFieldProcessor extends FieldProcessor {
 		inputValue = inputValue.replace("-", "/").replace(".", "/").toLowerCase();
 		
 		if ( inputValue.matches(REGEX_FULL_DATE) ) {
-			return inputValue.replace("[-]", "/").replace(".", "/");
+			String newValue = inputValue.replace("[-]", "/").replace(".", "/").trim();
+			String[] splittedDate = newValue.split("/");
+			String yearStr = splittedDate[2];
+			if (yearStr.length() == 2) yearStr = "20" + yearStr;
+			newValue = splittedDate[0] + "/" + splittedDate[1] + "/" + yearStr;
+			return newValue;
 		}
 		
 		if ( inputValue.matches(REGEX_DAY_MONTH) ) {

@@ -16,6 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.itextpdf.text.DocumentException;
+import com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet;
+import com.tiagoamp.sjc.model.input.HistoricoAfastamentos;
 import com.tiagoamp.sjc.model.input.InputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 
@@ -60,11 +62,27 @@ public class OutputFilesGeneratorTest {
 		Path outputTestFile = Paths.get("testfiles", "saida", "testOutFromSpreadSheetTest.xlsx");
 		List<InputSpreadsheet> inputlist = getInputSpreadsheetForTests();
 		OutputExcelSpreadsheet excelSpreadsheet = new OutputExcelSpreadsheet();
-		OutputSpreadsheet spreadsheet = excelSpreadsheet.loadDataFromInputSpreadsheets(inputlist);				
+		OutputSpreadsheet spreadsheet = excelSpreadsheet.loadDataFromInputSpreadsheets(inputlist, null);				
 		// when
 		filesGenerator.generateOuputSpreadsheetFile(outputTestFile, spreadsheet);		
 		// then
 		assertTrue("File should be created in filesystem.", Files.exists(outputTestFile));
+	}
+	
+	@Test
+	public void testGenerateOuputSpreadSheet_withAfastamentosSpreadsheet_shouldGenerateFileInSystem() throws IOException {
+		// given
+		Path outputTestFile = Paths.get("testfiles", "saida", "testOutFromSpreadSheetTest.xlsx");
+		Path afastTestFile = Paths.get("testfiles", "entrada", "template_HistoricoAfastamento.xlsx");
+		List<InputSpreadsheet> inputlist = getInputSpreadsheetForTests();
+		OutputExcelSpreadsheet excelSpreadsheet = new OutputExcelSpreadsheet();		
+		AfastamentosExcelSpreadsheet afastExcelSpreadsheet = new AfastamentosExcelSpreadsheet(afastTestFile);
+		HistoricoAfastamentos histAfastamentos = afastExcelSpreadsheet.loadFromFile();		
+		OutputSpreadsheet spreadsheet = excelSpreadsheet.loadDataFromInputSpreadsheets(inputlist, histAfastamentos);				
+		// when
+		filesGenerator.generateOuputSpreadsheetFile(outputTestFile, spreadsheet);		
+		// then
+		assertTrue("File should be created in filesystem with afastamentos.", Files.exists(outputTestFile));
 	}
 	
 	@Test
@@ -73,7 +91,7 @@ public class OutputFilesGeneratorTest {
 		Path outputTestFile = Paths.get("testfiles", "saida", "testOutMessageFromSpreadSheetTest.pdf");
 		List<InputSpreadsheet> inputlist = getInputSpreadsheetForTests();
 		OutputExcelSpreadsheet excelSpreadsheet = new OutputExcelSpreadsheet();
-		OutputSpreadsheet spreadsheet = excelSpreadsheet.loadDataFromInputSpreadsheets(inputlist);		
+		OutputSpreadsheet spreadsheet = excelSpreadsheet.loadDataFromInputSpreadsheets(inputlist, null);		
 		// when
 		filesGenerator.generateOutputMessageFile(outputTestFile, spreadsheet);		
 		// then

@@ -111,7 +111,7 @@ public class InExcelSheet {
                 			fieldProcessor = new DataPlantaoFieldProcessor(yearMonthRef);
                     		inrow.getDtPlantoesExtras()[indexPlantao] = fieldProcessor.process(dataPlantaoExtra);
                 		} catch (DateTimeException e) {
-                			//e.printStackTrace();
+                			//e.printStackTrace();  //FIXME
                 			sheet.getMessages().add(new ProcessingMessage(MessageType.ERROR, "Planilha contém na linha " + (row.getRowNum() + 1) +" "
                 					+ "'Data de Plantão Extra' com formato não reconhecido: '" + dataPlantaoExtra + "'. Formato recomendado = 'dd/mm/aaaa'."));
                 			inrow.getDtPlantoesExtras()[indexPlantao] = dataPlantaoExtra;

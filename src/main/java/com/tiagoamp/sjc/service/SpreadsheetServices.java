@@ -22,13 +22,7 @@ import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
 @Service
 public class SpreadsheetServices {
 	
-	public InputSpreadsheet loadInputSpreadsheet(Path filepath) throws IOException {
-		if (Files.notExists(filepath)) throw new IllegalArgumentException("Arquivo inexistente!");
-		InputExcelSpreadsheet excelSheet = new InputExcelSpreadsheet(filepath);
-		return excelSheet.loadFromFile();
-	}
-	
-	public List<InputSpreadsheet> loadInputSpreadsheetsFromDirectory(Path directory) throws IOException {
+		public List<InputSpreadsheet> loadInputSpreadsheetsFromDirectory(Path directory) throws IOException {
 		if (Files.notExists(directory)) throw new IllegalArgumentException("Diretório inexistente!");
 		List<InputSpreadsheet> inputList = new ArrayList<>();
 		DirectoryStream<Path> stream = Files.newDirectoryStream(directory);
@@ -39,15 +33,23 @@ public class SpreadsheetServices {
 		return inputList;
 	}
 	
+	public InputSpreadsheet loadInputSpreadsheet(Path filepath) throws IOException {
+		if (Files.notExists(filepath)) throw new IllegalArgumentException("Arquivo inexistente!");
+		InputExcelSpreadsheet excelSheet = new InputExcelSpreadsheet(filepath);
+		return excelSheet.loadFromFile();
+	}
+	
 	public HistoricoAfastamentos loadAfastamentosSpreadsheet(Path filepath) throws IOException {
 		if (Files.notExists(filepath)) throw new IllegalArgumentException("Arquivo inexistente!");
 		AfastamentosExcelSpreadsheet spreadsheet = new AfastamentosExcelSpreadsheet(filepath);
 		return spreadsheet.loadFromFile();
 	}
 	
-	public OutputSpreadsheet generateOutputSpreadSheet(List<InputSpreadsheet> inputSpreadSheets) {
-		OutputExcelSpreadsheet excelSheet = new OutputExcelSpreadsheet();
-		return excelSheet.loadDataFromInputSpreadsheets(inputSpreadSheets);
+	public OutputSpreadsheet generateOutputSpreadSheet(List<InputSpreadsheet> inputSpreadSheets, Path histAfastamentoFilePath) throws IOException {
+		HistoricoAfastamentos afastamentos = null;
+		if (histAfastamentoFilePath != null && Files.exists(histAfastamentoFilePath)) afastamentos = loadAfastamentosSpreadsheet(histAfastamentoFilePath);
+		OutputExcelSpreadsheet excelSheet = new OutputExcelSpreadsheet();		
+		return excelSheet.loadDataFromInputSpreadsheets(inputSpreadSheets, afastamentos);
 	}
 	
 	public void generateOuputSpreadsheetFile(Path outputFile, OutputSpreadsheet spreadsheet) throws IOException {

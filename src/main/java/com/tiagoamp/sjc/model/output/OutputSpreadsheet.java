@@ -9,14 +9,14 @@ import com.tiagoamp.sjc.model.SjcSpecificCode;
 
 public class OutputSpreadsheet {
 	
+	private Map<SjcSpecificCode, OutSheet> sheets;
+	private Map<String,List<ProcessingMessage>> messages;
+	
+	
 	public OutputSpreadsheet() {
 		sheets = new HashMap<>();
 		messages = new HashMap<>();
 	}
-	
-	
-	private Map<SjcSpecificCode, OutSheet> sheets;
-	private Map<String,List<ProcessingMessage>> messages;
 	
 			
 	public Map<SjcSpecificCode, OutSheet> getSheets() {

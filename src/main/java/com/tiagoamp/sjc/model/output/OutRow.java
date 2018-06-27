@@ -7,6 +7,8 @@ public class OutRow {
 	private String matricula;
 	private Integer quantidade;
 	private String[] dtPlantoesExtras = new String[5];
+	private String afastamento;	
+	private Boolean[] dtPlantoesWithinAfastamentos = new Boolean[5];
 	
 	
 	public OutRow() {		
@@ -60,6 +62,18 @@ public class OutRow {
 	}
 	public void setDtPlantoesExtras(String[] dtPlantoesExtras) {
 		this.dtPlantoesExtras = dtPlantoesExtras;
+	}
+	public String getAfastamento() {
+		return afastamento;
+	}
+	public void setAfastamento(String afastamento) {
+		this.afastamento = afastamento;
+	}
+	public Boolean[] getDtPlantoesWithinAfastamentos() {
+		return dtPlantoesWithinAfastamentos;
+	}
+	public void setDtPlantoesWithinAfastamentos(Boolean[] dtPlantoesWithinAfastamentos) {
+		this.dtPlantoesWithinAfastamentos = dtPlantoesWithinAfastamentos;
 	}
 
 }

@@ -47,18 +47,18 @@ public class InExcelSheetTest {
 	public void testLoadDataFrom_OperacionalSheet_shouldReturnData() {
 		// given
 		SjcGeneralCode code = SjcGeneralCode.OPERACIONAL;
-		XSSFSheet xssfsheet = this.getExcelSheetForTest(code);
-		
+		XSSFSheet xssfsheet = this.getExcelSheetForTest(code);		
 		// when
 		excelsheet = new InExcelSheet(code, YearMonth.now());
-		InSheet sheet = excelsheet.loadDataFrom(xssfsheet);
-		
+		InSheet sheet = excelsheet.loadDataFrom(xssfsheet);		
 		// then
 		final int invalidRowNum = 21;
 		assertEquals("'Operacional' sheet must have 17 rows", 17, sheet.getRows().size());
-		assertTrue("Alert message (invalid row) should be generated.", sheet.getMessages().size() > 0);
-		assertTrue("Alert message about invalid row number '" + invalidRowNum + "' should be generated.", 
-				sheet.getMessages().get(0).getText().contains(String.valueOf(invalidRowNum)));
+		assertTrue("Alert message (invalid row) should be generated.", sheet.getMessages().size() > 0);		
+		boolean hasInvalidNumberMesssage = sheet.getMessages().stream()
+				.filter(msg -> msg.getText().contains(String.valueOf(invalidRowNum)))
+				.findAny().isPresent();		
+		assertTrue("Alert message about invalid row number '" + invalidRowNum + "' should be generated.", hasInvalidNumberMesssage);
 	}
 	
 	@Test

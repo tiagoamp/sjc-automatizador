@@ -15,6 +15,13 @@ public class AfastamentoRow {
 	private String tipo;
 	
 	
+	public String getAfastamentoForOuputRow() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");			
+		String dataFinalStr = dataFinal != null ? formatter.format(dataFinal) : "-";
+		String periodoStr = periodo != null ? periodo : "-";
+		return String.format("Afastamento de %s até %s (%s) | Matrícula = %s - %s", formatter.format(dataInicial), dataFinalStr, periodoStr, matricula, nome);
+	}
+	
 	@Override
 	public String toString() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");			

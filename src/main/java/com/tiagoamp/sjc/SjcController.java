@@ -45,7 +45,8 @@ public class SjcController {
 	
 	
 	private final Path UPLOAD_DIR = SjcAutoApplication.BASE_DIR.resolve("upload/");
-	private final Path RESULT_DIR = SjcAutoApplication.BASE_DIR.resolve("resultado/");
+	private final Path RESULT_DIR = SjcAutoApplication.BASE_DIR.resolve("resultado/");	
+	private final Path HISTORICO_AFASTAMENTO_FILE_PATH = SjcAutoApplication.BASE_DIR.resolve("upload/").resolve("PesquisarHistoricoAfastamentoServidor.xlsx");
 	
 		
 	@RequestMapping(value = "upload", method = RequestMethod.POST)
@@ -109,7 +110,7 @@ public class SjcController {
 	public ResponseEntity<InputStreamResource> generateOutputSpreadsheet() {
 		try {
 			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(UPLOAD_DIR);
-			OutputSpreadsheet spreadsheet = sjcService.generateOutputSpreadSheet(list);
+			OutputSpreadsheet spreadsheet = sjcService.generateOutputSpreadSheet(list, HISTORICO_AFASTAMENTO_FILE_PATH);
 			
 			LocalDate now = LocalDate.now();
 			Path resultFile = RESULT_DIR.resolve("Resultado_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".xls");
@@ -139,7 +140,7 @@ public class SjcController {
 		OutputSpreadsheet outsheet = null;
 		try {
 			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(UPLOAD_DIR);
-			outsheet = sjcService.generateOutputSpreadSheet(list);
+			outsheet = sjcService.generateOutputSpreadSheet(list, HISTORICO_AFASTAMENTO_FILE_PATH);
 			
 			LocalDate now = LocalDate.now();
 			Path resultFile = RESULT_DIR.resolve("Mensagens_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".pdf");
