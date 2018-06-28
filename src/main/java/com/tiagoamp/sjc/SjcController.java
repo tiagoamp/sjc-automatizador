@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -50,8 +51,7 @@ public class SjcController {
 	
 	private final Path UPLOAD_DIR = SjcAutoApplication.BASE_DIR.resolve("upload/");
 	private final Path RESULT_DIR = SjcAutoApplication.BASE_DIR.resolve("resultado/");	
-	private final Path HISTORICO_AFASTAMENTO_FILE_PATH = SjcAutoApplication.BASE_DIR.resolve("upload/").resolve("PesquisarHistoricoAfastamentoServidor.xlsx");
-	
+		
 		
 	@RequestMapping(value = "upload", method = RequestMethod.POST)
 	public Response uploadFile(MultipartHttpServletRequest request) {
@@ -114,7 +114,10 @@ public class SjcController {
 	public ResponseEntity<InputStreamResource> generateOutputSpreadsheet() {
 		try {
 			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(UPLOAD_DIR);
-			OutputSpreadsheet spreadsheet = sjcService.generateOutputSpreadSheet(list, HISTORICO_AFASTAMENTO_FILE_PATH);
+			Optional<Path> histAfastamentoPath = uploadService.findAfastamentoSpreadsheetPath(UPLOAD_DIR);
+			Path afastamentoSpreadsheetFile = histAfastamentoPath.orElse(null);		
+			
+			OutputSpreadsheet spreadsheet = sjcService.generateOutputSpreadSheet(list, afastamentoSpreadsheetFile);
 			
 			LocalDate now = LocalDate.now();
 			Path resultFile = RESULT_DIR.resolve("Resultado_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".xls");
@@ -144,7 +147,10 @@ public class SjcController {
 		OutputSpreadsheet outsheet = null;
 		try {
 			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(UPLOAD_DIR);
-			outsheet = sjcService.generateOutputSpreadSheet(list, HISTORICO_AFASTAMENTO_FILE_PATH);
+			Optional<Path> histAfastamentoPath = uploadService.findAfastamentoSpreadsheetPath(UPLOAD_DIR);
+			Path afastamentoSpreadsheetFile = histAfastamentoPath.orElse(null);		
+						
+			outsheet = sjcService.generateOutputSpreadSheet(list, afastamentoSpreadsheetFile);
 			
 			LocalDate now = LocalDate.now();
 			Path resultFile = RESULT_DIR.resolve("Mensagens_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".pdf");

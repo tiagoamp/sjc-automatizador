@@ -76,7 +76,14 @@ function loadSpreadsheetAtIndex( i ) {
             showErrorMessage("Erro ao acessar o arquivo nro " + i + ".");
             return;
         }
-        showSuccessMessage("Planilha processada: " + data.fileName);                
+
+        const isPlanilhaDeAfastamento = data.fileName.toLowerCase().includes("afastamento");
+        if ( isPlanilhaDeAfastamento ) {
+            showInfoMessage("Planilha de Afastamentos identificada: " + data.fileName);
+        } else {
+            showSuccessMessage("Planilha processada: " + data.fileName); 
+        }
+
         createMessagesPanels(data);
 	})
 	.fail( function() { showErrorMessage("Falha no acesso ao arquivo (Índice = " + i + ").") } );

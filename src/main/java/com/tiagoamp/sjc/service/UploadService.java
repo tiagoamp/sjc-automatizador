@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -38,6 +39,20 @@ public class UploadService {
 				LOGGER.debug("Error on cleaning directories.", e);
 			}
 		});
+	}
+	
+	public Optional<Path> findAfastamentoSpreadsheetPath(Path uploadDir) {
+		Optional<Path> result = Optional.empty();
+		try {
+			result = Files.list(uploadDir)
+					.filter(path -> !Files.isDirectory(path))
+					.filter(path -> path.getFileName().toString().toLowerCase().contains("afastamento"))
+					.filter(path -> path.getFileName().toString().toLowerCase().endsWith("xlsx"))
+					.findFirst();
+		} catch (IOException e) {
+			LOGGER.debug("Error in searching 'afastamentos' spreadsheet.", e);
+		}
+		return result;
 	}
 	
 }
