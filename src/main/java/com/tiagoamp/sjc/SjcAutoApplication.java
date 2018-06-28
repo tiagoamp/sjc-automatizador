@@ -8,19 +8,25 @@ import java.nio.file.Paths;
 
 import javax.naming.ConfigurationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.tiagoamp.sjc.model.ExpirationManager;
 import com.tiagoamp.sjc.service.UploadService;
 
+
+
 @SpringBootApplication
 public class SjcAutoApplication {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(SjcAutoApplication.class);	
 	
 	public static Path BASE_DIR;
 	
 	
-	public static void main(String[] args) {		
+	public static void main(String[] args) {
 		String userDirectory = System.getProperty("user.dir");
 		BASE_DIR = Paths.get(userDirectory);
 		Path CONFIG_FILE = BASE_DIR.resolve("resources" + File.separator + "conf.dat");
@@ -45,13 +51,13 @@ public class SjcAutoApplication {
 			uploadService.cleanDirectory(BASE_DIR.resolve("upload/"));
 			
 		} catch (ConfigurationException e) {			
-			e.printStackTrace();
+			LOGGER.error("Application config error", e);
 			expirationManager.printConfigFileErrorMessage();
 			waitInSeconds(3);
 			System.out.println("Encerrado!");
 			System.exit(1);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error("Directory access error", e);
 			System.out.println("Erro ao acessar diretórios ('uploads' e/ou 'resultados') !!!");
 			waitInSeconds(3);
 			System.exit(1);
@@ -77,7 +83,7 @@ public class SjcAutoApplication {
 		try {
 			Thread.sleep(seconds * 1000);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 	}
 	 

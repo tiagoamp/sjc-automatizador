@@ -84,7 +84,6 @@ public class OutputFilesGenerator {
 			boolean isRowWithPlantaoExtra = objArr[initPlantoesObjIndex] != null;
 			
 			int cellnum = 0;
-			//for (Object obj : objArr) {
 			for (int i=0; i < objArr.length; i++ ) {
 				Object obj = objArr[i];				
 				Cell cell = row.createCell(cellnum++);

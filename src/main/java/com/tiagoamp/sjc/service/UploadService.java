@@ -7,11 +7,15 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UploadService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UploadService.class);
 
 	public void saveMultipartFileInFileSystem(MultipartFile mfile, String filepath) throws IllegalStateException, IOException {
 		File dest = new File(filepath);
@@ -31,7 +35,7 @@ public class UploadService {
 			try {
 				Files.delete(f);
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOGGER.debug("Error on cleaning directories.", e);
 			}
 		});
 	}

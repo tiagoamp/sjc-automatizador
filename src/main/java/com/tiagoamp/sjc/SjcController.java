@@ -14,6 +14,8 @@ import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -36,6 +38,8 @@ import com.tiagoamp.sjc.service.UploadService;
 @RestController
 @RequestMapping("/sjc")
 public class SjcController {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(SjcController.class);
 	
 	@Autowired
 	private SpreadsheetServices sjcService;
@@ -60,7 +64,7 @@ public class SjcController {
 				uploadService.saveMultipartFileInFileSystem(mfile, filepathStr);								
 			}
 		} catch (IOException e) {
-			e.printStackTrace();			
+			LOGGER.error(e.getMessage());			
 			return Response.serverError().build();
 		}
 		return Response.ok().build();
@@ -72,7 +76,7 @@ public class SjcController {
 		try {
 			total = uploadService.getNumberOfFilesInUploadDirectory(UPLOAD_DIR);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
 		}
 		return String.valueOf(total);
@@ -84,7 +88,7 @@ public class SjcController {
 			uploadService.cleanDirectory(UPLOAD_DIR);
 			uploadService.cleanDirectory(RESULT_DIR);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
 		}
 		return Response.ok().build();
@@ -99,7 +103,7 @@ public class SjcController {
 			Path filepath = list.get(Integer.valueOf(index));
 			insheet = sjcService.loadInputSpreadsheet(filepath);			
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
 		}		
 		return insheet;
@@ -129,7 +133,7 @@ public class SjcController {
 		    ResponseEntity<InputStreamResource> response = new ResponseEntity<InputStreamResource>(new InputStreamResource(new FileInputStream(resultFile.toFile())), headers, HttpStatus.OK);
 		    return response;			
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
 		}		
 	}
@@ -159,7 +163,7 @@ public class SjcController {
 		    ResponseEntity<InputStreamResource> response = new ResponseEntity<InputStreamResource>(new InputStreamResource(new FileInputStream(resultFile.toFile())), headers, HttpStatus.OK);
 		    return response;
 		} catch (IOException | DocumentException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
 		}		
 	}

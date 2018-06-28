@@ -21,6 +21,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.tiagoamp.sjc.model.MessageType;
 import com.tiagoamp.sjc.model.ProcessingMessage;
@@ -31,6 +33,8 @@ import com.tiagoamp.sjc.model.fieldprocessor.MatriculaFieldProcessor;
 import com.tiagoamp.sjc.model.fieldprocessor.NumericFieldProcessor;
 
 public class InExcelSheet {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(InExcelSheet.class);
 	
 	private InSheet sheet;
 	private SjcGeneralCode code;
@@ -111,7 +115,7 @@ public class InExcelSheet {
                 			fieldProcessor = new DataPlantaoFieldProcessor(yearMonthRef);
                     		inrow.getDtPlantoesExtras()[indexPlantao] = fieldProcessor.process(dataPlantaoExtra);
                 		} catch (DateTimeException e) {
-                			//e.printStackTrace();  //FIXME
+                			LOGGER.debug("Padrão de data não reconhecido: " + dataPlantaoExtra);
                 			sheet.getMessages().add(new ProcessingMessage(MessageType.ERROR, "Planilha contém na linha " + (row.getRowNum() + 1) +" "
                 					+ "'Data de Plantão Extra' com formato não reconhecido: '" + dataPlantaoExtra + "'. Formato recomendado = 'dd/mm/aaaa'."));
                 			inrow.getDtPlantoesExtras()[indexPlantao] = dataPlantaoExtra;

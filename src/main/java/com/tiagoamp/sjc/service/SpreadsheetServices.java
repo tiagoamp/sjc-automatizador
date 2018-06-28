@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.text.DocumentException;
@@ -22,7 +24,10 @@ import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
 @Service
 public class SpreadsheetServices {
 	
-		public List<InputSpreadsheet> loadInputSpreadsheetsFromDirectory(Path directory) throws IOException {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SpreadsheetServices.class);
+	
+	public List<InputSpreadsheet> loadInputSpreadsheetsFromDirectory(Path directory) throws IOException {
+		LOGGER.info("Carregando arquivos do diretório...");
 		if (Files.notExists(directory)) throw new IllegalArgumentException("Diretório inexistente!");
 		List<InputSpreadsheet> inputList = new ArrayList<>();
 		DirectoryStream<Path> stream = Files.newDirectoryStream(directory);
@@ -40,12 +45,14 @@ public class SpreadsheetServices {
 	}
 	
 	public HistoricoAfastamentos loadAfastamentosSpreadsheet(Path filepath) throws IOException {
+		LOGGER.info("Carregando planilha de afastamentos...");
 		if (Files.notExists(filepath)) throw new IllegalArgumentException("Arquivo inexistente!");
 		AfastamentosExcelSpreadsheet spreadsheet = new AfastamentosExcelSpreadsheet(filepath);
 		return spreadsheet.loadFromFile();
 	}
 	
 	public OutputSpreadsheet generateOutputSpreadSheet(List<InputSpreadsheet> inputSpreadSheets, Path histAfastamentoFilePath) throws IOException {
+		LOGGER.info("Gerando planilha de saída...");
 		HistoricoAfastamentos afastamentos = null;
 		if (histAfastamentoFilePath != null && Files.exists(histAfastamentoFilePath)) afastamentos = loadAfastamentosSpreadsheet(histAfastamentoFilePath);
 		OutputExcelSpreadsheet excelSheet = new OutputExcelSpreadsheet();		
@@ -53,11 +60,13 @@ public class SpreadsheetServices {
 	}
 	
 	public void generateOuputSpreadsheetFile(Path outputFile, OutputSpreadsheet spreadsheet) throws IOException {
+		LOGGER.info("Gerando arquivo da planilha de saída...");
 		OutputFilesGenerator filesGenerator = new OutputFilesGenerator();
 		filesGenerator.generateOuputSpreadsheetFile(outputFile, spreadsheet);
 	}
 	
 	public void generateOutputMessagesFile(Path outputFile, OutputSpreadsheet spreadsheet) throws FileNotFoundException, DocumentException  {
+		LOGGER.info("Gerando arquivo de mensagens...");
 		OutputFilesGenerator filesGenerator = new OutputFilesGenerator();
 		filesGenerator.generateOutputMessageFile(outputFile, spreadsheet);
 	}

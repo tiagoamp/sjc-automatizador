@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.tiagoamp.sjc.model.SjcItemType;
 import com.tiagoamp.sjc.model.SjcSpecificCode;
@@ -16,6 +18,8 @@ import com.tiagoamp.sjc.model.input.InSheet;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 
 public class OutputExcelSpreadsheet {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(OutputExcelSpreadsheet.class);
 	
 	private OutputSpreadsheet spreadsheet;
 	
@@ -106,6 +110,7 @@ public class OutputExcelSpreadsheet {
 				else outRow.getDtPlantoesWithinAfastamentos()[i] = true;
 
 			} catch (Exception e) {
+				LOGGER.debug("Padrão de data não reconhecido: " + dateStr);
 				outRow.getDtPlantoesWithinAfastamentos()[i] = null;
 			}
 
