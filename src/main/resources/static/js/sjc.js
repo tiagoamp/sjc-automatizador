@@ -82,9 +82,8 @@ function loadSpreadsheetAtIndex( i ) {
             showInfoMessage("Planilha de Afastamentos identificada: " + data.fileName);
         } else {
             showSuccessMessage("Planilha processada: " + data.fileName); 
-        }
-
-        createMessagesPanels(data);
+            createMessagesPanels(data);
+        }        
 	})
 	.fail( function() { showErrorMessage("Falha no acesso ao arquivo (Índice = " + i + ").") } );
 }
