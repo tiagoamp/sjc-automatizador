@@ -24,6 +24,9 @@ public class AfastamentosExcelSpreadsheet {
 	private HistoricoAfastamentos afastamentos;
 	private Path filePath; 
 	
+	public static final String AFASTAMENTO_IDENTIFIED_FILE_NAME = "afastamento";
+	
+	
 	
 	public AfastamentosExcelSpreadsheet(Path inputFile) {
 		this.filePath = inputFile;

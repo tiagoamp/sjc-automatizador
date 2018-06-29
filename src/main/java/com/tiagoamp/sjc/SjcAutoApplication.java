@@ -68,6 +68,7 @@ public class SjcAutoApplication {
 		
 		System.out.println("---");
 		System.out.println("*** System deployed! URL ==> http://localhost:8090/");
+		System.out.println("---");
 	}
 	
 	

@@ -1,5 +1,7 @@
 package com.tiagoamp.sjc.service;
 
+import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.AFASTAMENTO_IDENTIFIED_FILE_NAME;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -32,6 +34,8 @@ public class SpreadsheetServices {
 		List<InputSpreadsheet> inputList = new ArrayList<>();
 		DirectoryStream<Path> stream = Files.newDirectoryStream(directory);
 		for (Path file : stream) {
+			boolean isAfastamentoSpreasheetFile = file.getFileName().toString().toLowerCase().contains(AFASTAMENTO_IDENTIFIED_FILE_NAME); 
+			if (isAfastamentoSpreasheetFile) continue;
 			InputSpreadsheet spreadsheet = this.loadInputSpreadsheet(file);
 			inputList.add(spreadsheet);				
 		}		

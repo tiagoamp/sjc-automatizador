@@ -1,5 +1,7 @@
 package com.tiagoamp.sjc.service;
 
+import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.AFASTAMENTO_IDENTIFIED_FILE_NAME;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +48,7 @@ public class UploadService {
 		try {
 			result = Files.list(uploadDir)
 					.filter(path -> !Files.isDirectory(path))
-					.filter(path -> path.getFileName().toString().toLowerCase().contains("afastamento"))
+					.filter(path -> path.getFileName().toString().toLowerCase().contains(AFASTAMENTO_IDENTIFIED_FILE_NAME))
 					.filter(path -> path.getFileName().toString().toLowerCase().endsWith("xlsx"))
 					.findFirst();
 		} catch (IOException e) {

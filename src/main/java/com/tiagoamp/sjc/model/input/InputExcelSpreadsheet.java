@@ -121,14 +121,20 @@ public class InputExcelSpreadsheet {
 			spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'MÊS' (no lugar previsto, célula '" + monthCellAddr.formatAsString() + "') na planilha na aba '" + code.getDescription() + "'. Assumido como mês passado."));			
 		}
 		
+		YearMonth prevYearMonth = YearMonth.now().minusMonths(1);
 		if (!isValidYear || !isValidMonth) {
-			YearMonth prevYearMonth = YearMonth.now().minusMonths(1);		
-        	spreadsheet.setYearMonthRef(prevYearMonth);
+			spreadsheet.setYearMonthRef(prevYearMonth);
         	spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado 'ANO' e/ou 'MÊS' (no lugar previsto) na aba '" + code.getDescription() + "'. Assumido como planilha do mês passado."));
         	return;
 		}
 		
-		int year = Integer.parseInt(yearStr);
+		int year = prevYearMonth.getYear(); // get year from last month as default 
+		try {
+			year = Integer.parseInt(yearStr);	
+		} catch (NumberFormatException e) {
+			spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi possível identificar o 'ANO' (no lugar previsto, célula '" + yearCellAddr.formatAsString() + ") na planilha na aba '" + code.getDescription() + "'. Assumido ano ref mês passado."));
+		}
+		
 		Month month = convertedMonth.get();
 		spreadsheet.setYearMonthRef(YearMonth.of(year, month));		
 	}
