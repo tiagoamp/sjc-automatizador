@@ -109,7 +109,7 @@ public class InExcelSheet {
                 		   ) {
                 	int indexPlantao = cell.getColumnIndex() - INDEX_COLUMN_PLANTOESEXTRAS_01; // getting index of 'plantao' from 0 to 4 (there may be 5 plantoes)
                 	String dataPlantaoExtra = df.formatCellValue(cell);
-                	if (dataPlantaoExtra != null && !dataPlantaoExtra.isEmpty() && !hasNoNumbers(dataPlantaoExtra)) {                		
+                	if (dataPlantaoExtra != null && !dataPlantaoExtra.isEmpty() && !hasNoNumbers(dataPlantaoExtra) && !dataPlantaoExtra.equals("0")) {                		
                 		qtdDatasPlantoesPreenchidas++; 
                 		try {
                 			fieldProcessor = new DataPlantaoFieldProcessor(yearMonthRef);
