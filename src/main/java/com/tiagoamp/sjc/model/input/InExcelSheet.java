@@ -143,7 +143,7 @@ public class InExcelSheet {
 	}
 	
 	private boolean isEndOfData(String value) {
-		return value.startsWith("Tipos de afastamentos");
+		return value.startsWith("Tipos de afastamentos") || value.startsWith("Este relatório deverá ser encaminhado");
 	}
 
 	private boolean hasNoNumbers(String value) {    	 

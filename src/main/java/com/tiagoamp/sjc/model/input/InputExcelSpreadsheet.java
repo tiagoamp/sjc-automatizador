@@ -110,8 +110,8 @@ public class InputExcelSpreadsheet {
 			monthStr = df.formatCellValue(xssfsheet.getRow(monthCellAddr.getRow()).getCell(monthCellAddr.getColumn()));
 		}
 				
-		Pattern nonNumericPattern = Pattern.compile("[^0-9]");
-		boolean isValidYear = yearStr == null || yearStr.isEmpty() || nonNumericPattern.matcher(yearStr).find();
+		Pattern numericPattern = Pattern.compile("[0-9]");
+		boolean isValidYear = yearStr != null && !yearStr.isEmpty() && numericPattern.matcher(yearStr).find();
 		if (!isValidYear) {
 			spreadsheet.getMessages().add(new ProcessingMessage(MessageType.ALERT, "Não foi identificado o campo 'ANO' (no lugar previsto, célula '" + yearCellAddr.formatAsString() + "') na planilha na aba '" + code.getDescription() + "'. Assumido ano ref mês passado."));			
 		}		
