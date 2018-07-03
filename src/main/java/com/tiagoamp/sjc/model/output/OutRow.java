@@ -32,6 +32,13 @@ public class OutRow {
 		return String.format("%s | %s | %s", matricula, nome, lotacao);
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if ( !(obj instanceof OutRow) ) return false;
+		OutRow other = (OutRow) obj;
+		return this.toString().equals(other.toString());
+	}
+	
 	
 	public String getLotacao() {
 		return lotacao;
