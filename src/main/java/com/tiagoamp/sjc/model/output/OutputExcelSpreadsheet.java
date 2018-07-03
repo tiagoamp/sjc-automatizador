@@ -55,7 +55,7 @@ public class OutputExcelSpreadsheet {
 					outRows = outRows.stream().map(outrow -> this.fillAfastamentos(outrow, afastamentos)).collect(Collectors.toList());
 				}
 				
-				outSheet.getOutputrows().addAll(outRows);									
+				outSheet.getRows().addAll(outRows);									
 			}
 			this.updateOutputRows(outSheet);
 		}
@@ -120,12 +120,12 @@ public class OutputExcelSpreadsheet {
 	}
 	
 	private void updateOutputRows(OutSheet outputsheet) {
-		if (outputsheet.getOutputrows().isEmpty()) return;
+		if (outputsheet.getRows().isEmpty()) return;
 		
 		OutSheet sheet = spreadsheet.getSheets().get(outputsheet.getCode());
 		
 		if (sheet != null ) {
-			sheet.getOutputrows().addAll(outputsheet.getOutputrows());
+			sheet.getRows().addAll(outputsheet.getRows());
 		} else {
 			spreadsheet.getSheets().put(outputsheet.getCode(), outputsheet);
 		}				
