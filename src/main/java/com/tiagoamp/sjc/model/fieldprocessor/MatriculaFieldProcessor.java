@@ -12,7 +12,7 @@ public class MatriculaFieldProcessor extends FieldProcessor {
 	
 	public String process(String inputValue) {
 		if (inputValue == null) throw new IllegalArgumentException();
-		String value = inputValue;
+		String value = inputValue.trim();
 		if (nonNumericPattern.matcher(value).find()) { 
     		value = value.replaceAll(nonNumericPattern.pattern(), "");
     		messages.add(new ProcessingMessage(MessageType.ALERT, "Planilha contém matrícula não numérica: '" + inputValue + "'. Caracteres não-numéricos retirados pelo sistema: " + value + "."));
@@ -30,6 +30,7 @@ public class MatriculaFieldProcessor extends FieldProcessor {
 			messages.add(new ProcessingMessage(MessageType.ALERT, "Planilha contém matrícula < 10 dígitos: '" + inputValue + "'. Matrícula corrigida pelo sistema: completada com zeros à esquerda: " + value + "."));
 			inputValue = value;
 		}
+		
 		return value;
 	}
 		
