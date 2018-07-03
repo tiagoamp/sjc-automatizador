@@ -61,9 +61,9 @@ public class OutputExcelSpreadsheetTest {
 			.forEach(key -> {
 				OutSheet sheet = outputSpreadsheet.getSheets().get(key);
 				if (sheet.getCode().getGenericCode() == SjcGeneralCode.OPERACIONAL) {
-					assertEquals("'Operacional' sheet should generate 17 rows", 17, sheet.getOutputrows().size());
+					assertEquals("'Operacional' sheet should generate 17 rows", 17, sheet.getRows().size());
 				} else if (sheet.getCode().getGenericCode() == SjcGeneralCode.ADMINISTRATIVO) {
-					assertEquals("'Operacional' sheet should generate 9 rows", 9, sheet.getOutputrows().size());
+					assertEquals("'Operacional' sheet should generate 9 rows", 9, sheet.getRows().size());
 				}
 			});		
 	}
@@ -78,7 +78,7 @@ public class OutputExcelSpreadsheetTest {
 		OutputSpreadsheet outputSpreadsheet = excelSpreadsheet.loadDataFromInputSpreadsheets(inputlist, afastamentos);
 		//then
 		String[] matriculasWithAfastamentos = {"0691513203", "0691513204"};
-		List<OutRow> rowsWithAfastamentos = outputSpreadsheet.getSheets().get(SjcSpecificCode.OPERACIONAL_PLANTOESEXTRA).getOutputrows().stream()
+		List<OutRow> rowsWithAfastamentos = outputSpreadsheet.getSheets().get(SjcSpecificCode.OPERACIONAL_PLANTOESEXTRA).getRows().stream()
 			.filter(row -> row.getMatricula().equals(matriculasWithAfastamentos[0]) || row.getMatricula().equals(matriculasWithAfastamentos[1]))
 			.collect(Collectors.toList());
 		assertEquals("Should generate " + matriculasWithAfastamentos.length + " row with afastamentos",  matriculasWithAfastamentos.length, rowsWithAfastamentos.size());
