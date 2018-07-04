@@ -78,6 +78,11 @@ public class OutputFilesGenerator {
 		Set<Integer> newRows = data.keySet(); // Set to Iterate and add rows into XLS file
 		int rownum = xssfsheet.getLastRowNum(); // get the last row number to append new data   
 		
+		int initPlantoesObjIndex = 4;
+		int afastamentoIndex = 9;
+		int dtPlantoesAfastIndex = 10;
+		int repeatedMatriculaIndex = 11;
+		
 		for (Integer key : newRows) {
 			Row row = xssfsheet.createRow(rownum++); // Creating a new Row in existing XLSX sheet
 			Object [] objArr = data.get(key);
@@ -85,22 +90,21 @@ public class OutputFilesGenerator {
 			Object flagsPlantoesAfast = objArr[9];
 			boolean hasPlantoesExtrasWithAfastamentos = flagsPlantoesAfast != null; 
 			Boolean[] dtPlantoesWithinAfastamentos = null;
-			int dtPlantoesAfastIndex = 10;
+			
 			if (hasPlantoesExtrasWithAfastamentos) dtPlantoesWithinAfastamentos = (Boolean[]) objArr[dtPlantoesAfastIndex];
 			
-			int initPlantoesObjIndex = 4;
-			boolean isRowWithPlantaoExtra = objArr[initPlantoesObjIndex] != null;
 			
-			int afastamentoIndex = 9;
-			int repeatedMatriculaIndex = 11;			
+			boolean isRowWithPlantaoExtra = objArr[initPlantoesObjIndex] != null;
 			
 			int cellnum = 0;
 			for (int i=0; i < objArr.length; i++ ) {
 				Object obj = objArr[i];				
 				
 				boolean isPlantaoDatesInterval = i >= initPlantoesObjIndex && i < initPlantoesObjIndex+5;
-				if ( (isPlantaoDatesInterval && !isRowWithPlantaoExtra) || (i == dtPlantoesAfastIndex) ) continue; // no 'plantoes' columns to add OR is agast boolean arr column
-								
+				if ( (isPlantaoDatesInterval && !isRowWithPlantaoExtra) || (i == dtPlantoesAfastIndex) || (!isRowWithPlantaoExtra && i == afastamentoIndex)) {
+					continue; 
+				}
+				
 				Cell cell = row.createCell(cellnum++);
 				
 				if (obj != null && isPlantaoDatesInterval && isRowWithPlantaoExtra && hasPlantoesExtrasWithAfastamentos) {
@@ -143,7 +147,7 @@ public class OutputFilesGenerator {
 		XSSFFont font = xssfsheet.getWorkbook().createFont();
 		
 		if (type.equals("conflict")) font.setColor(HSSFColor.HSSFColorPredefined.RED.getIndex());
-		else if (type.equals("not-evaluated")) font.setColor(HSSFColor.HSSFColorPredefined.DARK_YELLOW.getIndex());
+		else if (type.equals("not-evaluated")) font.setColor(HSSFColor.HSSFColorPredefined.YELLOW.getIndex());
 		
 		XSSFCellStyle style = xssfsheet.getWorkbook().createCellStyle();
 		style.setFont(font);
