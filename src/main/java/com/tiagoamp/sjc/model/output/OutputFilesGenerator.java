@@ -116,7 +116,7 @@ public class OutputFilesGenerator {
 				
 				if (i == repeatedMatriculaIndex) { // repeated matricula
 					boolean isRepeated = (boolean) obj;
-					obj = isRepeated ? "** Matrícula repete nesta planilha" : null;
+					obj = isRepeated ? "** Matrícula repete nesta planilha para outra lotação" : null;
 				}
 								
 				if (obj instanceof String) {
