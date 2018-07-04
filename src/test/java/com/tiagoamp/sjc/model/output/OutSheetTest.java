@@ -22,7 +22,7 @@ public class OutSheetTest {
 	}
 
 	
-	/*@Test
+	@Test
 	public void testSortRows() {
 		// given
 		OutSheet sheet = new OutSheet(SjcSpecificCode.OPERACIONAL_PLANTOESEXTRA);
@@ -48,9 +48,10 @@ public class OutSheetTest {
 		for (int i = initialRepeatedIndex; i < numOfRepetitions-1; i++) {
 			OutRow currRow = outRows.get(i);
 			OutRow nextRow = outRows.get(i+1);
-			assertEquals("Repeated elements should be grouped.", currRow.getMatricula(), nextRow.getMatricula());			
+			assertEquals("Repeated elements should be grouped.", currRow.getMatricula(), nextRow.getMatricula());
+			assertTrue("Same person should be marked as duplicated row", currRow.hasDuplicates() && nextRow.hasDuplicates());
 		}
 		outRows.forEach(System.out::println);
-	}*/
+	}
 
 }

@@ -9,6 +9,7 @@ public class OutRow {
 	private String[] dtPlantoesExtras = new String[5];
 	private String afastamento;	
 	private Boolean[] dtPlantoesWithinAfastamentos = new Boolean[5];
+	private boolean duplicates;
 	
 	
 	public OutRow() {		
@@ -81,6 +82,12 @@ public class OutRow {
 	}
 	public void setDtPlantoesWithinAfastamentos(Boolean[] dtPlantoesWithinAfastamentos) {
 		this.dtPlantoesWithinAfastamentos = dtPlantoesWithinAfastamentos;
+	}
+	public void setDuplicates(boolean duplicates) {
+		this.duplicates = duplicates;
+	}
+	public boolean hasDuplicates() {
+		return this.duplicates;
 	}
 
 }

@@ -21,7 +21,7 @@ public class OutSheet {
 	
 	public void sortRows() {
 		sortRowsByLotacao();
-		//groupRowsByMatricula();		
+		groupRowsByMatricula();		
 	}
 	
 	
@@ -33,31 +33,16 @@ public class OutSheet {
 		List<OutRow> groupedRows = new ArrayList<>();
 		
 		rows.forEach( row -> {			
-			List<OutRow> filteredRows = rows.stream().filter(r -> r.getMatricula() == row.getMatricula()).collect(Collectors.toList());
-			filteredRows.forEach(fRow -> {
-				if (!groupedRows.contains(fRow)) groupedRows.add(fRow);
+			List<OutRow> samePersonRows = rows.stream().filter(r -> r.getMatricula().equals(row.getMatricula()) && r.getLotacao() != row.getLotacao()).collect(Collectors.toList());
+			boolean hasManyRows = samePersonRows.size() > 0;
+			samePersonRows.add(0, row);			
+			samePersonRows.forEach(filteredRow -> {
+				filteredRow.setDuplicates(hasManyRows);
+				if (!groupedRows.contains(filteredRow)) groupedRows.add(filteredRow);
 			});			
 		});
 		
-		rows = groupedRows;
-		
-		
-		/*List<OutRow> groupedRows = new ArrayList<>(rows); // creates new List from existing output rows
-			
-		for (int i = 0; i < rows.size(); i++) {
-			OutRow currRow = rows.get(i);
-			
-			for (int j = i+1; j < rows.size(); j++) {
-				OutRow nextRow = rows.get(j);
-				
-				if (currRow.getMatricula().equals(nextRow.getMatricula())) {
-					groupedRows.remove(j);
-					groupedRows.add(i+1, nextRow);
-					i++;  // to not process inserted repeated element
-				}
-			}			
-		}			
-		rows = groupedRows;*/
+		rows = groupedRows;		
 	}
 	
 	

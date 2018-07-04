@@ -16,12 +16,16 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.SjcSpecificCode;
 import com.tiagoamp.sjc.service.PDFGenerator;
 
 public class OutputFilesGenerator {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(OutputFilesGenerator.class);
 
 	public void generateOuputSpreadsheetFile(Path outputFile, OutputSpreadsheet spreadsheet) throws IOException  {		
 		try ( XSSFWorkbook workbook = new XSSFWorkbook();
@@ -31,12 +35,14 @@ public class OutputFilesGenerator {
 				OutSheet sheet = spreadsheet.getSheets().get(code);
 				if (sheet == null || sheet.getRows() == null || sheet.getRows().size() == 0) continue;
 				
+				LOGGER.info("Ordenando linhas da planilha de saída...");
 				sheet.sortRows();
 				
 				Map<Integer, Object[]> data = this.createOutputDataMap(sheet);
 								
 				XSSFSheet xsheet = workbook.createSheet(String.valueOf(code.getCode()));
 				
+				LOGGER.info("Preenchendo linhas da planilha de saída...");
 				fillNewOuputRowsInExcelSheet(xsheet, data);				
 								
 				int numberOfColumns = 11;
@@ -59,13 +65,10 @@ public class OutputFilesGenerator {
 		Map<Integer, Object[]> data = new HashMap<>();
 		Integer counter = 0;	         
 		for (OutRow outRow : sheet.getRows()) {
-			int countOfElements = (int) sheet.getRows().stream().filter(r -> r.getMatricula().equals(outRow.getMatricula()) && r.getLotacao() != outRow.getLotacao()).count();
-			boolean hasRepeatedMatricula = countOfElements > 1;
-			
 			data.put(counter, new Object[] {outRow.getLotacao(), outRow.getNome(), outRow.getMatricula(), outRow.getQuantidade(), 
 				outRow.getDtPlantoesExtras()[0], outRow.getDtPlantoesExtras()[1], outRow.getDtPlantoesExtras()[2], outRow.getDtPlantoesExtras()[3], outRow.getDtPlantoesExtras()[4], 
 				outRow.getAfastamento(), outRow.getDtPlantoesWithinAfastamentos(),
-				hasRepeatedMatricula});
+				outRow.hasDuplicates()});
 			counter++;
     	}
 		return data;

@@ -67,6 +67,7 @@ public class SpreadsheetServices {
 		LOGGER.info("Gerando arquivo da planilha de saída...");
 		OutputFilesGenerator filesGenerator = new OutputFilesGenerator();
 		filesGenerator.generateOuputSpreadsheetFile(outputFile, spreadsheet);
+		LOGGER.info("Arquivo gerado!");
 	}
 	
 	public void generateOutputMessagesFile(Path outputFile, OutputSpreadsheet spreadsheet) throws FileNotFoundException, DocumentException  {
