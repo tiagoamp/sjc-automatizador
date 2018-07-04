@@ -35,14 +35,14 @@ public class OutputFilesGenerator {
 				OutSheet sheet = spreadsheet.getSheets().get(code);
 				if (sheet == null || sheet.getRows() == null || sheet.getRows().size() == 0) continue;
 				
-				LOGGER.info("Ordenando linhas da planilha de saída...");
+				LOGGER.info("Ordenando linhas da planilha de saída [" + code.getCode().toString() + "] ...");
 				sheet.sortRows();
 				
 				Map<Integer, Object[]> data = this.createOutputDataMap(sheet);
 								
 				XSSFSheet xsheet = workbook.createSheet(String.valueOf(code.getCode()));
 				
-				LOGGER.info("Preenchendo linhas da planilha de saída...");
+				LOGGER.info("Preenchendo linhas da planilha de saída [" + code.getCode().toString() + "] ...");
 				fillNewOuputRowsInExcelSheet(xsheet, data);				
 								
 				int numberOfColumns = 11;
