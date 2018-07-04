@@ -29,7 +29,7 @@ public class OutputFilesGenerator {
 			{
 			for (SjcSpecificCode code : SjcSpecificCode.values()) {
 				OutSheet sheet = spreadsheet.getSheets().get(code);
-				if (sheet == null || sheet.getOutputrows() == null || sheet.getOutputrows().size() == 0) continue;
+				if (sheet == null || sheet.getRows() == null || sheet.getRows().size() == 0) continue;
 				
 				sheet.sortRows();
 				
@@ -39,7 +39,7 @@ public class OutputFilesGenerator {
 				
 				fillNewOuputRowsInExcelSheet(xsheet, data);				
 								
-				int numberOfColumns = 10;
+				int numberOfColumns = 11;
 				for (int i = 0; i < numberOfColumns; i++) {
 					xsheet.autoSizeColumn(i); // column adjusting
 				}
@@ -58,10 +58,14 @@ public class OutputFilesGenerator {
 	private Map<Integer, Object[]> createOutputDataMap(OutSheet sheet) {
 		Map<Integer, Object[]> data = new HashMap<>();
 		Integer counter = 0;	         
-		for (OutRow outRow : sheet.getOutputrows()) {
+		for (OutRow outRow : sheet.getRows()) {
+			int countOfElements = (int) sheet.getRows().stream().filter(r -> r.getMatricula().equals(outRow.getMatricula()) && r.getLotacao() != outRow.getLotacao()).count();
+			boolean hasRepeatedMatricula = countOfElements > 1;
+			
 			data.put(counter, new Object[] {outRow.getLotacao(), outRow.getNome(), outRow.getMatricula(), outRow.getQuantidade(), 
-				outRow.getDtPlantoesExtras()[0], outRow.getDtPlantoesExtras()[1], outRow.getDtPlantoesExtras()[2], 
-				outRow.getDtPlantoesExtras()[3], outRow.getDtPlantoesExtras()[4], outRow.getAfastamento(), outRow.getDtPlantoesWithinAfastamentos()});
+				outRow.getDtPlantoesExtras()[0], outRow.getDtPlantoesExtras()[1], outRow.getDtPlantoesExtras()[2], outRow.getDtPlantoesExtras()[3], outRow.getDtPlantoesExtras()[4], 
+				outRow.getAfastamento(), outRow.getDtPlantoesWithinAfastamentos(),
+				hasRepeatedMatricula});
 			counter++;
     	}
 		return data;
@@ -78,17 +82,24 @@ public class OutputFilesGenerator {
 			Object flagsPlantoesAfast = objArr[9];
 			boolean hasPlantoesExtrasWithAfastamentos = flagsPlantoesAfast != null; 
 			Boolean[] dtPlantoesWithinAfastamentos = null;
-			if (hasPlantoesExtrasWithAfastamentos) dtPlantoesWithinAfastamentos = (Boolean[]) objArr[10];
+			int dtPlantoesAfastIndex = 10;
+			if (hasPlantoesExtrasWithAfastamentos) dtPlantoesWithinAfastamentos = (Boolean[]) objArr[dtPlantoesAfastIndex];
 			
 			int initPlantoesObjIndex = 4;
 			boolean isRowWithPlantaoExtra = objArr[initPlantoesObjIndex] != null;
 			
+			int afastamentoIndex = 9;
+			int repeatedMatriculaIndex = 11;			
+			
 			int cellnum = 0;
 			for (int i=0; i < objArr.length; i++ ) {
 				Object obj = objArr[i];				
+				
+				boolean isPlantaoDatesInterval = i >= initPlantoesObjIndex && i < initPlantoesObjIndex+5;
+				if ( (isPlantaoDatesInterval && !isRowWithPlantaoExtra) || (i == dtPlantoesAfastIndex) ) continue; // no 'plantoes' columns to add OR is agast boolean arr column
+								
 				Cell cell = row.createCell(cellnum++);
 				
-				boolean isPlantaoDatesInterval = i >= initPlantoesObjIndex && i < initPlantoesObjIndex+5;  
 				if (obj != null && isPlantaoDatesInterval && isRowWithPlantaoExtra && hasPlantoesExtrasWithAfastamentos) {
 					Boolean hasDatesConflicts = dtPlantoesWithinAfastamentos[i - initPlantoesObjIndex];
 					XSSFCellStyle cellStyle = null;
@@ -98,10 +109,14 @@ public class OutputFilesGenerator {
 					if (cellStyle != null) cell.setCellStyle(cellStyle);
 				}
 				
-				int afastamentoIndex = 9;
 				if (i == afastamentoIndex) { // afastamento
 					XSSFCellStyle italicCellStyle = getItalicCellStyle(xssfsheet);
 					cell.setCellStyle(italicCellStyle);
+				}
+				
+				if (i == repeatedMatriculaIndex) { // repeated matricula
+					boolean isRepeated = (boolean) obj;
+					obj = isRepeated ? "** Matrícula repete nesta planilha" : null;
 				}
 								
 				if (obj instanceof String) {
