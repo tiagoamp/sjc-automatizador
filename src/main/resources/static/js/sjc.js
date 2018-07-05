@@ -76,7 +76,17 @@ function loadSpreadsheetAtIndex( i ) {
             showErrorMessage("Erro ao acessar o arquivo nro " + i + ".");
             return;
         }
-        showSuccessMessage("Planilha processada: " + data.fileName);                
+
+        const isPlanilhaDeAfastamento = data.fileName.toLowerCase().includes("afastamento");
+        if ( isPlanilhaDeAfastamento ) {
+            const message = { text: "Planilha de Afastamentos identificada: \"" + data.fileName + "\"", type: "INFO" }
+            showInfoMessage(message.text);
+            data.messages = [];
+            data.messages.push(message); 
+        } else {
+            showSuccessMessage("Planilha processada: " + data.fileName);             
+        }
+
         createMessagesPanels(data);
 	})
 	.fail( function() { showErrorMessage("Falha no acesso ao arquivo (Índice = " + i + ").") } );
@@ -85,7 +95,36 @@ function loadSpreadsheetAtIndex( i ) {
 function createMessagesPanels( file ) {
     if (file.messages == null) return;
     createErrorPanel(file);    
-    createAlertPanel(file);    
+    createAlertPanel(file); 
+    const isPlanilhaDeAfastamento = file.fileName.toLowerCase().includes("afastamento");
+    if (isPlanilhaDeAfastamento) createInfoPanel(file);   
+}
+
+function createInfoPanel( file ) {
+    let msgs = file.messages;
+    let msgsInfosUl = $("<ul>").addClass("text-info");
+
+    for (i=0; i < msgs.length; i++) {
+        if (msgs[i].type == "INFO") {
+            msgsInfosUl.append( $("<li>").text(msgs[i].text) );
+        }        
+    }
+
+    const existsMsgs = msgsInfosUl.children().length > 0;
+    if (existsMsgs) {
+        
+        $("#div-panel-infos").empty(); // limpando msg default
+
+        let panelInfoDiv = $("<div>").addClass("panel panel-info");
+        let headInfoDiv = $("<div>").addClass("panel-info");
+        //headInfoDiv.text("Geral");
+        let bodyInfoDiv = $("<div>").addClass("panel-body");
+        
+        bodyInfoDiv.append(msgsInfosUl);
+        panelInfoDiv.append(headInfoDiv);
+        panelInfoDiv.append(bodyInfoDiv);    
+        $("#div-panel-infos").append(panelInfoDiv);
+    }
 }
 
 function createErrorPanel( file ) {
