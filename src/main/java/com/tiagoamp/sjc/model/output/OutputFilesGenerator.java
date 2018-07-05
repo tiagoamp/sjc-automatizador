@@ -65,7 +65,7 @@ public class OutputFilesGenerator {
 		Map<Integer, Object[]> data = new HashMap<>();
 		Integer counter = 0;	         
 		for (OutRow outRow : sheet.getRows()) {
-			data.put(counter, new Object[] {outRow.getLotacao(), outRow.getNome(), outRow.getMatricula(), outRow.getQuantidade(), 
+			data.put(counter, new Object[] {outRow.getLotacao(), outRow.getNome().toUpperCase(), outRow.getMatricula(), outRow.getQuantidade(), 
 				outRow.getDtPlantoesExtras()[0], outRow.getDtPlantoesExtras()[1], outRow.getDtPlantoesExtras()[2], outRow.getDtPlantoesExtras()[3], outRow.getDtPlantoesExtras()[4], 
 				outRow.getAfastamento(), outRow.getDtPlantoesWithinAfastamentos(),
 				outRow.hasDuplicates()});
@@ -147,7 +147,7 @@ public class OutputFilesGenerator {
 		XSSFFont font = xssfsheet.getWorkbook().createFont();
 		
 		if (type.equals("conflict")) font.setColor(HSSFColor.HSSFColorPredefined.RED.getIndex());
-		else if (type.equals("not-evaluated")) font.setColor(HSSFColor.HSSFColorPredefined.YELLOW.getIndex());
+		else if (type.equals("not-evaluated")) font.setColor(HSSFColor.HSSFColorPredefined.LIGHT_ORANGE.getIndex());
 		
 		XSSFCellStyle style = xssfsheet.getWorkbook().createCellStyle();
 		style.setFont(font);
