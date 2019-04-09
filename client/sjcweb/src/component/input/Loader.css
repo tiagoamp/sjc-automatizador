@@ -13,17 +13,21 @@
 }
 
 .dropzone-div {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 80px;
-    width: 90%;
     background-color: aliceblue;
     margin: 10px;
     padding: 15px;
     border: 1px solid #73879C;
-    border-radius: 5px;    
+    border-radius: 5px;        
+}
+
+.dropzone-section {
+    flex:1;
+    max-width: 50%;
 }
 
 .dropzone-div p {
@@ -57,27 +61,4 @@
 .entrada-body button:hover {
     color: white;
     background-color: #73879C;
-}
-
-.entrada-body .table-entrada {
-    width: 60%;
-}
-
-.entrada-body .table-entrada, .table-entrada tr, .table-entrada td, .table-entrada th {
-    border: 1px solid #73879C;
-    padding: 5px;
-}
-
-.entrada-body .table-entrada tr {
-    font-size: 0.9rem;
-}
-
-.table-entrada .link-formatted {
-    text-decoration: none;
-    color: #73879C;
-    border: 1px solid #73879C;
-    border-radius: 5px;
-    font-size: 0.8rem;
-    padding: 2px;
-    margin: 0px 8px;
 }

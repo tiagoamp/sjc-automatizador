@@ -1,0 +1,32 @@
+.result-input {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    background-color: white;
+    color: #73879C;
+    align-items: center;
+    justify-content: space-around;    
+}
+
+.table-entrada {
+    width: 60%;
+}
+
+.table-entrada, .table-entrada tr, .table-entrada td, .table-entrada th {
+    border: 1px solid #73879C;
+    padding: 5px;
+}
+
+.table-entrada tr {
+    font-size: 0.9rem;
+}
+
+.link-formatted {
+    text-decoration: none;
+    color: #73879C;
+    border: 1px solid #73879C;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    padding: 2px;
+    margin: 0px 8px;
+}

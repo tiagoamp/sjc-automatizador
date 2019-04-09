@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Header from './component/Header';
+import Footer from './component/Footer';
 import FlowMenu from './component/FlowMenu';
-import Loader from './component/Loader';
+import Loader from './component/input/Loader';
 
 import './App.css';
 import './font-awesome-4.7.0/css/font-awesome.min.css';
@@ -15,7 +16,7 @@ class App extends Component {
         <Header />
 
         <FlowMenu />
-
+       
         {/* autenticação ? */}
 
         <main>
@@ -23,6 +24,8 @@ class App extends Component {
           <Loader />
 
         </main>
+
+        <Footer />
 
       </div>
 
