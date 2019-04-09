@@ -4,7 +4,15 @@ import './Loader.css';
 
 export default class Loader extends Component {
 
+  constructor() {
+    super();
+    this.state = { uploadedFiles: [], uploadedAfastFile: null };
+  }
+
   render() {
+    const uploadedFiles = this.state.uploadedFiles;
+    const uploadedAfastFile = this.state.uploadedFiles;
+
     return (
 
       <div className="entrada-body">
@@ -19,7 +27,7 @@ export default class Loader extends Component {
                     <input {...getInputProps()} />
                     <span><strong>Relatórios</strong></span>
                     <p>Arraste aqui os arquivos de relatórios em 'pdf' para o quadro abaixo ou click para selecioná-los</p>
-                    <div className="arquivos">Arquivos carregados: <span>nenhum</span></div>
+                    <div className="arquivos">Arquivos carregados: <span>{ uploadedFiles.length > 0 ? uploadedFiles.map( f => f + ' ') : 'nenhum' }</span></div>
                   </div>
                 </section>
               )}
@@ -32,14 +40,17 @@ export default class Loader extends Component {
                     <input {...getInputProps()} />
                     <span><strong>Afastamentos</strong></span>
                     <p>Arraste o arquivos de afastamentos em 'xlsx' para o quadro abaixo ou click para selecioná-lo</p>
-                    <div className="arquivos">Arquivo carregado: <span>nenhum</span></div>
+                    <div className="arquivos">Arquivos carregados: <span>{ uploadedAfastFile === null ? uploadedAfastFile : 'nenhum' }</span></div>
                   </div>
                 </section>
               )}
             </Dropzone>
           </div>
 
-          <button>CARREGAR</button>
+          <div>
+            <button>LIMPAR</button>
+            <button>CARREGAR</button>
+          </div>
         
           <h2>Resultado do Carregamento</h2>
 
