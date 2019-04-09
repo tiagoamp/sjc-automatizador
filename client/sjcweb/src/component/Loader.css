@@ -36,16 +36,48 @@
     border: 3px solid #73879C;
 }
 
+.dropzone-div .arquivos {
+    font-size: 0.8rem;
+}
+
+.dropzone-div .arquivos span {
+    color: darkcyan;
+}
+
 .entrada-body button {
     background-color: white;
     color: #73879C;
     font-weight: bold;
     font-size: 1rem;
-    margin: 20px;
-    padding: 10px;
+    width: 20%;
+    margin: 25px 10px;
+    padding: 15px;
 }
 
 .entrada-body button:hover {
     color: white;
     background-color: #73879C;
+}
+
+.entrada-body .table-entrada {
+    width: 60%;
+}
+
+.entrada-body .table-entrada, .table-entrada tr, .table-entrada td, .table-entrada th {
+    border: 1px solid #73879C;
+    padding: 5px;
+}
+
+.entrada-body .table-entrada tr {
+    font-size: 0.9rem;
+}
+
+.table-entrada .link-formatted {
+    text-decoration: none;
+    color: #73879C;
+    border: 1px solid #73879C;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    padding: 2px;
+    margin: 0px 8px;
 }

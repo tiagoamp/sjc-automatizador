@@ -17,8 +17,9 @@ export default class Loader extends Component {
                 <section>
                   <div {...getRootProps()} className="dropzone-div">
                     <input {...getInputProps()} />
-                    <p><strong>Relatórios</strong></p>
+                    <span><strong>Relatórios</strong></span>
                     <p>Arraste aqui os arquivos de relatórios em 'pdf' para o quadro abaixo ou click para selecioná-los</p>
+                    <div className="arquivos">Arquivos carregados: <span>nenhum</span></div>
                   </div>
                 </section>
               )}
@@ -29,16 +30,46 @@ export default class Loader extends Component {
                 <section>
                   <div {...getRootProps()} className="dropzone-div">
                     <input {...getInputProps()} />
-                    <p><strong>Afastamentos</strong></p>
+                    <span><strong>Afastamentos</strong></span>
                     <p>Arraste o arquivos de afastamentos em 'xlsx' para o quadro abaixo ou click para selecioná-lo</p>
+                    <div className="arquivos">Arquivo carregado: <span>nenhum</span></div>
                   </div>
                 </section>
               )}
             </Dropzone>
           </div>
 
-          <button>Carregar</button>
+          <button>CARREGAR</button>
         
+          <h2>Resultado do Carregamento</h2>
+
+          <table className="table-entrada">
+            <thead>
+              <tr>
+                <th>Arquivos de Entrada (pdf)</th>
+                <th>Planilhas Geradas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>UPA Blablabla NORTE.PDF <a className="link-formatted" href="/test.pdf">abrir</a></td>
+                <td>UPA Blablabla NORTE.xlsx <small>(xx serv. op | yy serv. adm)</small> <a className="link-formatted" href="/test.xlsx">abrir</a></td> 
+              </tr>
+              <tr>
+                <td>UPA Blablabla NORTE.PDF <a className="link-formatted" href="/test.pdf">abrir</a></td>
+                <td>UPA Blablabla NORTE.xlsx <small>(xx serv. op | yy serv. adm)</small> <a className="link-formatted" href="/test.xlsx">abrir</a></td> 
+              </tr>
+              <tr>
+                <td>UPA Blablabla NORTE.PDF <a className="link-formatted" href="/test.pdf">abrir</a></td>
+                <td>UPA Blablabla NORTE.xlsx <small>(xx serv. op | yy serv. adm)</small> <a className="link-formatted" href="/test.xlsx">abrir</a></td> 
+              </tr>
+              <tr>
+                <td>UPA Blablabla NORTE.PDF <a className="link-formatted" href="/test.pdf">abrir</a></td>
+                <td>UPA Blablabla NORTE.xlsx <small>(xx serv. op | yy serv. adm)</small> <a className="link-formatted" href="/test.xlsx">abrir</a></td> 
+              </tr>
+            </tbody>
+          </table>
+
       </div>
 
     )
