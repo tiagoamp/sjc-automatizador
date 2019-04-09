@@ -2,13 +2,15 @@ import React, { Component } from 'react'
 import './FlowMenu.css';
 
 export default class FlowMenu extends Component {
-
+  
   render() {
+    const activePhaseNr = this.props.phaseNumber || 0;
+        
     return (
 
       <nav>
         
-          <div className="box">
+          <div className={activePhaseNr === 0 ? 'box' : 'box inactive'}>
             <div>
                 <i className="fa fa-files-o fa-2x" aria-hidden="true"></i>
                 <span className="phaseName">Carregar Dados</span>
@@ -18,7 +20,7 @@ export default class FlowMenu extends Component {
 
           <i className="fa fa-angle-double-right fa-3x" aria-hidden="true"></i>
 
-          <div className="box inactive">
+          <div className={activePhaseNr === 1 ? 'box' : 'box inactive'}>
             <div>
                 <i className="fa fa-cogs fa-2x" aria-hidden="true"></i>
                 <span className="phaseName">Processar Dados</span>
@@ -28,7 +30,7 @@ export default class FlowMenu extends Component {
 
           <i className="fa fa-angle-double-right fa-3x" aria-hidden="true"></i>
 
-          <div className="box inactive">
+          <div className={activePhaseNr === 2 ? 'box' : 'box inactive'}>
             <div>
                 <i className="fa fa-table fa-2x" aria-hidden="true"></i>
                 <span className="phaseName">Gerar planilha de saída</span>

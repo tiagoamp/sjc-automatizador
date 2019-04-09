@@ -37,6 +37,13 @@ export default class Loader extends Component {
     this.setState( { uploadedAfastFile: file} );      
   }
 
+  limparAction = () => {
+
+  }
+
+  carregarAction = () => {
+    
+  }
 
   render() {
     const uploadedFiles = this.state.uploadedFiles;
