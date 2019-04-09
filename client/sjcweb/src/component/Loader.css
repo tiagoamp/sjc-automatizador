@@ -1,0 +1,51 @@
+.entrada-body {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    background-color: white;
+    color: #73879C;
+    align-items: center;
+    justify-content: space-around;    
+}
+
+.dropzone-group {
+    display: flex;    
+}
+
+.dropzone-div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    width: 90%;
+    background-color: aliceblue;
+    margin: 10px;
+    padding: 15px;
+    border: 1px solid #73879C;
+    border-radius: 5px;    
+}
+
+.dropzone-div p {
+    font-size: 0.9rem;
+    text-align: center;
+    font-style: italic;
+}
+
+.dropzone-div:hover {
+    border: 3px solid #73879C;
+}
+
+.entrada-body button {
+    background-color: white;
+    color: #73879C;
+    font-weight: bold;
+    font-size: 1rem;
+    margin: 20px;
+    padding: 10px;
+}
+
+.entrada-body button:hover {
+    color: white;
+    background-color: #73879C;
+}
