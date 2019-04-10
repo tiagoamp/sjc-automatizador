@@ -3,6 +3,7 @@ package com.tiagoamp.sjc;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Iterator;
@@ -25,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -33,7 +35,8 @@ import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
 import com.tiagoamp.sjc.service.SpreadsheetServices;
-import com.tiagoamp.sjc.service.UploadService;
+import com.tiagoamp.sjc.service.FilesService;
+import static com.tiagoamp.sjc.SjcAutoApplication.*;
 
 @CrossOrigin
 @RestController
@@ -46,35 +49,42 @@ public class SjcController {
 	private SpreadsheetServices sjcService;
 	
 	@Autowired
-	private UploadService uploadService;
+	private FilesService filesService;
 	
-	
-	private final Path UPLOAD_DIR = SjcAutoApplication.BASE_DIR.resolve("upload/");
-	private final Path RESULT_DIR = SjcAutoApplication.BASE_DIR.resolve("resultado/");	
 		
-		
-	@RequestMapping(value = "upload", method = RequestMethod.POST)
+	/*@RequestMapping(value = "upload", method = RequestMethod.POST)
 	public Response uploadFile(MultipartHttpServletRequest request) {
 		try {
 			Iterator<String> itr = request.getFileNames();
 			while (itr.hasNext()) {
 				String uploadedFile = itr.next();
 				MultipartFile mfile = request.getFile(uploadedFile);
-				String filepathStr = UPLOAD_DIR.toString() + File.separator +  mfile.getOriginalFilename();
-				uploadService.saveMultipartFileInFileSystem(mfile, filepathStr);								
+				String filepathStr = DIR_ENTRADA.toString() + File.separator +  mfile.getOriginalFilename();
+				filesService.saveMultipartFileInFileSystem(mfile, filepathStr);								
 			}
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());			
 			return Response.serverError().build();
 		}
 		return Response.ok().build();
+	}*/
+	
+	@RequestMapping(value = "upload", method = RequestMethod.POST)
+	public Response uploadFile(@RequestParam(value="inputfile", required=true) MultipartFile file) {
+		try {
+			file.transferTo(DIR_ENTRADA.resolve(file.getOriginalFilename()).toFile());
+		} catch (IllegalStateException | IOException e) {
+			LOGGER.error(e.getMessage());
+			throw new ResponseProcessingException(Response.serverError().build(),e);
+		}
+		return Response.created(URI.create(file.getName())).build();
 	}
 	
 	@RequestMapping(value = "upload/total", method = RequestMethod.GET)
 	public String getNumberOfUploadedSpreadsheets() {
 		long total = 0;
 		try {
-			total = uploadService.getNumberOfFilesInUploadDirectory(UPLOAD_DIR);
+			total = filesService.getNumberOfFilesInUploadDirectory(DIR_ENTRADA);
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
@@ -82,15 +92,20 @@ public class SjcController {
 		return String.valueOf(total);
 	}
 	
-	@RequestMapping(value = "upload", method = RequestMethod.DELETE)
-	public Response cleanUploadDirectory() {
+	@RequestMapping(value = "/", method = RequestMethod.DELETE)
+	public Response cleanWorkingDirectories() {
 		try {
-			uploadService.cleanDirectory(UPLOAD_DIR);
-			uploadService.cleanDirectory(RESULT_DIR);
+			filesService.cleanDirectories(DIR_ENTRADA, DIR_SAIDA);
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
 		}
+		return Response.ok().build();
+	}
+	
+	@RequestMapping(value = "upload/afast", method = RequestMethod.DELETE)
+	public Response deleteAfastamentoSpreadsheet() {
+		filesService.deleteAfastamentoSpreadsheet(DIR_ENTRADA);
 		return Response.ok().build();
 	}
 	
@@ -99,7 +114,7 @@ public class SjcController {
 	public InputSpreadsheet getSheetAtIndex(@QueryParam(value = "index") String index) {
 		InputSpreadsheet insheet = null;
 		try {
-			List<Path> list = uploadService.getUploadedFilesPath(UPLOAD_DIR);
+			List<Path> list = filesService.getUploadedFilesPath(DIR_ENTRADA);
 			Path filepath = list.get(Integer.valueOf(index));
 			insheet = sjcService.loadInputSpreadsheet(filepath);			
 		} catch (IOException e) {
@@ -113,14 +128,14 @@ public class SjcController {
 	@Produces( {"application/vnd.ms-excel"} )
 	public ResponseEntity<InputStreamResource> generateOutputSpreadsheet() {
 		try {
-			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(UPLOAD_DIR);
-			Optional<Path> histAfastamentoPath = uploadService.findAfastamentoSpreadsheetPath(UPLOAD_DIR);
+			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(DIR_ENTRADA);
+			Optional<Path> histAfastamentoPath = filesService.findAfastamentoSpreadsheetPath(DIR_ENTRADA);
 			Path afastamentoSpreadsheetFile = histAfastamentoPath.orElse(null);		
 			
 			OutputSpreadsheet spreadsheet = sjcService.generateOutputSpreadSheet(list, afastamentoSpreadsheetFile);
 			
 			LocalDate now = LocalDate.now();
-			Path resultFile = RESULT_DIR.resolve("Resultado_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".xls");
+			Path resultFile = DIR_SAIDA.resolve("Resultado_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".xls");
 			sjcService.generateOuputSpreadsheetFile(resultFile, spreadsheet);
 			
 			HttpHeaders headers = new HttpHeaders();
@@ -146,14 +161,14 @@ public class SjcController {
 	public ResponseEntity<InputStreamResource> getOutputMessagesFile() {
 		OutputSpreadsheet outsheet = null;
 		try {
-			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(UPLOAD_DIR);
-			Optional<Path> histAfastamentoPath = uploadService.findAfastamentoSpreadsheetPath(UPLOAD_DIR);
+			List<InputSpreadsheet> list = sjcService.loadInputSpreadsheetsFromDirectory(DIR_ENTRADA);
+			Optional<Path> histAfastamentoPath = filesService.findAfastamentoSpreadsheetPath(DIR_ENTRADA);
 			Path afastamentoSpreadsheetFile = histAfastamentoPath.orElse(null);		
 						
 			outsheet = sjcService.generateOutputSpreadSheet(list, afastamentoSpreadsheetFile);
 			
 			LocalDate now = LocalDate.now();
-			Path resultFile = RESULT_DIR.resolve("Mensagens_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".pdf");
+			Path resultFile = DIR_SAIDA.resolve("Mensagens_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".pdf");
 			sjcService.generateOutputMessagesFile(resultFile, outsheet);
 			
 			HttpHeaders headers = new HttpHeaders();

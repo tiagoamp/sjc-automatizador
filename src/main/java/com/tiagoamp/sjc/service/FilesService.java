@@ -1,7 +1,5 @@
 package com.tiagoamp.sjc.service;
 
-import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.AFASTAMENTO_IDENTIFIED_FILE_NAME;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,9 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class UploadService {
+public class FilesService {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(UploadService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(FilesService.class);
 
 	public void saveMultipartFileInFileSystem(MultipartFile mfile, String filepath) throws IllegalStateException, IOException {
 		File dest = new File(filepath);
@@ -33,8 +31,8 @@ public class UploadService {
 		return Files.list(uploadDir).collect(Collectors.toList());
 	}
 	
-	public void cleanDirectory(Path uploadDir) throws IOException {
-		Files.newDirectoryStream(uploadDir).forEach( f -> {
+	public void cleanDirectory(Path dir) throws IOException {
+		Files.newDirectoryStream(dir).forEach( f -> {
 			try {
 				Files.delete(f);
 			} catch (IOException e) {
@@ -43,18 +41,50 @@ public class UploadService {
 		});
 	}
 	
-	public Optional<Path> findAfastamentoSpreadsheetPath(Path uploadDir) {
+	public void cleanDirectories(Path... dirs) throws IOException {
+		for (Path  dir : dirs) {
+			cleanDirectory(dir);
+		}
+	}
+	
+	public void createDirectories(Path... paths) throws IOException {
+		try {
+			for (int i = 0; i < paths.length; i++) {
+				if (Files.notExists(paths[i])) {
+					Files.createDirectories(paths[i]);
+				}
+			}	
+		} catch (IOException e) {
+			LOGGER.error("Directory access error", e);
+			System.out.println("Erro ao acessar diretórios!!!");			
+			throw e;			
+		}	
+	}
+	
+	public Optional<Path> findAfastamentoSpreadsheetPath(Path dir) {
 		Optional<Path> result = Optional.empty();
 		try {
-			result = Files.list(uploadDir)
+			result = Files.list(dir)
 					.filter(path -> !Files.isDirectory(path))
-					.filter(path -> path.getFileName().toString().toLowerCase().contains(AFASTAMENTO_IDENTIFIED_FILE_NAME))
-					.filter(path -> path.getFileName().toString().toLowerCase().endsWith("xlsx"))
+					    // .filter(path -> path.getFileName().toString().toLowerCase().contains(AFASTAMENTO_IDENTIFIED_FILE_NAME))
+					.filter(path -> path.getFileName().toString().toLowerCase().endsWith("xlsx") || 
+									path.getFileName().toString().toLowerCase().endsWith("xls"))
 					.findFirst();
 		} catch (IOException e) {
 			LOGGER.debug("Error in searching 'afastamentos' spreadsheet.", e);
 		}
 		return result;
+	}
+	
+	public void deleteAfastamentoSpreadsheet(Path dir) {
+		Optional<Path> path = findAfastamentoSpreadsheetPath(dir);
+		path.ifPresent(p -> {
+			try {
+				Files.delete(p);
+			} catch (IOException e) {
+				LOGGER.debug("Error in deleting 'afastamentos' spreadsheet.", e);
+			}
+		});		
 	}
 	
 }
