@@ -62,3 +62,7 @@
     color: white;
     background-color: #73879C;
 }
+
+.entrada-body button i {
+    margin: 0px 5px;
+}

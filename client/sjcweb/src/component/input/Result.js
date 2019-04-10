@@ -4,12 +4,13 @@ import './Result.css';
 export default class Result extends Component {
 
   render() {
-    const uploadedFiles = this.props.uploadedFiles;
-    const resultFiles = this.props.resultFiles;
-
+    const { uploadedFiles, resultFiles, uploadedAfastFile } = this.props;
+    
     return (
       <div className="result-input">
             <h2>Resultado do Carregamento</h2>
+
+            <p className="result-afast">Arquivo de afastamentos: <span>{ uploadedAfastFile !== null ? uploadedAfastFile.name : ' nenhum ' }</span></p>
 
             <table className="table-entrada">
                 <thead>
@@ -24,7 +25,7 @@ export default class Result extends Component {
                     resultFiles.map( (resultFile, index) => {
                         const inputFile = uploadedFiles[index];
                         return (
-                        <tr key="{resultFile.name}">
+                        <tr key={index}>
                             <td>{inputFile.name}</td>
                             <td>{resultFile.name} <small>(xx serv. op | yy serv. adm)</small></td> 
                         </tr>

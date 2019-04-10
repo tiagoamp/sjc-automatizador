@@ -8,6 +8,14 @@
     justify-content: space-around;    
 }
 
+.result-input .result-afast {
+    font-size: 0.9rem;
+}
+
+.result-input .result-afast span {
+    font-style: italic;
+}
+
 .table-entrada {
     width: 60%;
 }

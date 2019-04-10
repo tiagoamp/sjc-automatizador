@@ -1,65 +1,22 @@
 import React, { Component } from 'react'
 import Dropzone from 'react-dropzone'
-import { ToastContainer, toast } from 'react-toastify';
 import Result from './Result';
-import 'react-toastify/dist/ReactToastify.min.css';
 import './Loader.css';
 
 export default class Loader extends Component {
-
-  constructor() {
-    super();
-    this.state = { uploadedFiles: [], uploadedAfastFile: null, resultFiles: [] };
-  }
-
-
-  handleInputFilesUpload = (files) => {
-    const newFiles = files.filter(f => f.name.toLowerCase().endsWith('.pdf'));
-    if (newFiles.length !== files.length) {
-      toast('Os arquivos com extensão inválidas nao foram carregados!', { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }); 
-    }
-    let prevFiles = this.state.uploadedFiles;
-    let updatedFiles = prevFiles.concat(newFiles); 
-    if (newFiles.length > 0) {
-      toast('Arquivos carregados!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-    }    
-    this.setState( {uploadedFiles: updatedFiles} );    
-  }
-
-  handleAfastamentosFilesUpload = (file) => {
-    const filename = file.name.toLowerCase();
-    console.log(filename);
-    if (!filename.endsWith('.xlsx') && !filename.endsWith('.xls')) {
-      toast('Extensão do arquivo inválida: ' + file.name, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false });
-      return;      
-    }
-    toast('Arquivos carregados!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-    this.setState( { uploadedAfastFile: file} );      
-  }
-
-  limparAction = () => {
-
-  }
-
-  carregarAction = () => {
-    
-  }
-
+  
   render() {
-    const uploadedFiles = this.state.uploadedFiles;
-    const uploadedAfastFile = this.state.uploadedAfastFile;
-    const resultFiles = this.state.resultFiles;
-
+    const { uploadedFiles, uploadedAfastFile, resultFiles, 
+            handleInputFilesUpload, handleAfastamentosFilesUpload, resetFiles, loadInputFiles } = this.props;
+    
     return (
     <section>
       <div className="entrada-body">
 
-        <ToastContainer autoClose={5000} />
-
         <h2>Entrada para processamento</h2>
 
         <div className="dropzone-group">
-          <Dropzone onDrop={acceptedFiles => this.handleInputFilesUpload(acceptedFiles)}>
+          <Dropzone onDrop={acceptedFiles => handleInputFilesUpload(acceptedFiles)}>
             {({getRootProps, getInputProps}) => (
               <section className="dropzone-section">
                 <div {...getRootProps()} className="dropzone-div">
@@ -72,7 +29,7 @@ export default class Loader extends Component {
               </section>
             )}
           </Dropzone>
-          <Dropzone onDrop={acceptedFiles => this.handleAfastamentosFilesUpload(acceptedFiles[0])}>
+          <Dropzone onDrop={acceptedFiles => handleAfastamentosFilesUpload(acceptedFiles[0])}>
             {({getRootProps, getInputProps}) => (
               <section>
                 <div {...getRootProps()} className="dropzone-div">
@@ -87,14 +44,14 @@ export default class Loader extends Component {
         </div>
 
         <div>
-          <button>LIMPAR</button>
-          <button>CARREGAR</button>
+          <button onClick={resetFiles}><i className="fa fa-trash-o fa-1x" aria-hidden="true"></i>LIMPAR</button>
+          <button onClick={loadInputFiles}><i className="fa fa-file-pdf-o fa-1x" aria-hidden="true"></i>CARREGAR</button>
         </div>
      
       </div>
 
       {
-        resultFiles.length > 0 ? (<Result uploadedFiles={uploadedFiles} resultFiles={resultFiles} />) : null
+        resultFiles.length > 0 ? (<Result uploadedFiles={uploadedFiles} resultFiles={resultFiles} uploadedAfastFile={uploadedAfastFile} />) : null
       }
       
 
