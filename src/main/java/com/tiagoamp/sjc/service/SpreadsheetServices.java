@@ -17,8 +17,11 @@ import org.springframework.stereotype.Service;
 import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet;
 import com.tiagoamp.sjc.model.input.HistoricoAfastamentos;
+import com.tiagoamp.sjc.model.input.InputConverter;
 import com.tiagoamp.sjc.model.input.InputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
+import com.tiagoamp.sjc.model.input.LoadedFileTO;
+import com.tiagoamp.sjc.model.input.LoadedFilesTO;
 import com.tiagoamp.sjc.model.output.OutputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputFilesGenerator;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
@@ -28,6 +31,31 @@ public class SpreadsheetServices {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpreadsheetServices.class);
 	
+	public LoadedFilesTO loadDataFromInputFiles(Path dir) throws IOException {
+		LOGGER.info("Carregando dados dos arquivos do diretório...");
+		if (Files.notExists(dir)) throw new IllegalArgumentException("Diretório inexistente!");
+		String afastFileName = null;
+		List<LoadedFileTO> tos = new ArrayList<>();
+		
+		DirectoryStream<Path> stream = Files.newDirectoryStream(dir);
+		for (Path file : stream) {
+			String filename = file.getFileName().toString();
+			boolean isAfastamentoFile = afastFileName == null && (filename.toLowerCase().endsWith("xls") || filename.toLowerCase().endsWith("xlsx"));
+			
+			if (isAfastamentoFile) {
+				afastFileName = filename;
+			} else {  // regular pdf files
+				InputConverter converter = new InputConverter(file);
+				converter.load();
+				
+				//TODO: TERMINAR !!!
+				
+			}		
+		}		
+		return null;
+	}
+	
+	@Deprecated
 	public List<InputSpreadsheet> loadInputSpreadsheetsFromDirectory(Path directory) throws IOException {
 		LOGGER.info("Carregando arquivos do diretório...");
 		if (Files.notExists(directory)) throw new IllegalArgumentException("Diretório inexistente!");

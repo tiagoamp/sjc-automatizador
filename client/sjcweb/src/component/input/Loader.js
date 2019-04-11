@@ -45,7 +45,7 @@ export default class Loader extends Component {
 
         <div>
           <button onClick={resetFiles}><i className="fa fa-trash-o fa-1x" aria-hidden="true"></i>LIMPAR</button>
-          <button onClick={loadInputFiles}><i className="fa fa-file-pdf-o fa-1x" aria-hidden="true"></i>CARREGAR</button>
+          <button onClick={loadInputFiles}><i className="fa fa-file-pdf-o fa-1x" aria-hidden="true"></i>CONVERTER</button>
         </div>
      
       </div>

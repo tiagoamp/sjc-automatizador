@@ -102,12 +102,12 @@ class App extends Component {
       toast('Nenhum arquivo feito upload!', { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }); 
       return;
     }
-    let currFiles = [...this.state.uploadedFiles];
 
 
     // TODO: transformar arquivos pdfs e setar no state !!!
 
-
+    
+    let currFiles = [...this.state.uploadedFiles];
     let result = currFiles.map(f => {
       const r = Object.assign({}, f);
       r.name = f.name.replace(/pdf/i,"xls");

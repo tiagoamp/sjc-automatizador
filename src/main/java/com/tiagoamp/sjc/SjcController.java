@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
+import com.tiagoamp.sjc.model.input.LoadedFilesTO;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
 import com.tiagoamp.sjc.service.SpreadsheetServices;
 import com.tiagoamp.sjc.service.FilesService;
@@ -52,7 +53,8 @@ public class SjcController {
 	private FilesService filesService;
 	
 		
-	/*@RequestMapping(value = "upload", method = RequestMethod.POST)
+	@Deprecated
+	@RequestMapping(value = "upload", method = RequestMethod.POST)
 	public Response uploadFile(MultipartHttpServletRequest request) {
 		try {
 			Iterator<String> itr = request.getFileNames();
@@ -67,9 +69,9 @@ public class SjcController {
 			return Response.serverError().build();
 		}
 		return Response.ok().build();
-	}*/
+	}
 	
-	@RequestMapping(value = "upload", method = RequestMethod.POST)
+	@RequestMapping(value = "upload2", method = RequestMethod.POST)
 	public Response uploadFile(@RequestParam(value="inputfile", required=true) MultipartFile file) {
 		try {
 			file.transferTo(DIR_ENTRADA.resolve(file.getOriginalFilename()).toFile());
@@ -103,12 +105,19 @@ public class SjcController {
 		return Response.ok().build();
 	}
 	
+	@Deprecated
+	@RequestMapping(value = "upload", method = RequestMethod.DELETE)
+	public Response cleanUploadDirectory() {
+		return cleanWorkingDirectories();
+	}
+	
 	@RequestMapping(value = "upload/afast", method = RequestMethod.DELETE)
 	public Response deleteAfastamentoSpreadsheet() {
 		filesService.deleteAfastamentoSpreadsheet(DIR_ENTRADA);
 		return Response.ok().build();
 	}
 	
+	@Deprecated
 	@RequestMapping(value = "input", method = RequestMethod.GET)
 	@Produces(MediaType.APPLICATION_JSON)
 	public InputSpreadsheet getSheetAtIndex(@QueryParam(value = "index") String index) {
@@ -122,6 +131,18 @@ public class SjcController {
 			throw new ResponseProcessingException(Response.serverError().build(),e);
 		}		
 		return insheet;
+	}
+	
+	@RequestMapping(value = "load", method = RequestMethod.GET)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ResponseEntity<LoadedFilesTO> loadDataFromInputFiles() {
+		try {
+			sjcService.loadDataFromInputFiles(DIR_ENTRADA);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	@RequestMapping(value = "output", method = RequestMethod.GET)
