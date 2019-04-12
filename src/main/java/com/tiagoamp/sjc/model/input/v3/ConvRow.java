@@ -1,12 +1,12 @@
 package com.tiagoamp.sjc.model.input.v3;
 
-public class InRow {
+public class ConvRow {
 	
 	private String nome;
 	private String matricula;
-	private Integer qtdHoraExtra;
-	private Integer qtdAdicionalNoturno;
-	private Integer qtdPlantoesExtra;
+	private String qtdHoraExtra;
+	private String qtdAdicionalNoturno;
+	private String qtdPlantoesExtra;
 	private String[] dtPlantoesExtras = new String[5];  
 	
 	
@@ -29,22 +29,22 @@ public class InRow {
 	public void setMatricula(String matricula) {
 		this.matricula = matricula;
 	}
-	public Integer getQtdHoraExtra() {
-		return qtdHoraExtra;
-	}
-	public void setQtdHoraExtra(Integer qtdHoraExtra) {
-		this.qtdHoraExtra = qtdHoraExtra;
-	}
-	public Integer getQtdAdicionalNoturno() {
+	public String getQtdAdicionalNoturno() {
 		return qtdAdicionalNoturno;
 	}
-	public void setQtdAdicionalNoturno(Integer qtdAdicionalNoturno) {
+	public void setQtdAdicionalNoturno(String qtdAdicionalNoturno) {
 		this.qtdAdicionalNoturno = qtdAdicionalNoturno;
 	}
-	public Integer getQtdPlantoesExtra() {
+	public String getQtdHoraExtra() {
+		return qtdHoraExtra;
+	}
+	public void setQtdHoraExtra(String qtdHoraExtra) {
+		this.qtdHoraExtra = qtdHoraExtra;
+	}
+	public String getQtdPlantoesExtra() {
 		return qtdPlantoesExtra;
 	}
-	public void setQtdPlantoesExtra(Integer qtdPlantoesExtra) {
+	public void setQtdPlantoesExtra(String qtdPlantoesExtra) {
 		this.qtdPlantoesExtra = qtdPlantoesExtra;
 	}
 	public String[] getDtPlantoesExtras() {

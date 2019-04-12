@@ -12,12 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eadge.extractpdfexcel.PdfConverter;
 import org.eadge.extractpdfexcel.data.ExtractedData;
 import org.eadge.extractpdfexcel.data.SortedData;
 import org.eadge.extractpdfexcel.data.SortedPage;
 import org.eadge.extractpdfexcel.data.XclPage;
+import org.eadge.extractpdfexcel.data.array.My2DArray;
 import org.eadge.extractpdfexcel.data.block.Block;
 import org.eadge.extractpdfexcel.data.lane.Lane;
 import org.eadge.extractpdfexcel.exception.IncorrectFileTypeException;
@@ -27,8 +30,10 @@ import static com.tiagoamp.sjc.model.SjcGeneralCode.*;
 
 import com.tiagoamp.sjc.model.SjcGeneralCode;
 import com.tiagoamp.sjc.model.fieldprocessor.MonthConverter;
-import com.tiagoamp.sjc.model.input.v3.InHeader;
-import com.tiagoamp.sjc.model.input.v3.InRow;
+import com.tiagoamp.sjc.model.input.v3.ConvHeader;
+import com.tiagoamp.sjc.model.input.v3.ConvRow;
+import com.tiagoamp.sjc.model.input.v3.ConvertedSheet;
+import com.tiagoamp.sjc.model.input.v3.to.IndexesPairTO;
 
 public class InputConverter {
 	
@@ -40,155 +45,170 @@ public class InputConverter {
 	public InputConverter(Path file) {
 		this.file = file;
 	}
-
 	
-	public static void main(String[] args) throws FileNotFoundException, IncorrectFileTypeException {
-		Path file = Paths.get("testfiles", "entrada", "Modelo.PDF");
-		InputConverter c = new InputConverter(file);
-		c.load();
-	}
+	
 	
 	/* https://github.com/eadgyo/Extract-PDF-Excel
 	 */
 	public void load() throws FileNotFoundException, IncorrectFileTypeException {
-		
-		ArrayList<XclPage> pages = PdfConverter.convertFileToXclPages(file.toAbsolutePath().toString());
-		
-		System.out.println(pages);
-		
+		// ArrayList<XclPage> pages = PdfConverter.convertFileToXclPages(file.toAbsolutePath().toString());  // gets pages as excel sheets style
 		ExtractedData extractedData = PdfConverter.extractFromFile(file.toAbsolutePath().toString(), new TextBlockIdentifier());
 		SortedData sortedData = PdfConverter.sortExtractedData(extractedData);
 		
-		ArrayList<XclPage> pages1 = PdfConverter.convertFileToXclPages("/home/d333280/Ti/proj/workspace-proj/LeitorPdf/Modelo.PDF");
-		
-		
-		
-		
-		//TODO: criar sheet de operacional e juntar as respectivas paginas
-		//TODO: criar sheet de adm e juntar as respectivas paginas
-		
 		Map<Integer, SortedPage> pagesMap = sortedData.getPages();
-		int qtPages = pagesMap.keySet().size();
+		Collection<SortedPage> pages = pagesMap.values();
 		
-		for (int pg = 1; pg <= qtPages; pg++) {
+		for (SortedPage page : pages) {
+			My2DArray<Block> arrBlocks = page.create2DArrayOfBlocks();			
 			
-			SortedPage sortedPage = pagesMap.get(pg);
-			
-			XclPage excelPage = PdfConverter.createExcelPage(sortedPage);
-			
-			System.out.println("ueba");
-			
-			SjcGeneralCode code = identifySheetCode((sortedPage));
-			InHeader headerRow = loadIdentificationInfo(sortedPage);						
-			//List<InRow> personalRows = loadPersonalInfo(sortedPage);
+			ConvertedSheet convertedPageSheet = loadDataFrom(arrBlocks);
 			
 		}			
 		
 	}
 	
-	private SjcGeneralCode identifySheetCode(SortedPage sortedPage) {
-		Collection<Lane> lanes = sortedPage.getLines().getLanes();
-		Iterator<Lane> iterator = lanes.iterator();
-		final int rowsThreshold = 100;   // search at 'n' first lines 
-		int counter = 0;
+	
+	private ConvertedSheet loadDataFrom(My2DArray<Block> arr) {
+		int nrOfCols = arr.numberOfColumns(), nrOfRows = arr.numberOfLines();
+		String nomeUnidade = null, monthStr = null, yearStr = null;
+		List<ConvRow> rows = null;
+		boolean hasPlantoesFields = false;
+				
+		IndexesPairTO indexes = null;
 		
-		while(iterator.hasNext() && counter < rowsThreshold) {
-			Lane lane = iterator.next();
-			
-			TreeMap<Double, Block> blocks = lane.getBlocks();
-			Collection<Block> values = blocks.values();
-			for (Block block : values) {
-				String text = block.getOriginalText().trim();				
-				boolean hasPlantaoColumns = text.toUpperCase().matches("^PLANTÃO\\s\\d") || text.toUpperCase().matches("^PLANTAO\\s\\d") || 
-						                    text.equalsIgnoreCase("TOTAL DE PLANTÕES EXTRAS");
-				if (hasPlantaoColumns) return OPERACIONAL;
+		for(int col=0; col < nrOfCols; col++) {
+			for(int line=0; line < nrOfRows; line++) {
+				Block block = arr.get(col, line);
+				if (block == null) continue;
+				String text = block.getOriginalText().trim();
+				
+				if (indexes == null) { // initializes indexes before any other data
+					if (!text.toUpperCase().matches("MATR(Í|I)CULA")) continue; 
+					indexes = identifyServidoresDataIndexes(arr, col, line);
+					if (indexes.getDataIndexes().isEmpty()) return null;  // no 'matriculas' found!!!					
+				}
+				
+				if (text.toUpperCase().matches("MATR(Í|I)CULA")) {                                   
+					List<String> matriculas = loadDataFromColumn(col, arr, indexes.getDataIndexes());
+					rows = generateRowsFromMatriculas(matriculas); // initializes rows
+				} else if (text.toUpperCase().startsWith("NOME DA UNIDADE")) {
+					Block nextBlock = arr.get(col, line+1);
+					String value = nextBlock == null ? null : nextBlock.getOriginalText();
+					nomeUnidade = value;
+				} else if (text.toUpperCase().matches("M(E|Ê)S")) {
+					Block nextBlock = arr.get(col, line+1);
+					String value = nextBlock == null ? null : nextBlock.getOriginalText();
+					monthStr = value;
+				} else if (text.toUpperCase().matches("ANO")) {
+					Block nextBlock = arr.get(col, line+1);
+					String value = nextBlock == null ? null : nextBlock.getOriginalText();
+					yearStr = value;
+				} else if (text.toUpperCase().contains("NOME DO SERVIDOR")) {
+					List<String> values = loadDataFromColumn(col, arr, indexes.getDataIndexes());
+					for (int i = 0; i < rows.size(); i++) rows.get(i).setNome( values.get(i) );
+				} else if (text.toUpperCase().contains("HORA EXTRA")) {
+					List<String> values = loadDataFromColumn(col, arr, indexes.getDataIndexes());
+					for (int i = 0; i < rows.size(); i++) rows.get(i).setQtdHoraExtra( values.get(i) );
+				} else if (text.toUpperCase().contains("ADICIONAL NOTURNO")) {
+					List<String> values = loadDataFromColumn(col, arr, indexes.getDataIndexes());
+					for (int i = 0; i < rows.size(); i++) rows.get(i).setQtdAdicionalNoturno( values.get(i) );
+				} else if (text.toUpperCase().matches("PLANT(Ã|A)O 1")) {
+					List<String> values = loadDataFromColumn(col, arr, indexes.getDataIndexes());
+					for (int i = 0; i < rows.size(); i++) rows.get(i).getDtPlantoesExtras()[0] = values.get(i);
+				} else if (text.toUpperCase().matches("PLANT(Ã|A)O 2")) {
+					List<String> values = loadDataFromColumn(col, arr, indexes.getDataIndexes());
+					for (int i = 0; i < rows.size(); i++) rows.get(i).getDtPlantoesExtras()[1] = values.get(i);
+				} else if (text.toUpperCase().matches("PLANT(Ã|A)O 3")) {
+					List<String> values = loadDataFromColumn(col, arr, indexes.getDataIndexes());
+					for (int i = 0; i < rows.size(); i++) rows.get(i).getDtPlantoesExtras()[2] = values.get(i);
+				} else if (text.toUpperCase().matches("PLANT(Ã|A)O 4")) {
+					List<String> values = loadDataFromColumn(col, arr, indexes.getDataIndexes());
+					for (int i = 0; i < rows.size(); i++) rows.get(i).getDtPlantoesExtras()[3] = values.get(i);
+				} else if (text.toUpperCase().matches("PLANT(Ã|A)O 5")) {
+					List<String> values = loadDataFromColumn(col, arr, indexes.getDataIndexes());
+					for (int i = 0; i < rows.size(); i++) rows.get(i).getDtPlantoesExtras()[4] = values.get(i);
+				} else if (text.toUpperCase().matches("TOTAL DE PLANT(Õ|O)ES EXTRAS")) {
+					hasPlantoesFields = true;
+					List<String> values = loadDataFromColumn(col, arr, indexes.getDataIndexes());
+					for (int i = 0; i < rows.size(); i++) rows.get(i).setQtdPlantoesExtra( values.get(i) );
+				}								
 			}
-			
 		}
-		return ADMINISTRATIVO;
+		
+		ConvHeader header = createHeaderFrom(nomeUnidade, monthStr, yearStr);
+		SjcGeneralCode code = hasPlantoesFields ? OPERACIONAL : ADMINISTRATIVO;
+		ConvertedSheet convSheet = new ConvertedSheet(code, header, rows);		
+		return convSheet;		
 	}
 	
-	private InHeader loadIdentificationInfo(SortedPage sortedPage) {
-		Collection<Lane> lanes = sortedPage.getLines().getLanes();		
-		Iterator<Lane> iterator = lanes.iterator();
-		String nome = null, month = null, year = null;
-		YearMonth yearMonth = null;
-		int hits = 0, nrOfHeaderHits = 4, counter = 0, linesThreshold = 100;
-		boolean isFieldsFilled = false;		
+	
+	private IndexesPairTO identifyServidoresDataIndexes(My2DArray<Block> arr, final Integer col, final Integer line) {
+		String possibleMatricula = null;
+		boolean foundValidMatricula = false, hasMatriculaToScan = true;
+		Integer servidoresInitIndex = null, servidoresEndIndex = null;
+		int nrOfLines = arr.numberOfLines(), currLine = line, qtMatr = 0;
+		List<Integer> indexes = new ArrayList<>();
 		
-		while(iterator.hasNext() && counter < linesThreshold) {
-			Lane lane = iterator.next();			
-			if (isFieldsFilled) break;
-			
-			TreeMap<Double, Block> blocks = lane.getBlocks();
-			Collection<Block> values = blocks.values();
-			
-			for (Block block : values) {
-				String text = block.getOriginalText();
-				
-				if (hits != nrOfHeaderHits) {
-					boolean isIndexHeader = text.toUpperCase().startsWith("NOME DA UNIDADE") ||  // hit 1 
-			                (text.equalsIgnoreCase("MÊS") || text.equalsIgnoreCase("MES")) ||    // hit 2
-			                text.equalsIgnoreCase("ANO") ||                                      // hit 3
-			                text.equalsIgnoreCase("SJC");                                        // hit 4
-					if (isIndexHeader) hits++;
-					continue;
+		while (hasMatriculaToScan) {
+			Block nextBlock = arr.get(col, ++currLine);
+			if (nextBlock != null) {
+				possibleMatricula = nextBlock.getOriginalText();
+				foundValidMatricula = isValidMatricula(possibleMatricula);
+				if (servidoresInitIndex == null && foundValidMatricula) servidoresInitIndex = currLine;
+				servidoresEndIndex = servidoresInitIndex != null ? (servidoresInitIndex + qtMatr) : null;
+				if (foundValidMatricula) {
+					qtMatr++;
+					indexes.add(currLine);
 				}
-				
-				// nr of hits achieved
-				if (nome == null) nome = text != null ? text : FIELD_NOT_FOUND;
-				else if (month == null) month = text != null ? text : FIELD_NOT_FOUND;
-				else if (year == null) year = text != null ? text : FIELD_NOT_FOUND;
-				else {  // everything filled
-					isFieldsFilled = true;
-					break;  
-				}
-			}			
-		}		
+			}
+			hasMatriculaToScan = (currLine+1) < nrOfLines && !isStringOfEndOfFile(possibleMatricula);
+		}
 		
+		IndexesPairTO pairTO = new IndexesPairTO(servidoresInitIndex, servidoresEndIndex, indexes);
+		return pairTO;
+	}
+	
+	private boolean isValidMatricula(String value) {
+		return value != null && !value.isEmpty() && value.matches(".*\\d+.*") && !isStringOfEndOfFile(value);
+	}
+	
+	private boolean isStringOfEndOfFile(String value) {
+		return value != null && value.toUpperCase().startsWith("TIPOS DE AFASTAMENTOS");
+	}
+	
+	private List<ConvRow> generateRowsFromMatriculas(List<String> matriculas) {
+		return matriculas.stream().map(matr -> {
+			ConvRow row = new ConvRow();
+			row.setMatricula(matr);
+			return row;
+		}).collect(Collectors.toList());
+	}
+	
+	private List<String> loadDataFromColumn(final Integer col, My2DArray<Block> arr, List<Integer> dataIndexes) {
+		List<String> values = dataIndexes.stream()
+				.map(index -> {
+					Block nextBlock = arr.get(col, index);
+					String value = nextBlock == null ? null : nextBlock.getOriginalText();
+					return value;
+				}).collect(Collectors.toList());
+		return values;
+	}
+	
+	private ConvHeader createHeaderFrom(String nomeUnidade, String month, String year) {
 		Optional<Month> convertedMonth = MonthConverter.getConvertedMonth(month);
+		YearMonth yearMonth = null;
 		if ( convertedMonth.isPresent() && year.matches("//d+")) {
 			yearMonth = YearMonth.of(Integer.parseInt(year), convertedMonth.get());			
-		}
-		
-		InHeader header = yearMonth != null ? new InHeader(yearMonth, nome) : new InHeader(nome, month, year);
+		}		
+		ConvHeader header = yearMonth != null ? new ConvHeader(yearMonth, nomeUnidade) : new ConvHeader(nomeUnidade, month, year);
 		return header;
 	}
-	
-	private List<InRow> loadPersonalInfo(SortedPage sortedPage, SjcGeneralCode code) {
-		Collection<Lane> lanes = sortedPage.getLines().getLanes();		
-		Iterator<Lane> iterator = lanes.iterator();
-		List<InRow> rows = new ArrayList<>();
-		boolean startInfo = false, endOfData = false; 
 		
 		
-		
-		final String textBeforeServidoresInfo = code == OPERACIONAL ? "TOTAL DE PLANTÕES EXTRAS" : "ADICIONAL NOTURNO";
-		final String textAfterServidoresInfo = "TIPOS DE AFASTAMENTOS";
-		
-		while (iterator.hasNext() && !endOfData) {
-			Lane lane = iterator.next();
-			InRow row = startInfo ? new InRow() : null;;
-			
-			TreeMap<Double, Block> blocks = lane.getBlocks();
-			Collection<Block> values = blocks.values();	
-			for(Block block : values) {				
-				String text = block.getOriginalText();
-				
-				if (!startInfo) {
-					if (text.equalsIgnoreCase(textBeforeServidoresInfo)) {
-						startInfo = true;
-						break;
-					}
-					continue;
-				}
-				
-				
-												
-			}			
-		}
-		
-		return rows;
-	}
+	/*
+	 * public static void main(String[] args) throws FileNotFoundException,
+	 * IncorrectFileTypeException { Path file = Paths.get("testfiles", "entrada",
+	 * "Modelo.PDF"); InputConverter c = new InputConverter(file); c.load(); }
+	 */
 	
 }

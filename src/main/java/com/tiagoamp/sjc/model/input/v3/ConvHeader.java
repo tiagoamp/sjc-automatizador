@@ -2,7 +2,7 @@ package com.tiagoamp.sjc.model.input.v3;
 
 import java.time.YearMonth;
 
-public class InHeader {
+public class ConvHeader {
 	
 	private final String fixedTitle = "RELATÓRIO MENSAL DE HORA EXTRA, ADICIONAL NOTURNO E PLANTÃO EXTRA";
 	private YearMonth yearMonthRef;
@@ -12,15 +12,15 @@ public class InHeader {
 	private String yearRefAsStr;
 	
 	
-	public InHeader() { } 
+	public ConvHeader() { } 
 			
-	public InHeader(String nomeUnidadePrisional, String monthRefAsStr, String yearRefAsStr) {
+	public ConvHeader(String nomeUnidadePrisional, String monthRefAsStr, String yearRefAsStr) {
 		this.nomeUnidadePrisional = nomeUnidadePrisional;
 		this.monthRefAsStr = monthRefAsStr;
 		this.yearRefAsStr = yearRefAsStr;
 	}
 
-	public InHeader(YearMonth yearMonthRef, String nomeUnidadePrisional) {
+	public ConvHeader(YearMonth yearMonthRef, String nomeUnidadePrisional) {
 		this.yearMonthRef = yearMonthRef;
 		this.monthRefAsStr = yearMonthRef.getMonth().name();
 		this.yearRefAsStr = String.valueOf(yearMonthRef.getYear());
