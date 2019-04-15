@@ -42,15 +42,14 @@ public class SpreadsheetServices {
 	public ConvertedFilesTO convertInputFiles(Path dir) throws IOException {
 		LOGGER.info("Convertendo arquivos do diretório...");
 		if (Files.notExists(dir)) throw new IllegalArgumentException("Diretório inexistente!");
-		String afastFileName = null;		
 		ConvertedFilesTO resultTO = new ConvertedFilesTO();		
 		
 		DirectoryStream<Path> stream = Files.newDirectoryStream(dir);
 		for (Path file : stream) {
 			String filename = file.getFileName().toString();
-			boolean isAfastamentoFile = afastFileName == null && filename.contains(NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME);
+			boolean isAfastamentoFile = resultTO.getAfastamentoFileName() == null && filename.contains(NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME);
 			if (isAfastamentoFile) {				
-				afastFileName = filename;				
+				resultTO.setAfastamentoFileName(filename);
 			} else {   // regular pdf files
 				InputConverter converter = new InputConverter(file);
 				ConvertedSpreadsheet convertedSpreadsheet = converter.convert();				
