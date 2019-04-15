@@ -25,6 +25,7 @@ public class AfastamentosExcelSpreadsheet {
 	private Path filePath; 
 	
 	public static final String AFASTAMENTO_IDENTIFIED_FILE_NAME = "afastamento";
+	public static final String NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME = "AFASTAMENTOS";
 	
 	
 	

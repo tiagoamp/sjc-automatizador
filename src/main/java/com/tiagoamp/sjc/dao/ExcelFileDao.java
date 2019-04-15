@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -12,146 +11,131 @@ import java.util.Set;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
-import com.itextpdf.text.DocumentException;
-import com.tiagoamp.sjc.model.SjcSpecificCode;
+import com.tiagoamp.sjc.model.SjcGeneralCode;
+import com.tiagoamp.sjc.model.input.v3.ConvHeader;
+import com.tiagoamp.sjc.model.input.v3.ConvRow;
+import com.tiagoamp.sjc.model.input.v3.ConvertedSheet;
 import com.tiagoamp.sjc.model.input.v3.ConvertedSpreadsheet;
-import com.tiagoamp.sjc.model.output.OutRow;
-import com.tiagoamp.sjc.model.output.OutSheet;
-import com.tiagoamp.sjc.model.output.OutputFilesGenerator;
-import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
-import com.tiagoamp.sjc.service.PDFGenerator;
 
+@Repository
 public class ExcelFileDao {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExcelFileDao.class);
 	
-	public void createConvertedSpreadsheet(ConvertedSpreadsheet convSpreadsheet) {
+	public Path createConvertedSpreadsheet(ConvertedSpreadsheet convSpreadsheet, String convertedFileName) throws FileNotFoundException, IOException {
+		LOGGER.info("Convertendo arquivo a partir de " + convSpreadsheet.getOriginalFile().getFileName());
+		Path convFilePath = convSpreadsheet.getOriginalFile().getParent().resolve(convertedFileName);		
 		try ( XSSFWorkbook workbook = new XSSFWorkbook();
-			  FileOutputStream fos = new FileOutputStream(convSpreadsheet.getOriginalFile().toFile()); ) 
-				{
-				for (SjcSpecificCode code : SjcSpecificCode.values()) {
-					OutSheet sheet = spreadsheet.getSheets().get(code);
-					if (sheet == null || sheet.getRows() == null || sheet.getRows().size() == 0) continue;
-					
-					LOGGER.info("Ordenando linhas da planilha de saída [" + code.getCode().toString() + "] ...");
-					sheet.sortRows();
-					
-					Map<Integer, Object[]> data = this.createOutputDataMap(sheet);
-									
-					XSSFSheet xsheet = workbook.createSheet(String.valueOf(code.getCode()));
-					
-					LOGGER.info("Preenchendo linhas da planilha de saída [" + code.getCode().toString() + "] ...");
-					fillNewOuputRowsInExcelSheet(xsheet, data);				
-									
-					int numberOfColumns = 11;
-					for (int i = 0; i < numberOfColumns; i++) {
-						xsheet.autoSizeColumn(i); // column adjusting
-					}
+			  FileOutputStream fos = new FileOutputStream(convFilePath.toFile()); ) 
+			{
+				Map<Integer, String[]> headerMap = createHeaderMap(convSpreadsheet.getHeader());
+				
+				for (SjcGeneralCode code : SjcGeneralCode.values()) {
+					ConvertedSheet convSheet = convSpreadsheet.getConvertedSheets().get(code);
+					if (convSheet == null || convSheet.getRows() == null || convSheet.getRows().size() == 0) continue;									
+					Map<Integer, String[]> dataMap = this.createDataMap(convSheet, code);					
+					XSSFSheet xsheet = workbook.createSheet(code.toString());					
+					fillRowsInExcelSheet(xsheet, headerMap, dataMap);						
+					adjustColumnsSize(xsheet);
 				}
 				
 				workbook.write(fos);
-			}	
-		
+			}
+		return convFilePath;
 	}
 	
 	
-	
-
-	public void generateOuputSpreadsheetFile(Path outputFile, OutputSpreadsheet spreadsheet) throws IOException  {		
-		
+	private Map<Integer, String[]> createHeaderMap(ConvHeader header) {
+		Map<Integer, String[]> data = new HashMap<>();		
+		data.put(0, new String[] {"Título:", header.getFixedTitle()});
+		data.put(1, new String[] {"Nome da Unidade:", header.getNomeUnidadePrisional()});
+		data.put(2, new String[] {"Mês:", header.getYearMonthRef() != null ? header.getMonthRefAsStr() : "NÃO IDENTIFICADO"});
+		data.put(3, new String[] {"Ano:", header.getYearMonthRef() != null ? header.getYearRefAsStr() : "NÃO IDENTIFICADO"});		
+		return data;		
 	}
 	
-	public void generateOutputMessageFile(Path outputFile, OutputSpreadsheet spreadsheet) throws FileNotFoundException, DocumentException {
-		PDFGenerator pdfGen = new PDFGenerator();
-		pdfGen.generateMessagesPdfFile(spreadsheet.getMessages(), outputFile);
-	}
-	
-	
-	private Map<Integer, Object[]> createOutputDataMap(OutSheet sheet) {
-		Map<Integer, Object[]> data = new HashMap<>();
-		Integer counter = 0;	         
-		for (OutRow outRow : sheet.getRows()) {
-			data.put(counter, new Object[] {outRow.getLotacao(), outRow.getNome().toUpperCase(), outRow.getMatricula(), outRow.getQuantidade(), 
-				outRow.getDtPlantoesExtras()[0], outRow.getDtPlantoesExtras()[1], outRow.getDtPlantoesExtras()[2], outRow.getDtPlantoesExtras()[3], outRow.getDtPlantoesExtras()[4], 
-				outRow.getAfastamento(), outRow.getDtPlantoesWithinAfastamentos(),
-				outRow.hasDuplicates()});
-			counter++;
+	private Map<Integer, String[]> createDataMap(ConvertedSheet cnvSheet, SjcGeneralCode code) {
+		Map<Integer, String[]> data = new HashMap<>();
+		Integer counter = 0;
+		if (code == SjcGeneralCode.ADMINISTRATIVO) {
+			data.put(counter, new String[] {"MATRÍCULA", "NOME DO SERVIDOR", "HORA EXTRA", "ADICIONAL NOTURNO"});
+		} else {
+			data.put(counter, new String[] {"MATRÍCULA", "NOME DO SERVIDOR", "HORA EXTRA", "ADICIONAL NOTURNO", "PLANTÃO 1", "PLANTÃO 2", "PLANTÃO 3", "PLANTÃO 4", "PLANTÃO 5", "TOTAL DE PLANTÕES"});
+		}		
+		for (ConvRow row : cnvSheet.getRows()) {
+			if (code == SjcGeneralCode.ADMINISTRATIVO) {
+				data.put(++counter, new String[] {row.getMatricula(), row.getNome().toUpperCase(), row.getQtdHoraExtra(), row.getQtdAdicionalNoturno()});								
+			} else {
+				data.put(++counter, new String[] {row.getMatricula(), row.getNome().toUpperCase(), row.getQtdHoraExtra(), row.getQtdAdicionalNoturno(), 
+					    row.getDtPlantoesExtras()[0], row.getDtPlantoesExtras()[1], row.getDtPlantoesExtras()[2], row.getDtPlantoesExtras()[3], row.getDtPlantoesExtras()[4], 
+					    row.getQtdPlantoesExtra()});	
+			}			
     	}
 		return data;
 	}
 	
-	private void fillNewOuputRowsInExcelSheet(XSSFSheet xssfsheet, Map<Integer, Object[]> data) {
-		Set<Integer> newRows = data.keySet(); // Set to Iterate and add rows into XLS file
+	private void fillRowsInExcelSheet(XSSFSheet xssfsheet, Map<Integer, String[]> headerMap, Map<Integer, String[]> dataMap) {
+		Set<Integer> headerRows = headerMap.keySet(); // Sets to Iterate and add rows into XLS file
+		Set<Integer> dataRows = dataMap.keySet(); 
 		int rownum = xssfsheet.getLastRowNum(); // get the last row number to append new data   
 		
-		int initPlantoesObjIndex = 4;
-		int afastamentoIndex = 9;
-		int dtPlantoesAfastIndex = 10;
-		int repeatedMatriculaIndex = 11;
-		
-		for (Integer key : newRows) {
+		for (Integer key : headerRows) {
 			Row row = xssfsheet.createRow(rownum++); // Creating a new Row in existing XLSX sheet
-			Object [] objArr = data.get(key);
-			
-			Object flagsPlantoesAfast = objArr[9];
-			boolean hasPlantoesExtrasWithAfastamentos = flagsPlantoesAfast != null; 
-			Boolean[] dtPlantoesWithinAfastamentos = null;
-			
-			if (hasPlantoesExtrasWithAfastamentos) dtPlantoesWithinAfastamentos = (Boolean[]) objArr[dtPlantoesAfastIndex];
-			
-			
-			boolean isRowWithPlantaoExtra = objArr[initPlantoesObjIndex] != null;
-			
-			int cellnum = 0;
-			for (int i=0; i < objArr.length; i++ ) {
-				Object obj = objArr[i];				
-				
-				boolean isPlantaoDatesInterval = i >= initPlantoesObjIndex && i < initPlantoesObjIndex+5;
-				if ( (isPlantaoDatesInterval && !isRowWithPlantaoExtra) || (i == dtPlantoesAfastIndex) || (!isRowWithPlantaoExtra && i == afastamentoIndex)) {
-					continue; 
-				}
-				
-				Cell cell = row.createCell(cellnum++);
-				
-				if (obj != null && isPlantaoDatesInterval && isRowWithPlantaoExtra && hasPlantoesExtrasWithAfastamentos) {
-					Boolean hasDatesConflicts = dtPlantoesWithinAfastamentos[i - initPlantoesObjIndex];
-					XSSFCellStyle cellStyle = null;
-					if (hasDatesConflicts == null) cellStyle = getCellStyleFor(xssfsheet, "not-evaluated");
-					else if (hasDatesConflicts) cellStyle = getCellStyleFor(xssfsheet, "conflict");
-					
-					if (cellStyle != null) cell.setCellStyle(cellStyle);
-				}
-				
-				if (i == afastamentoIndex) { // afastamento
-					XSSFCellStyle italicCellStyle = getItalicCellStyle(xssfsheet);
-					cell.setCellStyle(italicCellStyle);
-				}
-				
-				if (i == repeatedMatriculaIndex) { // repeated matricula
-					boolean isRepeated = (boolean) obj;
-					obj = isRepeated ? "** Matrícula repete nesta planilha para outra lotação" : null;
-				}
-								
-				if (obj instanceof String) {
-					cell.setCellValue((String) obj);
-                } else if (obj instanceof Boolean) {
-                	cell.setCellValue((Boolean) obj);
-                } else if (obj instanceof Date) {
-                	cell.setCellValue((Date) obj);
-                } else if (obj instanceof Double) {
-                	cell.setCellValue((Double) obj);
-                } else if (obj instanceof Integer) {
-                	cell.setCellValue((Integer) obj);
-                }	                    
-			}
-			
+			String[] headersArr = headerMap.get(key);
+			int cellnum = 0;			
+			Cell cellKey = row.createCell(cellnum++);			
+			cellKey.setCellStyle(getBoldCellStyle(xssfsheet));
+			cellKey.setCellValue(headersArr[0]);
+			Cell cellValue = row.createCell(cellnum++);
+			cellValue.setCellValue(headersArr[1]);
 		}
 		
+		Row emptyRow = xssfsheet.createRow(rownum++); 
+		emptyRow.createCell(0);
+		
+		Row row = xssfsheet.createRow(rownum++); 
+		String[] colsNamesArr = dataMap.get(0);
+		int cellnum = 0;
+		for (int i=0; i < colsNamesArr.length; i++ ) {
+			String colName = colsNamesArr[i];
+			Cell cellForColName = row.createCell(cellnum++);			
+			cellForColName.setCellStyle(getBoldCellStyle(xssfsheet));
+			cellForColName.setCellValue(colName);
+		}
+		dataMap.remove(0); // removes cols names already put in the file
+		
+		for (Integer key : dataRows) {			
+			row = xssfsheet.createRow(rownum++); 
+			cellnum = 0;
+			String[] colsValsArr = dataMap.get(key);
+			for (int i=0; i < colsValsArr.length; i++ ) { 
+				String value = colsValsArr[i];			
+				Cell cellForColValue = row.createCell(cellnum++);
+				cellForColValue.setCellValue(value);
+			}			
+		}		
+	}
+	
+	private XSSFCellStyle getBoldCellStyle(XSSFSheet xssfsheet) {
+		XSSFFont font = xssfsheet.getWorkbook().createFont();
+		font.setBold(true);
+		XSSFCellStyle style = xssfsheet.getWorkbook().createCellStyle();
+		style.setFont(font);		
+		return style;
+	}
+	
+	private void adjustColumnsSize(XSSFSheet xsheet) {
+		int numberOfColumns = 11;
+		for (int i = 0; i < numberOfColumns; i++) {
+			xsheet.autoSizeColumn(i); // column adjusting
+		}
 	}
 	
 }

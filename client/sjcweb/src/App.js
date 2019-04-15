@@ -80,7 +80,10 @@ class App extends Component {
       return;          
     }
     httpGatewayFunctions.deleteAfastamentoRequest()
-      .then(res => httpGatewayFunctions.uploadFileRequest(file) )
+      .then(res => {
+        file.isAfastamento = true;
+        httpGatewayFunctions.uploadFileRequest(file);
+        })
       .then(res => {
             toast('Arquivo carregado!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
             this.setState( { uploadedAfastFile: file, resultFiles: []} );

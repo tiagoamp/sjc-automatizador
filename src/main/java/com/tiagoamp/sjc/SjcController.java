@@ -1,5 +1,9 @@
 package com.tiagoamp.sjc;
 
+import static com.tiagoamp.sjc.SjcAutoApplication.DIR_ENTRADA;
+import static com.tiagoamp.sjc.SjcAutoApplication.DIR_SAIDA;
+import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,12 +36,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.itextpdf.text.DocumentException;
+import com.tiagoamp.sjc.model.input.ConvertedFilesTO;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
-import com.tiagoamp.sjc.model.input.LoadedFilesTO;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
-import com.tiagoamp.sjc.service.SpreadsheetServices;
 import com.tiagoamp.sjc.service.FilesService;
-import static com.tiagoamp.sjc.SjcAutoApplication.*;
+import com.tiagoamp.sjc.service.SpreadsheetServices;
 
 @CrossOrigin
 @RestController
@@ -74,7 +77,11 @@ public class SjcController {
 	@RequestMapping(value = "upload2", method = RequestMethod.POST)
 	public Response uploadFile(@RequestParam(value="inputfile", required=true) MultipartFile file) {
 		try {
-			file.transferTo(DIR_ENTRADA.resolve(file.getOriginalFilename()).toFile());
+			String filename = file.getOriginalFilename();
+			if (filename.endsWith("xlsx") || filename.endsWith("xls") ) {
+				filename = NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME + ".xlsx";
+			}			
+			file.transferTo(DIR_ENTRADA.resolve(filename).toFile());
 		} catch (IllegalStateException | IOException e) {
 			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
@@ -121,28 +128,28 @@ public class SjcController {
 	@RequestMapping(value = "input", method = RequestMethod.GET)
 	@Produces(MediaType.APPLICATION_JSON)
 	public InputSpreadsheet getSheetAtIndex(@QueryParam(value = "index") String index) {
-		InputSpreadsheet insheet = null;
 		try {
 			List<Path> list = filesService.getUploadedFilesPath(DIR_ENTRADA);
 			Path filepath = list.get(Integer.valueOf(index));
-			insheet = sjcService.loadInputSpreadsheet(filepath);			
+			InputSpreadsheet insheet = sjcService.loadInputSpreadsheet(filepath);
+			return insheet;
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
-		}		
-		return insheet;
+		}
 	}
 	
 	@RequestMapping(value = "convert", method = RequestMethod.GET)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ResponseEntity<LoadedFilesTO> loadDataFromInputFiles() {
+	public ResponseEntity<ConvertedFilesTO> loadDataFromInputFiles() {
 		try {
-			sjcService.convertInputFiles(DIR_ENTRADA);
+			ConvertedFilesTO convertedsTO = sjcService.convertInputFiles(DIR_ENTRADA);
+			ResponseEntity<ConvertedFilesTO> entity = new ResponseEntity<ConvertedFilesTO>(convertedsTO, HttpStatus.CREATED);
+			return entity;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			throw new ResponseProcessingException(Response.serverError().build(),e);
 		}
-		return null;
 	}
 	
 	@RequestMapping(value = "output", method = RequestMethod.GET)

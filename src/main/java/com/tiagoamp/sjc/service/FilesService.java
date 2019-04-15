@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -66,7 +68,7 @@ public class FilesService {
 		try {
 			result = Files.list(dir)
 					.filter(path -> !Files.isDirectory(path))
-					    // .filter(path -> path.getFileName().toString().toLowerCase().contains(AFASTAMENTO_IDENTIFIED_FILE_NAME))
+					.filter(path -> path.getFileName().toString().toLowerCase().contains(AFASTAMENTO_IDENTIFIED_FILE_NAME))
 					.filter(path -> path.getFileName().toString().toLowerCase().endsWith("xlsx") || 
 									path.getFileName().toString().toLowerCase().endsWith("xls"))
 					.findFirst();
@@ -76,8 +78,23 @@ public class FilesService {
 		return result;
 	}
 	
+	public Optional<Path> findNewAfastamentoSpreadsheetPath(Path dir) {
+		Optional<Path> result = Optional.empty();
+		try {
+			result = Files.list(dir)
+					.filter(path -> !Files.isDirectory(path))
+					.filter(path -> path.getFileName().toString().equals(NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME))
+					.filter(path -> path.getFileName().toString().endsWith("xlsx") || 
+									path.getFileName().toString().endsWith("xls"))
+					.findFirst();
+		} catch (IOException e) {
+			LOGGER.debug("Error in searching 'afastamentos' spreadsheet.", e);
+		}
+		return result;
+	}
+	
 	public void deleteAfastamentoSpreadsheet(Path dir) {
-		Optional<Path> path = findAfastamentoSpreadsheetPath(dir);
+		Optional<Path> path = findNewAfastamentoSpreadsheetPath(dir);
 		path.ifPresent(p -> {
 			try {
 				Files.delete(p);

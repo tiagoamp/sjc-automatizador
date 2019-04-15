@@ -1,6 +1,7 @@
 package com.tiagoamp.sjc.service;
 
 import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.AFASTAMENTO_IDENTIFIED_FILE_NAME;
+import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,16 +13,18 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.text.DocumentException;
+import com.tiagoamp.sjc.dao.ExcelFileDao;
 import com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet;
+import com.tiagoamp.sjc.model.input.ConvertedFileTO;
+import com.tiagoamp.sjc.model.input.ConvertedFilesTO;
 import com.tiagoamp.sjc.model.input.HistoricoAfastamentos;
 import com.tiagoamp.sjc.model.input.InputConverter;
 import com.tiagoamp.sjc.model.input.InputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
-import com.tiagoamp.sjc.model.input.LoadedFileTO;
-import com.tiagoamp.sjc.model.input.LoadedFilesTO;
 import com.tiagoamp.sjc.model.input.v3.ConvertedSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputFilesGenerator;
@@ -32,33 +35,34 @@ public class SpreadsheetServices {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpreadsheetServices.class);
 	
-	public LoadedFilesTO convertInputFiles(Path dir) throws IOException {
+	@Autowired
+	private ExcelFileDao excelFileDao; 
+	
+	
+	public ConvertedFilesTO convertInputFiles(Path dir) throws IOException {
 		LOGGER.info("Convertendo arquivos do diretório...");
 		if (Files.notExists(dir)) throw new IllegalArgumentException("Diretório inexistente!");
-		String afastFileName = null;
-		
-		List<LoadedFileTO> tos = new ArrayList<>();
+		String afastFileName = null;		
+		ConvertedFilesTO resultTO = new ConvertedFilesTO();		
 		
 		DirectoryStream<Path> stream = Files.newDirectoryStream(dir);
 		for (Path file : stream) {
 			String filename = file.getFileName().toString();
-			boolean isAfastamentoFile = afastFileName == null && (filename.toLowerCase().endsWith("xls") || filename.toLowerCase().endsWith("xlsx"));
-			
-			if (isAfastamentoFile) {
-				afastFileName = filename;
-			} else {  // regular pdf files
+			boolean isAfastamentoFile = afastFileName == null && filename.contains(NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME);
+			if (isAfastamentoFile) {				
+				afastFileName = filename;				
+			} else {   // regular pdf files
 				InputConverter converter = new InputConverter(file);
-				ConvertedSpreadsheet convertedSpreadsheet = converter.convert();
-				
-								
-				//TODO: TERMINAR !!!
-				
-				gerar planilha excel
-				
-				
+				ConvertedSpreadsheet convertedSpreadsheet = converter.convert();				
+				String convFileName = convertedSpreadsheet.getOriginalFile().getFileName().toString().toLowerCase().replace(".pdf", ".xlsx");
+				Path convSpreadsheetFile = excelFileDao.createConvertedSpreadsheet(convertedSpreadsheet, convFileName);
+				convertedSpreadsheet.setConvertedFile(convSpreadsheetFile);				
+				ConvertedFileTO convertedFileTO = convertedSpreadsheet.toConvertedFileTO();
+				resultTO.getConvertedFilesTO().add(convertedFileTO);
 			}		
-		}		
-		return null;
+		}
+		
+		return resultTO;
 	}
 	
 	@Deprecated

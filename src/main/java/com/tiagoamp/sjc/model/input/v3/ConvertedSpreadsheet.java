@@ -1,19 +1,27 @@
 package com.tiagoamp.sjc.model.input.v3;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.tiagoamp.sjc.model.SjcGeneralCode;
+import static com.tiagoamp.sjc.model.SjcGeneralCode.*;
+import com.tiagoamp.sjc.model.input.ConvertedFileTO;
 
 public class ConvertedSpreadsheet {
 
 	private ConvHeader header;	
-	private ConvertedSheet operacionalSheet;
-	private ConvertedSheet administrativoSheet;
 	private Path originalFile;
 	private Path convertedFile;
+	private Map<SjcGeneralCode, ConvertedSheet> convertedSheets;
 	
 	
-	public ConvertedSpreadsheet() { }
+	public ConvertedSpreadsheet() {
+		this.convertedSheets = new HashMap<>();
+	}
 	
 	public ConvertedSpreadsheet(ConvHeader header, ConvertedSheet operacionalSheet, ConvertedSheet administrativoSheet, Path originalFilePath) {
+		this();
 		if (header == null) {
 			header = new ConvHeader();
 			
@@ -43,13 +51,25 @@ public class ConvertedSpreadsheet {
 		}
 		
 		this.header = header;
-		this.operacionalSheet = operacionalSheet;
-		this.administrativoSheet = administrativoSheet;
 		this.originalFile = originalFilePath;
+		this.convertedSheets.put(OPERACIONAL, operacionalSheet);
+		this.convertedSheets.put(ADMINISTRATIVO, administrativoSheet);		
 	}
 	
 	public ConvertedSpreadsheet(ConvertedSheet operacionalSheet, ConvertedSheet administrativoSheet, Path originalFilePath) {
 		this(null, operacionalSheet, administrativoSheet, originalFilePath);		
+	}
+	
+	
+	public ConvertedFileTO toConvertedFileTO() {
+		String originalFileName = this.getOriginalFile().getFileName().toString();
+		String convertedFileName = this.getConvertedFile().getFileName().toString();
+		int opRowsCount = 0, admRowsCount = 0;
+		ConvertedSheet opSheet = this.getConvertedSheets().get(OPERACIONAL);
+		ConvertedSheet admSheet = this.getConvertedSheets().get(ADMINISTRATIVO);
+		if (opSheet != null && opSheet.getRows() != null) opRowsCount = opSheet.getRows().size();
+		if (admSheet != null && admSheet.getRows() != null) admRowsCount = admSheet.getRows().size();		
+		return new ConvertedFileTO(originalFileName, convertedFileName, opRowsCount, admRowsCount);
 	}
 	
 	
@@ -58,18 +78,6 @@ public class ConvertedSpreadsheet {
 	}
 	public void setHeader(ConvHeader header) {
 		this.header = header;
-	}
-	public ConvertedSheet getOperacionalSheet() {
-		return operacionalSheet;
-	}
-	public void setOperacionalSheet(ConvertedSheet operacionalSheet) {
-		this.operacionalSheet = operacionalSheet;
-	}
-	public ConvertedSheet getAdministrativoSheet() {
-		return administrativoSheet;
-	}
-	public void setAdministrativoSheet(ConvertedSheet administrativoSheet) {
-		this.administrativoSheet = administrativoSheet;
 	}
 	public Path getConvertedFile() {
 		return convertedFile;
@@ -82,6 +90,12 @@ public class ConvertedSpreadsheet {
 	}
 	public void setOriginalFile(Path originalFile) {
 		this.originalFile = originalFile;
+	}	
+	public Map<SjcGeneralCode, ConvertedSheet> getConvertedSheets() {
+		return convertedSheets;
+	}
+	public void setConvertedSheets(Map<SjcGeneralCode, ConvertedSheet> convertedSheets) {
+		this.convertedSheets = convertedSheets;
 	}
 	
 }
