@@ -80,6 +80,13 @@
 
 	</dependencies>
 
+	<repositories>
+		<repository>
+		    <id>Extract-PDF-Excel</id>
+		    <url>https://raw.githubusercontent.com/eadgyo/Extract-PDF-Excel/master/</url>
+		</repository>
+	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>
