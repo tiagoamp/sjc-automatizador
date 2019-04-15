@@ -22,6 +22,7 @@ import com.tiagoamp.sjc.model.input.InputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.input.LoadedFileTO;
 import com.tiagoamp.sjc.model.input.LoadedFilesTO;
+import com.tiagoamp.sjc.model.input.v3.ConvertedSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputFilesGenerator;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
@@ -31,10 +32,11 @@ public class SpreadsheetServices {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpreadsheetServices.class);
 	
-	public LoadedFilesTO loadDataFromInputFiles(Path dir) throws IOException {
-		LOGGER.info("Carregando dados dos arquivos do diretório...");
+	public LoadedFilesTO convertInputFiles(Path dir) throws IOException {
+		LOGGER.info("Convertendo arquivos do diretório...");
 		if (Files.notExists(dir)) throw new IllegalArgumentException("Diretório inexistente!");
 		String afastFileName = null;
+		
 		List<LoadedFileTO> tos = new ArrayList<>();
 		
 		DirectoryStream<Path> stream = Files.newDirectoryStream(dir);
@@ -46,9 +48,13 @@ public class SpreadsheetServices {
 				afastFileName = filename;
 			} else {  // regular pdf files
 				InputConverter converter = new InputConverter(file);
-				converter.load();
+				ConvertedSpreadsheet convertedSpreadsheet = converter.convert();
 				
+								
 				//TODO: TERMINAR !!!
+				
+				gerar planilha excel
+				
 				
 			}		
 		}		

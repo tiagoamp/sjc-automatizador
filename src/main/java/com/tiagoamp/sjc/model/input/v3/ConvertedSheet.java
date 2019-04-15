@@ -20,6 +20,20 @@ public class ConvertedSheet {
 	}
 	
 	
+	public void print() {
+		System.out.println(this);
+		rows.forEach(System.out::println);
+	}
+	
+	
+	@Override
+	public String toString() {
+		return header.getFixedTitle() + " | " + 
+	           header.getYearMonthRef() + " [" + header.getYearRefAsStr() + " / " + header.getMonthRefAsStr()  + "]" + " | " + 
+	           "Qtd rows: " + " [" + (rows != null ? rows.size() : 0) + "]";			   
+	}
+	
+	
 	public SjcGeneralCode getCode() {
 		return code;
 	}

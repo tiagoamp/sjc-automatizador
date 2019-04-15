@@ -133,11 +133,11 @@ public class SjcController {
 		return insheet;
 	}
 	
-	@RequestMapping(value = "load", method = RequestMethod.GET)
+	@RequestMapping(value = "convert", method = RequestMethod.GET)
 	@Produces(MediaType.APPLICATION_JSON)
 	public ResponseEntity<LoadedFilesTO> loadDataFromInputFiles() {
 		try {
-			sjcService.loadDataFromInputFiles(DIR_ENTRADA);
+			sjcService.convertInputFiles(DIR_ENTRADA);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

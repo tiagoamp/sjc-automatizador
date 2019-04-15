@@ -3,7 +3,7 @@ package com.tiagoamp.sjc.model.input;
 public class LoadedFileTO {
 
 	private String originalFileName;
-	private String loadedFileName;
+	private String convertedFileName;
 	private int operacionalNr;
 	private int administrativoNr;
 	
@@ -12,7 +12,7 @@ public class LoadedFileTO {
 	
 	public LoadedFileTO(String originalFileName, String loadedFileName, int operacionalNr, int administrativoNr) {
 		this.originalFileName = originalFileName;
-		this.loadedFileName = loadedFileName;
+		this.convertedFileName = loadedFileName;
 		this.operacionalNr = operacionalNr;
 		this.administrativoNr = administrativoNr;
 	}
@@ -24,11 +24,11 @@ public class LoadedFileTO {
 	public void setOriginalFileName(String originalFileName) {
 		this.originalFileName = originalFileName;
 	}
-	public String getLoadedFileName() {
-		return loadedFileName;
+	public String getConvertedFileName() {
+		return convertedFileName;
 	}
-	public void setLoadedFileName(String loadedFileName) {
-		this.loadedFileName = loadedFileName;
+	public void setConvertedFileName(String convertedFileName) {
+		this.convertedFileName = convertedFileName;
 	}
 	public int getOperacionalNr() {
 		return operacionalNr;

@@ -1,5 +1,7 @@
 package com.tiagoamp.sjc.model.input.v3;
 
+import java.util.Arrays;
+
 public class ConvRow {
 	
 	private String nome;
@@ -12,8 +14,8 @@ public class ConvRow {
 	
 	@Override
 	public String toString() {
-		return String.format("Matrícula: %s | Nome: %s | Hora Extra: %s | Adic. Noturno: %s | Plantões: %s", 
-				matricula, nome, qtdHoraExtra, qtdAdicionalNoturno, qtdPlantoesExtra);
+		return String.format("Matrícula: %s | Nome: %s | Hora Extra: %s | Adic. Noturno: %s | Qtd Plantões: %s | Dt Plantões: %s", 
+				matricula, nome, qtdHoraExtra, qtdAdicionalNoturno, qtdPlantoesExtra, Arrays.toString(dtPlantoesExtras));
 	}
 	
 	
