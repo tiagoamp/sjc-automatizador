@@ -12,7 +12,8 @@ public class NumericFieldProcessor extends FieldProcessor {
 	}
 	    
     public String process(String inputValue) {
-		if (inputValue == null) throw new IllegalArgumentException();
+		//if (inputValue == null) throw new IllegalArgumentException();
+    	if (inputValue == null) return null;
 		String value = inputValue;
 		if (nonNumericPattern.matcher(value).find()) {
     		value = value.replaceAll(nonNumericPattern.pattern(), "");

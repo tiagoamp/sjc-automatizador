@@ -1,24 +1,22 @@
 package com.tiagoamp.sjc.model.input.v3;
 
-import java.io.FileInputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.time.DateTimeException;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import com.tiagoamp.sjc.model.MessageType;
 import com.tiagoamp.sjc.model.ProcessingMessage;
 import com.tiagoamp.sjc.model.SjcGeneralCode;
+import com.tiagoamp.sjc.model.fieldprocessor.DataPlantaoFieldProcessor;
+import com.tiagoamp.sjc.model.fieldprocessor.FieldProcessor;
+import com.tiagoamp.sjc.model.fieldprocessor.MatriculaFieldProcessor;
 import com.tiagoamp.sjc.model.fieldprocessor.MonthConverter;
-import com.tiagoamp.sjc.model.input.InExcelSheet;
-import com.tiagoamp.sjc.model.input.InSheet;
+import com.tiagoamp.sjc.model.fieldprocessor.NumericFieldProcessor;
 
 public class InputSpreadSheetProcessor {
 	
@@ -26,22 +24,20 @@ public class InputSpreadSheetProcessor {
 	public List<ProcessingMessage> process(ConvertedSpreadsheet spreadsheet) {
 		List<ProcessingMessage> msgs = new ArrayList<>();
 		
-		validateHeader(spreadsheet.getHeader());
+		List<ProcessingMessage> headerMsgs = validateHeader(spreadsheet.getHeader());
+		msgs.addAll(headerMsgs);
 		
 		for (SjcGeneralCode code : SjcGeneralCode.values()) {
-			ConvertedSheet sheet = spreadsheet.getConvertedSheets().get(code);
-			
+			ConvertedSheet sheet = spreadsheet.getConvertedSheets().get(code);			
 			if (sheet == null) {
 				msgs.add(new ProcessingMessage(MessageType.ERROR, "Aba com nome '" + code.toString() +"' não encontrada na planilha."));
 	        	continue;
-	        }
+	        }	
+			sheet.setHeader(spreadsheet.getHeader());  // updated header from validation			
+			List<ProcessingMessage> rowsMsgs = validateRows(sheet.getRows(), spreadsheet.getHeader().getYearMonthRef());
+			msgs.addAll(rowsMsgs);
 			
-			
-			
-		}
-		
- 
-		
+		}		
 		
 	}
 
@@ -88,8 +84,68 @@ public class InputSpreadSheetProcessor {
 		return headerMsgs;
 	}
 	
-	private List<ProcessingMessage> validateRows(List<ConvRow> rows) {
+	private List<ProcessingMessage> validateRows(List<ConvRow> rows, YearMonth defaultYearMonth) {
+		List<ProcessingMessage> rowsMsgs = new ArrayList<>();
+		FieldProcessor fieldProcessor;
 		
+		Iterator<ConvRow> iterator = rows.iterator();
+		while (iterator.hasNext()) {
+			ConvRow row = iterator.next();
+			
+			String matricula = row.getMatricula();
+			boolean hasNoNumbers = matricula.matches("^\\D+$");
+			if (hasNoNumbers) { 
+				rowsMsgs.add(new ProcessingMessage(MessageType.ERROR, String.format("Matrícula sem nenhum número [%s]. A linha foi desconsiderada!", matricula)));
+				iterator.remove();
+				continue;
+			}
+			fieldProcessor = new MatriculaFieldProcessor();
+			String validMatricula = fieldProcessor.process(matricula);
+			row.setMatricula(validMatricula);
+			rowsMsgs.addAll(fieldProcessor.getMessages());
+			
+			String nome = row.getNome();
+			if (nome == null || nome.isEmpty()) 
+				rowsMsgs.add(new ProcessingMessage(MessageType.ERROR, "Nome não identificado: " + nome));
+			
+			String value = row.getQtdHoraExtra();
+			fieldProcessor = new NumericFieldProcessor("Hora Extra");
+			String validNumber = fieldProcessor.process(value);
+			row.setQtdHoraExtra(validNumber);
+			rowsMsgs.addAll(fieldProcessor.getMessages());
+			
+			value = row.getQtdAdicionalNoturno();
+			fieldProcessor = new NumericFieldProcessor("Adicional Noturno");
+			validNumber = fieldProcessor.process(value);
+			row.setQtdAdicionalNoturno(validNumber);
+			rowsMsgs.addAll(fieldProcessor.getMessages());
+			
+			value = row.getQtdPlantoesExtra();
+			fieldProcessor = new NumericFieldProcessor("Plantão Extra");
+			String validQtPltExtras = fieldProcessor.process(value);
+			row.setQtdPlantoesExtra(validQtPltExtras);
+			rowsMsgs.addAll(fieldProcessor.getMessages());
+			
+			int qtdDatasPlantInformadas = 0;
+			String[] dtPlantoesExtras = row.getDtPlantoesExtras();
+			for (int i = 0; i < dtPlantoesExtras.length; i++) {
+				String dataPlantaoExtra = dtPlantoesExtras[i];
+				boolean isInformedDate = dataPlantaoExtra != null && !dataPlantaoExtra.isEmpty() && dataPlantaoExtra.matches(".*\\d+.*") && !dataPlantaoExtra.equals("0");
+				if (isInformedDate) {
+					qtdDatasPlantInformadas++;
+					try {
+						fieldProcessor = new DataPlantaoFieldProcessor(defaultYearMonth);
+						String validDatePlExtra = fieldProcessor.process(dataPlantaoExtra);
+						row.getDtPlantoesExtras()[i] = validDatePlExtra;
+					} catch (DateTimeException e) {
+	        			rowsMsgs.add(new ProcessingMessage(MessageType.ERROR, "Planilha contém 'Data de Plantão Extra' com formato não reconhecido: '" + dataPlantaoExtra + "'. Formato recomendado = 'dd/mm/aaaa'."));	        			
+	        		}
+					
+				}
+			}
+			
+		}				
+		return rowsMsgs;
 	}
 	
 }
