@@ -36,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.itextpdf.text.DocumentException;
+import com.tiagoamp.sjc.model.input.ConvertedFileTO;
 import com.tiagoamp.sjc.model.input.ConvertedFilesTO;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
@@ -141,10 +142,10 @@ public class SjcController {
 	
 	@RequestMapping(value = "convert", method = RequestMethod.GET)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ResponseEntity<ConvertedFilesTO> loadDataFromInputFiles() {
+	public ResponseEntity<List<ConvertedFileTO>> loadDataFromInputFiles() {
 		try {
-			ConvertedFilesTO convertedsTO = sjcService.convertInputFiles(DIR_ENTRADA);
-			ResponseEntity<ConvertedFilesTO> entity = new ResponseEntity<ConvertedFilesTO>(convertedsTO, HttpStatus.CREATED);
+			List<ConvertedFileTO> tos = sjcService.convertInputFiles(DIR_ENTRADA);
+			ResponseEntity<List<ConvertedFileTO>> entity = new ResponseEntity<>(tos, HttpStatus.CREATED);
 			return entity;
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());

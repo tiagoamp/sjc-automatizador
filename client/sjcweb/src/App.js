@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Header from './component/Header';
 import Footer from './component/Footer';
 import FlowMenu from './component/FlowMenu';
-import Loader from './component/input/Loader';
+import Converter from './component/input/Converter';
 import { ToastContainer, toast } from 'react-toastify';
 
 import './App.css';
@@ -24,13 +24,27 @@ class App extends Component {
     switch(step) {
       case 0: 
         return (
-          <Loader uploadedFiles={uploadedFiles} uploadedAfastFile={uploadedAfastFile} resultFiles={resultFiles}
+          <Converter uploadedFiles={uploadedFiles} uploadedAfastFile={uploadedAfastFile} resultFiles={resultFiles}
                   handleInputFilesUpload={this.handleInputFilesUpload} handleAfastamentosFilesUpload={this.handleAfastamentosFilesUpload} 
                   resetFiles={this.resetFiles} loadInputFiles={this.loadInputFiles} />
         );
       case 1: 
         return (
-          <h1>Step 1</h1>
+          <div>
+            <h1>Step 1</h1>
+            {/* <Dropzone onDrop={acceptedFiles => handleAfastamentosFilesUpload(acceptedFiles[0])}>
+            {({getRootProps, getInputProps}) => (
+              <section>
+                <div {...getRootProps()} className="dropzone-div">
+                  <input {...getInputProps()} accept=".xlsx, xls"/>
+                  <span><strong>Afastamentos</strong></span>
+                  <p>Arraste aqui o arquivo de afastamentos em 'xlsx' ou click para selecioná-lo</p>
+                  <div className="arquivos">Arquivo de afastamentos: <span>{ uploadedAfastFile !== null ? uploadedAfastFile.name : ' nenhum ' }</span></div>
+                </div>
+              </section>
+            )}
+          </Dropzone> */}
+          </div>
         );
       case 2: 
         return (
@@ -38,7 +52,7 @@ class App extends Component {
         );
       default: 
         return (
-          <Loader />
+          <Converter />
         );
 
     }

@@ -1,7 +1,6 @@
 package com.tiagoamp.sjc.service;
 
 import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.AFASTAMENTO_IDENTIFIED_FILE_NAME;
-import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,7 +19,6 @@ import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.dao.ExcelFileDao;
 import com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet;
 import com.tiagoamp.sjc.model.input.ConvertedFileTO;
-import com.tiagoamp.sjc.model.input.ConvertedFilesTO;
 import com.tiagoamp.sjc.model.input.HistoricoAfastamentos;
 import com.tiagoamp.sjc.model.input.InputConverter;
 import com.tiagoamp.sjc.model.input.InputExcelSpreadsheet;
@@ -39,29 +37,25 @@ public class SpreadsheetServices {
 	private ExcelFileDao excelFileDao; 
 	
 	
-	public ConvertedFilesTO convertInputFiles(Path dir) throws IOException {
+	public List<ConvertedFileTO> convertInputFiles(Path dir) throws IOException {
 		LOGGER.info("Convertendo arquivos do diretório...");
 		if (Files.notExists(dir)) throw new IllegalArgumentException("Diretório inexistente!");
-		ConvertedFilesTO resultTO = new ConvertedFilesTO();		
+		List<ConvertedFileTO> tos = new ArrayList<>();		
 		
 		DirectoryStream<Path> stream = Files.newDirectoryStream(dir);
 		for (Path file : stream) {
 			String filename = file.getFileName().toString();
-			boolean isAfastamentoFile = resultTO.getAfastamentoFileName() == null && filename.contains(NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME);
-			if (isAfastamentoFile) {				
-				resultTO.setAfastamentoFileName(filename);
-			} else {   // regular pdf files
-				InputConverter converter = new InputConverter(file);
-				ConvertedSpreadsheet convertedSpreadsheet = converter.convert();				
-				String convFileName = convertedSpreadsheet.getOriginalFile().getFileName().toString().toLowerCase().replace(".pdf", ".xlsx");
-				Path convSpreadsheetFile = excelFileDao.createConvertedSpreadsheet(convertedSpreadsheet, convFileName);
-				convertedSpreadsheet.setConvertedFile(convSpreadsheetFile);				
-				ConvertedFileTO convertedFileTO = convertedSpreadsheet.toConvertedFileTO();
-				resultTO.getConvertedFilesTO().add(convertedFileTO);
-			}		
+			if (!filename.toUpperCase().endsWith("PDF")) continue;
+			InputConverter converter = new InputConverter(file);
+			ConvertedSpreadsheet convertedSpreadsheet = converter.convert();				
+			String convFileName = convertedSpreadsheet.getOriginalFile().getFileName().toString().toLowerCase().replace(".pdf", ".xlsx");
+			Path convSpreadsheetFile = excelFileDao.createConvertedSpreadsheet(convertedSpreadsheet, convFileName);
+			convertedSpreadsheet.setConvertedFile(convSpreadsheetFile);				
+			ConvertedFileTO convertedFileTO = convertedSpreadsheet.toConvertedFileTO();
+			tos.add(convertedFileTO);					
 		}
 		
-		return resultTO;
+		return tos;
 	}
 	
 	@Deprecated
