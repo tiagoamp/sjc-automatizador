@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
 import Dropzone from 'react-dropzone'
 import Result from './Result';
-import './Converter.css';
+import './Steps.css';
 
 export default class Converter extends Component {
   
   render() {
-    const { uploadedFiles, uploadedAfastFile, resultFiles, 
-            handleInputFilesUpload, resetFiles, loadInputFiles } = this.props;
+    const { uploadedFiles, convertedFiles, handleInputFilesUpload, resetFiles, convertInputFiles, nextStep } = this.props;
     
     return (
     <section>
@@ -31,13 +30,13 @@ export default class Converter extends Component {
         
         <div>
           <button onClick={resetFiles}><i className="fa fa-trash-o fa-1x" aria-hidden="true"></i>LIMPAR</button>
-          <button onClick={loadInputFiles}><i className="fa fa-file-pdf-o fa-1x" aria-hidden="true"></i>CONVERTER</button>
+          <button onClick={convertInputFiles}><i className="fa fa-file-pdf-o fa-1x" aria-hidden="true"></i>CONVERTER</button>
         </div>
      
       </div>
 
       {
-        resultFiles.length > 0 ? (<Result uploadedFiles={uploadedFiles} resultFiles={resultFiles} uploadedAfastFile={uploadedAfastFile} />) : null
+        convertedFiles.length > 0 ? (<Result convertedFiles={convertedFiles} nextStep={nextStep} />) : null
       }
       
     </section>

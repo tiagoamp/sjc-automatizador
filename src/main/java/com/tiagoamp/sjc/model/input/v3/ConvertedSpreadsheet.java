@@ -5,8 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.tiagoamp.sjc.model.SjcGeneralCode;
+import com.tiagoamp.sjc.model.input.v3.to.ConvertedFileTO;
+
 import static com.tiagoamp.sjc.model.SjcGeneralCode.*;
-import com.tiagoamp.sjc.model.input.ConvertedFileTO;
 
 public class ConvertedSpreadsheet {
 

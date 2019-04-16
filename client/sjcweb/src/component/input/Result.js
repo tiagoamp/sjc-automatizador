@@ -4,30 +4,29 @@ import './Result.css';
 export default class Result extends Component {
 
   render() {
-    const { uploadedFiles, resultFiles, uploadedAfastFile } = this.props;
+    const { convertedFiles, nextStep } = this.props;
     
     return (
       <div className="result-input">
             <h2>Resultado do Carregamento</h2>
 
-            <p className="result-afast">Arquivo de afastamentos: <span>{ uploadedAfastFile !== null ? uploadedAfastFile.name : ' nenhum ' }</span></p>
+            <p>Diretório: "Entrada"</p>
 
             <table className="table-entrada">
                 <thead>
                     <tr>
-                    <th>Arquivos de Entrada (diretório 'ENTRADA')</th>
-                    <th>Planilhas Geradas (diretório 'CARREGADO')</th>
+                    <th>Arquivos de Entrada</th>
+                    <th>Planilhas Geradas</th>
                     </tr>
                 </thead>
                 <tbody>
 
                     {
-                    resultFiles.map( (resultFile, index) => {
-                        const inputFile = uploadedFiles[index];
+                    convertedFiles.map( (convFile, index) => {
                         return (
                         <tr key={index}>
-                            <td>{inputFile.name}</td>
-                            <td>{resultFile.name} <small>(xx serv. op | yy serv. adm)</small></td> 
+                            <td>{convFile.originalFileName}</td>
+                            <td>{convFile.convertedFileName} <small>({convFile.operacionalRowsCount} serv. op | {convFile.administrativoRowsCount} serv. adm)</small></td> 
                         </tr>
                         )
                     })
@@ -35,6 +34,8 @@ export default class Result extends Component {
                     
                 </tbody>
             </table>
+
+            <button onClick={nextStep}>AVANÇAR<i className="fa fa-angle-double-right fa-1x" aria-hidden="true"></i></button>
         
       </div>
     )

@@ -1,6 +1,7 @@
 package com.tiagoamp.sjc.model.fieldprocessor;
 
 import java.time.Month;
+import java.time.YearMonth;
 import java.util.Optional;
 
 public class MonthConverter {
@@ -22,6 +23,16 @@ public class MonthConverter {
 		if (input.equals("11") || input.equals("novembro") || input.equals("nov") || input.equals("november") ) month = Optional.of(Month.NOVEMBER);
 		if (input.equals("12") || input.equals("dezembro") || input.equals("dez") || input.equals("dec") || input.equals("december") ) month = Optional.of(Month.DECEMBER);		
 		return month;
+	}
+	
+	public static Optional<YearMonth> getYearMonthFrom(String month, String year) {
+		Optional<YearMonth> result = Optional.empty();
+		Optional<Month> convertedMonth = getConvertedMonth(month);
+		if ( convertedMonth.isPresent() && year.matches("^\\d+$")) {
+			YearMonth yearMonth = YearMonth.of(Integer.parseInt(year), convertedMonth.get());
+			result = Optional.of(yearMonth);
+		}		
+		return result;
 	}
 
 }

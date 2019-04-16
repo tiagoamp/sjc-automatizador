@@ -3,6 +3,7 @@ import Header from './component/Header';
 import Footer from './component/Footer';
 import FlowMenu from './component/FlowMenu';
 import Converter from './component/input/Converter';
+import Processor from './component/input/Processor';
 import { ToastContainer, toast } from 'react-toastify';
 
 import './App.css';
@@ -15,36 +16,22 @@ class App extends Component {
 
   constructor() {
     super();
-    this.state = { step: 0, uploadedFiles: [], uploadedAfastFile: null, resultFiles: [] };
+    this.state = { step: 0, uploadedFiles: [], convertedFiles: [], uploadedAfastFile: null };
   }
 
   getComponentForStep = () => {
-    const { step, uploadedFiles, uploadedAfastFile, resultFiles } = this.state;
+    const { step, uploadedFiles, uploadedAfastFile, convertedFiles } = this.state;
 
     switch(step) {
       case 0: 
         return (
-          <Converter uploadedFiles={uploadedFiles} uploadedAfastFile={uploadedAfastFile} resultFiles={resultFiles}
-                  handleInputFilesUpload={this.handleInputFilesUpload} handleAfastamentosFilesUpload={this.handleAfastamentosFilesUpload} 
-                  resetFiles={this.resetFiles} loadInputFiles={this.loadInputFiles} />
+          <Converter uploadedFiles={uploadedFiles} convertedFiles={convertedFiles}
+                  handleInputFilesUpload={this.handleInputFilesUpload} resetFiles={this.resetFiles} convertInputFiles={this.convertInputFiles} nextStep={this.nextStep} />
         );
       case 1: 
         return (
-          <div>
-            <h1>Step 1</h1>
-            {/* <Dropzone onDrop={acceptedFiles => handleAfastamentosFilesUpload(acceptedFiles[0])}>
-            {({getRootProps, getInputProps}) => (
-              <section>
-                <div {...getRootProps()} className="dropzone-div">
-                  <input {...getInputProps()} accept=".xlsx, xls"/>
-                  <span><strong>Afastamentos</strong></span>
-                  <p>Arraste aqui o arquivo de afastamentos em 'xlsx' ou click para selecioná-lo</p>
-                  <div className="arquivos">Arquivo de afastamentos: <span>{ uploadedAfastFile !== null ? uploadedAfastFile.name : ' nenhum ' }</span></div>
-                </div>
-              </section>
-            )}
-          </Dropzone> */}
-          </div>
+          <Processor uploadedAfastFile={uploadedAfastFile} handleAfastamentosFilesUpload={this.handleAfastamentosFilesUpload}
+                  prevStep={this.prevStep} nextStep={this.nextStep} />
         );
       case 2: 
         return (
@@ -56,6 +43,16 @@ class App extends Component {
         );
 
     }
+  }
+
+  nextStep = () => {
+    const currStep = this.state.step;
+    this.setState( { step: currStep+1 } );
+  }
+
+  prevStep = () => {
+    const currStep = this.state.step;
+    this.setState( { step: currStep-1 } );
   }
 
   handleInputFilesUpload = (files) => {
@@ -108,29 +105,24 @@ class App extends Component {
   resetFiles = () => {
     httpGatewayFunctions.cleanDirsRequest()
       .then(res => {
+        toast('Arquivos de Entrada apagados!!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
         this.setState( { step: 0, uploadedFiles: [], uploadedAfastFile: null, resultFiles: [] } )
       })
-      .catch(err => toast('Erro ao limpar diretórios: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
-    
+      .catch(err => toast('Erro ao limpar diretórios: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));    
   } 
 
-  loadInputFiles = () => {
+  convertInputFiles = () => {
     if (this.state.uploadedFiles.length === 0) {
       toast('Nenhum arquivo feito upload!', { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }); 
       return;
     }
 
-
-    // TODO: transformar arquivos pdfs e setar no state !!!
-
-    
-    let currFiles = [...this.state.uploadedFiles];
-    let result = currFiles.map(f => {
-      const r = Object.assign({}, f);
-      r.name = f.name.replace(/pdf/i,"xls");
-      return r;
-    });
-    this.setState( {resultFiles: result} );
+    httpGatewayFunctions.convertInputFiles()
+      .then(res => res.json())
+      .then(res => {
+        this.setState( { convertedFiles: res } )
+      })
+      .catch(err => toast('Erro ao converter arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
   }
 
 

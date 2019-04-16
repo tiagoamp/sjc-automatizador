@@ -1,11 +1,10 @@
-package com.tiagoamp.sjc.model.input;
+package com.tiagoamp.sjc.model.input.v3;
 
 import static com.tiagoamp.sjc.model.SjcGeneralCode.ADMINISTRATIVO;
 import static com.tiagoamp.sjc.model.SjcGeneralCode.OPERACIONAL;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
-import java.time.Month;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,10 +24,6 @@ import org.eadge.extractpdfexcel.models.TextBlockIdentifier;
 
 import com.tiagoamp.sjc.model.SjcGeneralCode;
 import com.tiagoamp.sjc.model.fieldprocessor.MonthConverter;
-import com.tiagoamp.sjc.model.input.v3.ConvHeader;
-import com.tiagoamp.sjc.model.input.v3.ConvRow;
-import com.tiagoamp.sjc.model.input.v3.ConvertedSheet;
-import com.tiagoamp.sjc.model.input.v3.ConvertedSpreadsheet;
 import com.tiagoamp.sjc.model.input.v3.to.IndexesPairTO;
 
 public class InputConverter {
@@ -212,12 +207,8 @@ public class InputConverter {
 	}
 	
 	private ConvHeader createHeaderFrom(String nomeUnidade, String month, String year) {
-		Optional<Month> convertedMonth = MonthConverter.getConvertedMonth(month);
-		YearMonth yearMonth = null;
-		if ( convertedMonth.isPresent() && year.matches("^\\d+$")) {
-			yearMonth = YearMonth.of(Integer.parseInt(year), convertedMonth.get());			
-		}		
-		ConvHeader header = yearMonth != null ? new ConvHeader(yearMonth, nomeUnidade) : new ConvHeader(nomeUnidade, month, year);
+		Optional<YearMonth> yearMonth = MonthConverter.getYearMonthFrom(month, year);
+		ConvHeader header = yearMonth.isPresent() ? new ConvHeader(yearMonth.get(), nomeUnidade) : new ConvHeader(nomeUnidade, month, year);
 		return header;
 	}
 	

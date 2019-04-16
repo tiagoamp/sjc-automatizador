@@ -1,6 +1,8 @@
 package com.tiagoamp.sjc.model.input.v3;
 
 import java.time.YearMonth;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 public class ConvHeader {
 	
@@ -22,7 +24,7 @@ public class ConvHeader {
 
 	public ConvHeader(YearMonth yearMonthRef, String nomeUnidadePrisional) {
 		this.yearMonthRef = yearMonthRef;
-		this.monthRefAsStr = yearMonthRef.getMonth().name();
+		this.monthRefAsStr = yearMonthRef.getMonth().getDisplayName(TextStyle.FULL, new Locale("pt", "br")).toUpperCase();
 		this.yearRefAsStr = String.valueOf(yearMonthRef.getYear());
 		this.nomeUnidadePrisional = nomeUnidadePrisional;
 	}

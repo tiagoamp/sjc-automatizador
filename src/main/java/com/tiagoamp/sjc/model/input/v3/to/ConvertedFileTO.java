@@ -1,4 +1,4 @@
-package com.tiagoamp.sjc.model.input;
+package com.tiagoamp.sjc.model.input.v3.to;
 
 public class ConvertedFileTO {
 

@@ -5,6 +5,7 @@ const URL_BASE = "http://" + hostname + ":" + port + "/sjc/";
 
 const URL_UPLOAD_INPUT_FILE = URL_BASE + "upload2";
 const URL_DELETE_AFAST = URL_BASE + "upload/afast";
+const URL_CONVERT_INPUT_FILES = URL_BASE + "convert";
 
 
 const httpGatewayFunctions = {
@@ -24,6 +25,10 @@ const httpGatewayFunctions = {
 
     deleteAfastamentoRequest: () => {
         return fetch(URL_DELETE_AFAST, {method: 'DELETE'})
+    },
+
+    convertInputFiles: () => {
+        return fetch(URL_CONVERT_INPUT_FILES);
     }
 
 

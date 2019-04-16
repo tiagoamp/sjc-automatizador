@@ -1,15 +1,36 @@
 package com.tiagoamp.sjc.dao;
 
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_ANO;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_LOTACAO;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_MES;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_ADICIONAL_NOTURNO;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_HORA_EXTRA;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_MATRICULA;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_NOME;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_01;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_02;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_03;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_04;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_05;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOES_EXTRAS;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_DATA_INIT_ROW;
+
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -22,12 +43,16 @@ import com.tiagoamp.sjc.model.SjcGeneralCode;
 import com.tiagoamp.sjc.model.input.v3.ConvHeader;
 import com.tiagoamp.sjc.model.input.v3.ConvRow;
 import com.tiagoamp.sjc.model.input.v3.ConvertedSheet;
-import com.tiagoamp.sjc.model.input.v3.ConvertedSpreadsheet;
+import com.tiagoamp.sjc.model.input.v3.ConvertedSpreadsheet; 
+
 
 @Repository
 public class ExcelFileDao {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExcelFileDao.class);
+	
+	private DataFormatter df = new DataFormatter();
+	
 	
 	public Path createConvertedSpreadsheet(ConvertedSpreadsheet convSpreadsheet, String convertedFileName) throws FileNotFoundException, IOException {
 		LOGGER.info("Convertendo arquivo a partir de " + convSpreadsheet.getOriginalFile().getFileName());
@@ -45,10 +70,34 @@ public class ExcelFileDao {
 					fillRowsInExcelSheet(xsheet, headerMap, dataMap);						
 					adjustColumnsSize(xsheet);
 				}
-				
+				 
 				workbook.write(fos);
 			}
 		return convFilePath;
+	}
+	
+	public ConvertedSpreadsheet loadFrom(Path file) throws FileNotFoundException, IOException {
+		LOGGER.info("Carregando arquivo: " + file.getFileName());
+		
+		ConvertedSpreadsheet spreadsheet = new ConvertedSpreadsheet();
+		spreadsheet.setConvertedFile(file);
+		
+		try ( FileInputStream fis = new FileInputStream(file.toFile());
+			  XSSFWorkbook xssworkbook = new XSSFWorkbook(fis); ) 
+			{
+				for (SjcGeneralCode code : SjcGeneralCode.values()) {
+					XSSFSheet xsheet = xssworkbook.getSheet(code.toString());
+					if (xsheet == null) continue;
+					
+					ConvHeader header = loadHeader(xsheet);
+					List<ConvRow> rows = loadRows(xsheet, code);
+					ConvertedSheet sheet = new ConvertedSheet(code, header, rows);					
+					
+					if (spreadsheet.getHeader() == null) spreadsheet.setHeader(header);
+					spreadsheet.getConvertedSheets().put(code, sheet);						            	            	
+				}				
+			}
+		return spreadsheet;
 	}
 	
 	
@@ -136,6 +185,71 @@ public class ExcelFileDao {
 		for (int i = 0; i < numberOfColumns; i++) {
 			xsheet.autoSizeColumn(i); // column adjusting
 		}
+	}
+	
+	private ConvHeader loadHeader(XSSFSheet xsheet) {
+		CellAddress unidCellAddr = new CellAddress(CELL_ADDRESS_LOTACAO);
+		CellAddress yearCellAddr = new CellAddress(CELL_ADDRESS_ANO);
+		CellAddress monthCellAddr = new CellAddress(CELL_ADDRESS_MES);		
+		String unidade = df.formatCellValue(xsheet.getRow(unidCellAddr.getRow()).getCell(unidCellAddr.getColumn()));
+		String yearStr = df.formatCellValue(xsheet.getRow(yearCellAddr.getRow()).getCell(yearCellAddr.getColumn()));
+		String monthStr = df.formatCellValue(xsheet.getRow(monthCellAddr.getRow()).getCell(monthCellAddr.getColumn()));				
+		return new ConvHeader(unidade, monthStr, yearStr);		
+	}
+	
+	private List<ConvRow> loadRows(XSSFSheet xsheet, SjcGeneralCode code) {
+		List<ConvRow> rows = new ArrayList<>();
+        Iterator<Row> rowItr = xsheet.iterator();
+        if (!rowItr.hasNext()) return rows;
+        Row row = goToInitialDataRow(rowItr);
+		boolean endOfData = false;
+
+        while (rowItr.hasNext() && !endOfData) {  // for each row
+        	row = rowItr.next();
+        	ConvRow cnvRow = new ConvRow();
+                             
+            Iterator<Cell> cellIterator = row.cellIterator();
+            while (cellIterator.hasNext()) {  // for each cell/column
+                Cell cell = cellIterator.next();
+                String value = df.formatCellValue(cell);
+                
+                if (cell.getColumnIndex() == INDEX_COLUMN_MATRICULA) {
+                	if (value == null || value.isEmpty() || isEndOfData(value)) {
+                		endOfData = true;
+                		break;
+                	}
+                	cnvRow.setMatricula(value);
+                } else if (cell.getColumnIndex() == INDEX_COLUMN_NOME) {
+                	cnvRow.setNome(value);
+                } else if (cell.getColumnIndex() == INDEX_COLUMN_HORA_EXTRA) {
+                	cnvRow.setQtdHoraExtra(value);
+                } else if (cell.getColumnIndex() == INDEX_COLUMN_ADICIONAL_NOTURNO) {
+                	cnvRow.setQtdAdicionalNoturno(value);
+                } else if (code == SjcGeneralCode.OPERACIONAL && cell.getColumnIndex() == INDEX_COLUMN_PLANTOES_EXTRAS) {
+                	cnvRow.setQtdPlantoesExtra(value);
+                } else if ( (code == SjcGeneralCode.OPERACIONAL) && 
+                	   (cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_01 || cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_02 || 
+                	    cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_03 || cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_04 || 
+                	    cell.getColumnIndex() == INDEX_COLUMN_PLANTOESEXTRAS_05) 
+                	   ) {                	
+                	int indexPlantao = cell.getColumnIndex() - INDEX_COLUMN_PLANTOESEXTRAS_01; // getting index of 'plantao' from 0 to 4 (there may be 5 plantoes)
+                	cnvRow.getDtPlantoesExtras()[indexPlantao] = value;
+                } //end columns
+             }
+            
+            if (!endOfData && cnvRow.getMatricula() != null) rows.add(cnvRow);            
+        }  // end rows
+        return rows;
+	}
+	
+	private Row goToInitialDataRow(Iterator<Row> rowItr) {
+		Row row = rowItr.next();
+        while ( rowItr.hasNext() && row.getRowNum() < INDEX_DATA_INIT_ROW - 1 ) row = rowItr.next();
+        return row;
+	}
+	
+	private boolean isEndOfData(String value) {
+		return value.startsWith("Tipos de afastamentos") || value.startsWith("Este relatório deverá ser encaminhado");
 	}
 	
 }

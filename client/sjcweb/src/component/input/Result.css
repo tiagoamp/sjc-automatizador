@@ -8,16 +8,10 @@
     justify-content: space-around;    
 }
 
-.result-input .result-afast {
-    font-size: 0.9rem;
-}
-
-.result-input .result-afast span {
-    font-style: italic;
-}
-
 .table-entrada {
     width: 60%;
+    margin: 10px 0px;
+    padding: 5px;
 }
 
 .table-entrada, .table-entrada tr, .table-entrada td, .table-entrada th {
@@ -29,7 +23,7 @@
     font-size: 0.9rem;
 }
 
-.link-formatted {
+/* .link-formatted {
     text-decoration: none;
     color: #73879C;
     border: 1px solid #73879C;
@@ -37,4 +31,4 @@
     font-size: 0.8rem;
     padding: 2px;
     margin: 0px 8px;
-}
+} */

@@ -36,9 +36,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.itextpdf.text.DocumentException;
-import com.tiagoamp.sjc.model.input.ConvertedFileTO;
-import com.tiagoamp.sjc.model.input.ConvertedFilesTO;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
+import com.tiagoamp.sjc.model.input.v3.to.ConvertedFileTO;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
 import com.tiagoamp.sjc.service.FilesService;
 import com.tiagoamp.sjc.service.SpreadsheetServices;

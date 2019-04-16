@@ -12,6 +12,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.tiagoamp.sjc.model.input.v3.InputConverter;
+
 public class InputConverterTest {
 
 	private InputConverter converter;
