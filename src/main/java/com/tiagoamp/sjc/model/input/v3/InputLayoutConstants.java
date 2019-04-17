@@ -18,6 +18,10 @@ public abstract class InputLayoutConstants {
 	public static final String CELL_ADDRESS_LOTACAO = "B2";	
 	public static final String CELL_ADDRESS_MES = "B3";
 	public static final String CELL_ADDRESS_ANO = "B4";
+	
+	public static final String CELL_ADDRESS_TITLE_LOTACAO = "A2";	
+	public static final String CELL_ADDRESS_TITLE_MES = "A3";
+	public static final String CELL_ADDRESS_TITLE_ANO = "A4";
 		
 	public static final int INDEX_DATA_AFAST_INIT_ROW = 8; // index starts at 0	
 	

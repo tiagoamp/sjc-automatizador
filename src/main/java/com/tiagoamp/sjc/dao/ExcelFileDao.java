@@ -1,19 +1,6 @@
 package com.tiagoamp.sjc.dao;
 
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_ANO;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_LOTACAO;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_MES;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_ADICIONAL_NOTURNO;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_HORA_EXTRA;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_MATRICULA;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_NOME;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_01;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_02;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_03;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_04;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_05;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOES_EXTRAS;
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_DATA_INIT_ROW;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -89,6 +76,11 @@ public class ExcelFileDao {
 					XSSFSheet xsheet = xssworkbook.getSheet(code.toString());
 					if (xsheet == null) continue;
 					
+					if (!verifySpreadsheetLayout(xsheet)) {
+						LOGGER.error("Planilha " + file.getFileName().toString() + " tem problemas de layout e será desconsiderada!");
+						continue;
+					}
+					
 					ConvHeader header = loadHeader(xsheet);
 					List<ConvRow> rows = loadRows(xsheet, code);
 					ConvertedSheet sheet = new ConvertedSheet(code, header, rows);					
@@ -98,6 +90,19 @@ public class ExcelFileDao {
 				}				
 			}
 		return spreadsheet;
+	}
+	
+	public boolean verifySpreadSheetLayout(Path file) throws FileNotFoundException, IOException {
+		try ( FileInputStream fis = new FileInputStream(file.toFile());
+			  XSSFWorkbook xssworkbook = new XSSFWorkbook(fis); ) 
+			{
+				for (SjcGeneralCode code : SjcGeneralCode.values()) {
+					XSSFSheet xsheet = xssworkbook.getSheet(code.toString());
+					if (xsheet == null) continue;					
+					if (!verifySpreadsheetLayout(xsheet)) return false;											            	            	
+				}				
+			}
+		return true;
 	}
 	
 	
@@ -185,6 +190,30 @@ public class ExcelFileDao {
 		for (int i = 0; i < numberOfColumns; i++) {
 			xsheet.autoSizeColumn(i); // column adjusting
 		}
+	}
+	
+	private boolean verifySpreadsheetLayout(XSSFSheet xsheet) {
+		CellAddress unidTitleCellAddr = new CellAddress(CELL_ADDRESS_TITLE_LOTACAO);
+		CellAddress yearTitleCellAddr = new CellAddress(CELL_ADDRESS_TITLE_ANO);
+		CellAddress monthTitleCellAddr = new CellAddress(CELL_ADDRESS_TITLE_MES);
+		String unidade = df.formatCellValue(xsheet.getRow(unidTitleCellAddr.getRow()).getCell(unidTitleCellAddr.getColumn()));
+		String yearStr = df.formatCellValue(xsheet.getRow(yearTitleCellAddr.getRow()).getCell(yearTitleCellAddr.getColumn()));
+		String monthStr = df.formatCellValue(xsheet.getRow(monthTitleCellAddr.getRow()).getCell(monthTitleCellAddr.getColumn()));
+		boolean isValidHeader = unidade.equalsIgnoreCase("Nome da Unidade:") && yearStr.equalsIgnoreCase("Ano:") && monthStr.equalsIgnoreCase("Mês:");
+		if (!isValidHeader) return false;
+				
+		for (int col = 0; col <= INDEX_COLUMN_ADICIONAL_NOTURNO; col++) {
+			CellAddress colCellAddr = new CellAddress((INDEX_DATA_INIT_ROW-1), col);
+			String value = df.formatCellValue(xsheet.getRow(colCellAddr.getRow()).getCell(colCellAddr.getColumn()));
+			if (value == null) return false;
+			value = value.trim();
+			if (col == INDEX_COLUMN_MATRICULA && !value.equalsIgnoreCase("MATRÍCULA")) return false;            	
+            else if (col == INDEX_COLUMN_NOME && !value.equalsIgnoreCase("NOME DO SERVIDOR")) return false;
+            else if (col == INDEX_COLUMN_HORA_EXTRA && !value.equalsIgnoreCase("HORA EXTRA")) return false;
+            else if (col == INDEX_COLUMN_ADICIONAL_NOTURNO && !value.equalsIgnoreCase("ADICIONAL NOTURNO")) return false;
+		}
+		
+		return true;
 	}
 	
 	private ConvHeader loadHeader(XSSFSheet xsheet) {

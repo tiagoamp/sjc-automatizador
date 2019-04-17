@@ -1,6 +1,6 @@
 package com.tiagoamp.sjc.service;
 
-import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.AFASTAMENTO_IDENTIFIED_FILE_NAME;
+import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,6 +8,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,13 +18,17 @@ import org.springframework.stereotype.Service;
 
 import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.dao.ExcelFileDao;
+import com.tiagoamp.sjc.model.MessageType;
+import com.tiagoamp.sjc.model.ProcessingMessage;
 import com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet;
 import com.tiagoamp.sjc.model.input.HistoricoAfastamentos;
 import com.tiagoamp.sjc.model.input.InputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.input.v3.ConvertedSpreadsheet;
 import com.tiagoamp.sjc.model.input.v3.InputConverter;
+import com.tiagoamp.sjc.model.input.v3.InputSpreadSheetProcessor;
 import com.tiagoamp.sjc.model.input.v3.to.ConvertedFileTO;
+import com.tiagoamp.sjc.model.input.v3.to.ProcessedFileTO;
 import com.tiagoamp.sjc.model.output.OutputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.output.OutputFilesGenerator;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
@@ -73,10 +78,50 @@ public class SpreadsheetServices {
 		return inputList;
 	}
 	
+	@Deprecated
 	public InputSpreadsheet loadInputSpreadsheet(Path filepath) throws IOException {
 		if (Files.notExists(filepath)) throw new IllegalArgumentException("Arquivo inexistente!");
 		InputExcelSpreadsheet excelSheet = new InputExcelSpreadsheet(filepath);
 		return excelSheet.loadFromFile();
+	}
+	
+	public List<ProcessedFileTO> processFilesFrom(Path directory) throws IOException {
+		boolean foundAfastamentoSheet = false;
+		InputSpreadSheetProcessor processor = new InputSpreadSheetProcessor();
+		List<ProcessedFileTO> result = new ArrayList<>();
+		
+		DirectoryStream<Path> stream = Files.newDirectoryStream(directory);				
+		for (Path file : stream) {
+			if (!file.getFileName().toString().endsWith(".xlsx")) continue;
+			
+			boolean isValidLayout = excelFileDao.verifySpreadSheetLayout(file);
+			if (!isValidLayout) {
+				ProcessedFileTO to = new ProcessedFileTO(file.getFileName().toString(),	Arrays.asList(new ProcessingMessage(MessageType.ERROR, "Planilha com problema de Layout e será desconsiderada no processamento.")));
+				result.add(to);
+				continue;
+			}
+			
+			if (file.getFileName().startsWith(NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME)) {
+				foundAfastamentoSheet = true;
+				ProcessedFileTO to = new ProcessedFileTO(file.getFileName().toString(),	Arrays.asList(new ProcessingMessage(MessageType.INFO, "Identificada planilha de Afastamentos.")));
+				result.add(to);
+				continue;
+			}
+			
+			ConvertedSpreadsheet spreadsheet = excelFileDao.loadFrom(file);
+			List<ProcessingMessage> messages = processor.process(spreadsheet);
+			if (messages.isEmpty()) continue;
+			
+			ProcessedFileTO to = new ProcessedFileTO(file.getFileName().toString(), messages);
+			result.add(to);
+		}
+		
+		if (!foundAfastamentoSheet) {
+			ProcessedFileTO to = new ProcessedFileTO("Planilha de AFastamentos", Arrays.asList(new ProcessingMessage(MessageType.INFO, "Não foi identificada planilha de afastamentos nos arquivos.")));
+			result.add(to);
+		}
+		
+		return result;
 	}
 	
 	public HistoricoAfastamentos loadAfastamentosSpreadsheet(Path filepath) throws IOException {

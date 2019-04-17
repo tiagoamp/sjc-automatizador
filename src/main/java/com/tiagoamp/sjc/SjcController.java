@@ -38,6 +38,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.input.v3.to.ConvertedFileTO;
+import com.tiagoamp.sjc.model.input.v3.to.ProcessedFileTO;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
 import com.tiagoamp.sjc.service.FilesService;
 import com.tiagoamp.sjc.service.SpreadsheetServices;
@@ -141,10 +142,23 @@ public class SjcController {
 	
 	@RequestMapping(value = "convert", method = RequestMethod.GET)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ResponseEntity<List<ConvertedFileTO>> loadDataFromInputFiles() {
+	public ResponseEntity<List<ConvertedFileTO>> convertDataFromInputFiles() {
 		try {
 			List<ConvertedFileTO> tos = sjcService.convertInputFiles(DIR_ENTRADA);
 			ResponseEntity<List<ConvertedFileTO>> entity = new ResponseEntity<>(tos, HttpStatus.CREATED);
+			return entity;
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage());
+			throw new ResponseProcessingException(Response.serverError().build(),e);
+		}
+	}
+	
+	@RequestMapping(value = "process", method = RequestMethod.GET)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ResponseEntity<List<ProcessedFileTO>> processInputFiles() {
+		try {
+			List<ProcessedFileTO> tos = sjcService.processFilesFrom(DIR_ENTRADA);
+			ResponseEntity<List<ProcessedFileTO>> entity = new ResponseEntity<>(tos, HttpStatus.CREATED);
 			return entity;
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());
