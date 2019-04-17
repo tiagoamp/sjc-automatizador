@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.poi.openxml4j.exceptions.OLE2NotOfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -101,6 +102,9 @@ public class ExcelFileDao {
 					if (xsheet == null) continue;					
 					if (!verifySpreadsheetLayout(xsheet)) return false;											            	            	
 				}				
+			} catch (OLE2NotOfficeXmlFileException e) {
+				LOGGER.error("Arquivo " + file.getFileName() + " não é um formato válido do MS-Office.");
+				return false;
 			}
 		return true;
 	}

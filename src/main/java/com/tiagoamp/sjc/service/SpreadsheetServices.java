@@ -94,20 +94,20 @@ public class SpreadsheetServices {
 		for (Path file : stream) {
 			if (!file.getFileName().toString().endsWith(".xlsx")) continue;
 			
-			boolean isValidLayout = excelFileDao.verifySpreadSheetLayout(file);
-			if (!isValidLayout) {
-				ProcessedFileTO to = new ProcessedFileTO(file.getFileName().toString(),	Arrays.asList(new ProcessingMessage(MessageType.ERROR, "Planilha com problema de Layout e será desconsiderada no processamento.")));
-				result.add(to);
-				continue;
-			}
-			
-			if (file.getFileName().startsWith(NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME)) {
+			if (file.getFileName().toString().startsWith(NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME)) {
 				foundAfastamentoSheet = true;
 				ProcessedFileTO to = new ProcessedFileTO(file.getFileName().toString(),	Arrays.asList(new ProcessingMessage(MessageType.INFO, "Identificada planilha de Afastamentos.")));
 				result.add(to);
 				continue;
 			}
 			
+			boolean isValidLayout = excelFileDao.verifySpreadSheetLayout(file);
+			if (!isValidLayout) {
+				ProcessedFileTO to = new ProcessedFileTO(file.getFileName().toString(),	Arrays.asList(new ProcessingMessage(MessageType.ERROR, "Planilha com problema de Layout e será desconsiderada no processamento.")));
+				result.add(to);
+				continue;
+			}
+						
 			ConvertedSpreadsheet spreadsheet = excelFileDao.loadFrom(file);
 			List<ProcessingMessage> messages = processor.process(spreadsheet);
 			if (messages.isEmpty()) continue;

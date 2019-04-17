@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Dropzone from 'react-dropzone'
-import Result from './Result';
+import ConvertedTable from './ConvertedTable';
 import './Steps.css';
 
 export default class Converter extends Component {
@@ -36,7 +36,7 @@ export default class Converter extends Component {
       </div>
 
       {
-        convertedFiles.length > 0 ? (<Result convertedFiles={convertedFiles} nextStep={nextStep} />) : null
+        convertedFiles.length > 0 ? (<ConvertedTable convertedFiles={convertedFiles} nextStep={nextStep} />) : null
       }
       
     </section>

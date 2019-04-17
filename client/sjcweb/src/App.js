@@ -16,11 +16,11 @@ class App extends Component {
 
   constructor() {
     super();
-    this.state = { step: 0, uploadedFiles: [], convertedFiles: [], uploadedAfastFile: null };
+    this.state = { step: 0, uploadedFiles: [], convertedFiles: [], uploadedAfastFile: null, processedFiles: [] };
   }
 
   getComponentForStep = () => {
-    const { step, uploadedFiles, uploadedAfastFile, convertedFiles } = this.state;
+    const { step, uploadedFiles, uploadedAfastFile, convertedFiles, processedFiles } = this.state;
 
     switch(step) {
       case 0: 
@@ -30,7 +30,8 @@ class App extends Component {
         );
       case 1: 
         return (
-          <Processor uploadedAfastFile={uploadedAfastFile} handleAfastamentosFilesUpload={this.handleAfastamentosFilesUpload}
+          <Processor uploadedAfastFile={uploadedAfastFile} processedFiles={processedFiles} 
+                  handleAfastamentosFilesUpload={this.handleAfastamentosFilesUpload} processInputFiles={this.processInputFiles}
                   prevStep={this.prevStep} nextStep={this.nextStep} />
         );
       case 2: 
@@ -77,7 +78,7 @@ class App extends Component {
       .then(res => {
         const updatedFiles = currFiles.concat(newFiles);
         toast('Arquivos carregados!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-        this.setState( {uploadedFiles: updatedFiles, resultFiles: []} );
+        this.setState( {uploadedFiles: updatedFiles, convertedFiles: []} );
       })
       .catch(err => {
         toast('Erro ao fazer upload de arquivo: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }); 
@@ -97,7 +98,7 @@ class App extends Component {
         })
       .then(res => {
             toast('Arquivo carregado!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-            this.setState( { uploadedAfastFile: file, resultFiles: []} );
+            this.setState( { uploadedAfastFile: file, convertedFiles: []} );
         })
       .catch(err => toast('Erro ao fazer upload de arquivo: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
   }
@@ -106,7 +107,7 @@ class App extends Component {
     httpGatewayFunctions.cleanDirsRequest()
       .then(res => {
         toast('Arquivos de Entrada apagados!!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-        this.setState( { step: 0, uploadedFiles: [], uploadedAfastFile: null, resultFiles: [] } )
+        this.setState( { step: 0, uploadedFiles: [], uploadedAfastFile: null, convertedFiles: [] } )
       })
       .catch(err => toast('Erro ao limpar diretórios: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));    
   } 
@@ -116,13 +117,17 @@ class App extends Component {
       toast('Nenhum arquivo feito upload!', { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }); 
       return;
     }
-
     httpGatewayFunctions.convertInputFiles()
       .then(res => res.json())
-      .then(res => {
-        this.setState( { convertedFiles: res } )
-      })
+      .then(res => this.setState( { convertedFiles: res } ))
       .catch(err => toast('Erro ao converter arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+  }
+
+  processInputFiles = () => {
+    httpGatewayFunctions.processInputFiles()
+      .then(res => res.json())
+      .then(res => this.setState( { processedFiles: res } ))
+      .catch(err => toast('Erro ao processar arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
   }
 
 

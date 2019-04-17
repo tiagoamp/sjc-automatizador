@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import Dropzone from 'react-dropzone'
+import ProcessedTable from './ProcessedTable'
 import './Steps.css';
 
 export default class Processor extends Component {
   
   render() {
-    const { uploadedAfastFile, handleAfastamentosFilesUpload, prevStep, nextStep } = this.props;
+    const { uploadedAfastFile, processedFiles, handleAfastamentosFilesUpload, processInputFiles,  prevStep, nextStep } = this.props;
     
     return (
     <section>
@@ -28,10 +29,14 @@ export default class Processor extends Component {
         
         <div>
           <button onClick={prevStep}><i className="fa fa-angle-double-left fa-1x" aria-hidden="true"></i>VOLTAR</button>
-          <button ><i className="fa fa-cogs fa-1x" aria-hidden="true"></i>PROCESSAR</button>
+          <button onClick={processInputFiles}><i className="fa fa-cogs fa-1x" aria-hidden="true"></i>PROCESSAR</button>
         </div>
      
       </div>
+
+      {
+        processedFiles.length > 0 ? (<ProcessedTable processedFiles={processedFiles} nextStep={nextStep} />) : null
+      }
 
     </section>
     )

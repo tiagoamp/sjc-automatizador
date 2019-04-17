@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import './Result.css';
+import './ConvertedTable.css';
 
-export default class Result extends Component {
+export default class ConvertedTable extends Component {
 
   render() {
     const { convertedFiles, nextStep } = this.props;

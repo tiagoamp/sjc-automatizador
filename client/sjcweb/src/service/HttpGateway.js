@@ -6,6 +6,7 @@ const URL_BASE = "http://" + hostname + ":" + port + "/sjc/";
 const URL_UPLOAD_INPUT_FILE = URL_BASE + "upload2";
 const URL_DELETE_AFAST = URL_BASE + "upload/afast";
 const URL_CONVERT_INPUT_FILES = URL_BASE + "convert";
+const URL_PROCESS_INPUT_FILES = URL_BASE + "process";
 
 
 const httpGatewayFunctions = {
@@ -29,6 +30,10 @@ const httpGatewayFunctions = {
 
     convertInputFiles: () => {
         return fetch(URL_CONVERT_INPUT_FILES);
+    },
+
+    processInputFiles: () => {
+        return fetch(URL_PROCESS_INPUT_FILES);
     }
 
 
