@@ -1,13 +1,3 @@
-.result-input {
-    display: flex;
-    flex-direction: column;
-    margin: 10px;
-    background-color: white;
-    color: #73879C;
-    align-items: center;
-    justify-content: space-around;    
-}
-
 .table-entrada {
     width: 60%;
     margin: 10px 0px;

@@ -31,7 +31,7 @@ class App extends Component {
       case 1: 
         return (
           <Processor uploadedAfastFile={uploadedAfastFile} processedFiles={processedFiles} 
-                  handleAfastamentosFilesUpload={this.handleAfastamentosFilesUpload} processInputFiles={this.processInputFiles}
+                  handleAfastamentosFilesUpload={this.handleAfastamentosFilesUpload} processInputFiles={this.processInputFiles} deleteAfastamentosFile={this.deleteAfastamentosFile}
                   prevStep={this.prevStep} nextStep={this.nextStep} />
         );
       case 2: 
@@ -53,7 +53,7 @@ class App extends Component {
 
   prevStep = () => {
     const currStep = this.state.step;
-    this.setState( { step: currStep-1 } );
+    this.setState( { step: currStep-1, processedFiles: [] } );    
   }
 
   handleInputFilesUpload = (files) => {
@@ -98,7 +98,7 @@ class App extends Component {
         })
       .then(res => {
             toast('Arquivo carregado!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-            this.setState( { uploadedAfastFile: file, convertedFiles: []} );
+            this.setState( { uploadedAfastFile: file, processedFiles: []} );
         })
       .catch(err => toast('Erro ao fazer upload de arquivo: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
   }
@@ -107,10 +107,19 @@ class App extends Component {
     httpGatewayFunctions.cleanDirsRequest()
       .then(res => {
         toast('Arquivos de Entrada apagados!!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-        this.setState( { step: 0, uploadedFiles: [], uploadedAfastFile: null, convertedFiles: [] } )
+        this.setState( { step: 0, uploadedFiles: [], uploadedAfastFile: null, convertedFiles: [], processedFiles: [] } )
       })
       .catch(err => toast('Erro ao limpar diretórios: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));    
-  } 
+  }
+  
+  deleteAfastamentosFile = () => {
+    httpGatewayFunctions.deleteAfastamentoRequest()
+      .then(res => {
+        toast('Arquivos de Afastamento apagado!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
+        this.setState( { processedFiles: [], uploadedAfastFile: null } )
+      })
+      .catch(err => toast('Erro ao limpar diretórios: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));    
+  }
 
   convertInputFiles = () => {
     if (this.state.uploadedFiles.length === 0) {

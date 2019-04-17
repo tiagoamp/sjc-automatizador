@@ -117,7 +117,7 @@ public class SpreadsheetServices {
 		}
 		
 		if (!foundAfastamentoSheet) {
-			ProcessedFileTO to = new ProcessedFileTO("Planilha de AFastamentos", Arrays.asList(new ProcessingMessage(MessageType.INFO, "Não foi identificada planilha de afastamentos nos arquivos.")));
+			ProcessedFileTO to = new ProcessedFileTO("Planilha de Afastamentos", Arrays.asList(new ProcessingMessage(MessageType.INFO, "Não foi identificada planilha de afastamentos nos arquivos.")));
 			result.add(to);
 		}
 		

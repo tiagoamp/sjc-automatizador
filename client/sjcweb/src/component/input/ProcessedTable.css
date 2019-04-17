@@ -1,0 +1,40 @@
+.msgs {
+    border: 1px groove;
+    border-radius: 5px;
+    width: 80%;
+    min-width: 80%;
+    margin: 5px;
+    padding: 5px;
+}
+
+.msgs-header {    
+    font-size: 1.1rem;
+    text-align: center;
+    font-weight: bold;    
+}
+
+.msgs-body {
+    font-size: 0.9rem;
+}
+
+.msg-filename {
+    margin: 0px 5px;
+    padding: 0px 20px;
+    font-weight: bold;
+}
+
+.msgs-info {
+    color: #6495ED;    
+    border-color: #6495ED;
+}
+
+.msgs-error {
+    color: #FF4500;   
+    border-color: #FF4500; 
+}
+
+.msgs-alert {
+    color: #DAA520;    
+    border-color: #DAA520;
+}
+

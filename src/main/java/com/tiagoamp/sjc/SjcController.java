@@ -90,11 +90,24 @@ public class SjcController {
 		return Response.created(URI.create(file.getName())).build();
 	}
 	
+	@Deprecated
 	@RequestMapping(value = "upload/total", method = RequestMethod.GET)
 	public String getNumberOfUploadedSpreadsheets() {
 		long total = 0;
 		try {
 			total = filesService.getNumberOfFilesInUploadDirectory(DIR_ENTRADA);
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage());
+			throw new ResponseProcessingException(Response.serverError().build(),e);
+		}
+		return String.valueOf(total);
+	}
+	
+	@RequestMapping(value = "input/total", method = RequestMethod.GET)
+	public String getNumberOfInputFiles() {
+		long total = 0;
+		try {
+			total = filesService.getNumberOfPdfFilesInInputDirectory(DIR_ENTRADA);
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
@@ -124,7 +137,7 @@ public class SjcController {
 		filesService.deleteAfastamentoSpreadsheet(DIR_ENTRADA);
 		return Response.ok().build();
 	}
-	
+		
 	@Deprecated
 	@RequestMapping(value = "input", method = RequestMethod.GET)
 	@Produces(MediaType.APPLICATION_JSON)
