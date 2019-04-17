@@ -9,7 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,6 +152,14 @@ public class SpreadsheetServices {
 		LOGGER.info("Gerando arquivo de mensagens...");
 		OutputFilesGenerator filesGenerator = new OutputFilesGenerator();
 		filesGenerator.generateOutputMessageFile(outputFile, spreadsheet);
+	}
+	
+	public void generateProcessingMessagesFile(Path outputFile, List<ProcessedFileTO> processedTOs) throws FileNotFoundException, DocumentException  {
+		LOGGER.info("Gerando arquivo de mensagens...");		
+		Map<String, List<ProcessingMessage>> msgsMap = new HashMap<>();		
+		processedTOs.forEach(to -> msgsMap.put(to.getFileName().toString(), to.getMessages())  );		
+		PDFGenerator pdfGen = new PDFGenerator();
+		pdfGen.generateMessagesPdfFile(msgsMap, outputFile);
 	}
 	
 }

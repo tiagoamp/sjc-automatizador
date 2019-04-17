@@ -5,14 +5,23 @@ import './Steps.css';
 
 export default class Processor extends Component {
   
+  componentDidMount() {
+    this.props.getTotalInputFiles();
+  }
+
   render() {
-    const { uploadedAfastFile, processedFiles, handleAfastamentosFilesUpload, processInputFiles, deleteAfastamentosFile, prevStep, nextStep } = this.props;
+    const { uploadedAfastFile, processedFiles, totalInputFiles, handleAfastamentosFilesUpload, processInputFiles, deleteAfastamentosFile, downloadMessagesFile,
+      prevStep, nextStep } = this.props;
     
     return (
     <section>
       <div className="entrada-body">
 
         <h2>Processamento dos Arquivos</h2>
+
+        <p>
+          Total de arquivos convertidos identificados: { totalInputFiles }
+        </p>
         
         <Dropzone onDrop={acceptedFiles => handleAfastamentosFilesUpload(acceptedFiles[0])}>
           {({getRootProps, getInputProps}) => (
@@ -36,7 +45,7 @@ export default class Processor extends Component {
       </div>
 
       {
-        processedFiles.length > 0 ? (<ProcessedTable processedFiles={processedFiles} prevStep={prevStep} nextStep={nextStep} />) : null
+        processedFiles.length > 0 ? (<ProcessedTable processedFiles={processedFiles} downloadMessagesFile={downloadMessagesFile} prevStep={prevStep} nextStep={nextStep} />) : null
       }
 
     </section>

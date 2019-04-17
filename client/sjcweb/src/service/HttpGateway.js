@@ -6,7 +6,9 @@ const URL_BASE = "http://" + hostname + ":" + port + "/sjc/";
 const URL_UPLOAD_INPUT_FILE = URL_BASE + "upload2";
 const URL_DELETE_AFAST = URL_BASE + "upload/afast";
 const URL_CONVERT_INPUT_FILES = URL_BASE + "convert";
+const URL_CONVERT_TOTAL_INPUT_FILES = URL_BASE + "convert/total";
 const URL_PROCESS_INPUT_FILES = URL_BASE + "process";
+const URL_DOWNLOAD_MSGS_FILES = URL_BASE + "messages";
 
 
 const httpGatewayFunctions = {
@@ -32,10 +34,17 @@ const httpGatewayFunctions = {
         return fetch(URL_CONVERT_INPUT_FILES);
     },
 
+    totalConvertInputFiles: () => {
+        return fetch(URL_CONVERT_TOTAL_INPUT_FILES);
+    },
+
     processInputFiles: () => {
         return fetch(URL_PROCESS_INPUT_FILES);
-    }
+    }, 
 
+    downloadMessagesFile: () => {
+        return fetch(URL_DOWNLOAD_MSGS_FILES);
+    }
 
 }
 

@@ -103,7 +103,7 @@ public class SjcController {
 		return String.valueOf(total);
 	}
 	
-	@RequestMapping(value = "input/total", method = RequestMethod.GET)
+	@RequestMapping(value = "convert/total", method = RequestMethod.GET)
 	public String getNumberOfInputFiles() {
 		long total = 0;
 		try {
@@ -211,6 +211,7 @@ public class SjcController {
 		}		
 	}
 	
+	@Deprecated
 	@RequestMapping(value = "output/messages", method = RequestMethod.GET)
 	@Produces( {"application/pdf"} )
 	public ResponseEntity<InputStreamResource> getOutputMessagesFile() {
@@ -225,6 +226,33 @@ public class SjcController {
 			LocalDate now = LocalDate.now();
 			Path resultFile = DIR_SAIDA.resolve("Mensagens_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".pdf");
 			sjcService.generateOutputMessagesFile(resultFile, outsheet);
+			
+			HttpHeaders headers = new HttpHeaders();
+		    headers.setContentType(org.springframework.http.MediaType.parseMediaType("application/pdf"));
+		    headers.add("Access-Control-Allow-Origin", "*");
+		    headers.add("Access-Control-Allow-Methods", "GET, POST, PUT");
+		    headers.add("Access-Control-Allow-Headers", "Content-Type");
+		    headers.add("Content-Disposition", "filename=" + resultFile.getFileName());
+		    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		    headers.add("Pragma", "no-cache");
+		    headers.add("Expires", "0");
+		    
+		    ResponseEntity<InputStreamResource> response = new ResponseEntity<InputStreamResource>(new InputStreamResource(new FileInputStream(resultFile.toFile())), headers, HttpStatus.OK);
+		    return response;
+		} catch (IOException | DocumentException e) {
+			LOGGER.error(e.getMessage());
+			throw new ResponseProcessingException(Response.serverError().build(),e);
+		}		
+	}
+	
+	@RequestMapping(value = "messages", method = RequestMethod.GET)
+	@Produces( {"application/pdf"} )
+	public ResponseEntity<InputStreamResource> getProcessingMessagesFile() {
+		try {
+			List<ProcessedFileTO> tos = sjcService.processFilesFrom(DIR_ENTRADA);
+			LocalDate now = LocalDate.now();
+			Path resultFile = DIR_SAIDA.resolve("Mensagens_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".pdf");
+			sjcService.generateProcessingMessagesFile(resultFile, tos);
 			
 			HttpHeaders headers = new HttpHeaders();
 		    headers.setContentType(org.springframework.http.MediaType.parseMediaType("application/pdf"));

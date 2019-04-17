@@ -11,7 +11,7 @@ export default class ProcessedTable extends Component {
 
 
   render() {
-    const { processedFiles, prevStep, nextStep } = this.props;
+    const { processedFiles, downloadMessagesFile, prevStep, nextStep } = this.props;
 
     return (
       <div className="result-input">
@@ -76,6 +76,7 @@ export default class ProcessedTable extends Component {
             
             <div className='buttons-group'>
                 <button onClick={prevStep}><i className="fa fa-angle-double-left fa-1x" aria-hidden="true"></i>VOLTAR</button>
+                <button onClick={downloadMessagesFile}><i className="fa fa-download fa-1x" aria-hidden="true"></i>DOWNLOAD</button>
                 <button onClick={nextStep}>AVANÇAR<i className="fa fa-angle-double-right fa-1x" aria-hidden="true"></i></button>
             </div>
         

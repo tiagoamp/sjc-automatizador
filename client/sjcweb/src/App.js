@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import Header from './component/Header';
 import Footer from './component/Footer';
 import FlowMenu from './component/FlowMenu';
-import Converter from './component/input/Converter';
-import Processor from './component/input/Processor';
+import Converter from './component/steps/Converter';
+import Processor from './component/steps/Processor';
+import Output from './component/steps/Output';
 import { ToastContainer, toast } from 'react-toastify';
 
 import './App.css';
@@ -16,11 +17,11 @@ class App extends Component {
 
   constructor() {
     super();
-    this.state = { step: 0, uploadedFiles: [], convertedFiles: [], uploadedAfastFile: null, processedFiles: [] };
+    this.state = { step: 0, totalInputFiles: 0, uploadedFiles: [], convertedFiles: [], uploadedAfastFile: null, processedFiles: [] };
   }
 
   getComponentForStep = () => {
-    const { step, uploadedFiles, uploadedAfastFile, convertedFiles, processedFiles } = this.state;
+    const { step, uploadedFiles, uploadedAfastFile, convertedFiles, processedFiles, totalInputFiles } = this.state;
 
     switch(step) {
       case 0: 
@@ -30,13 +31,14 @@ class App extends Component {
         );
       case 1: 
         return (
-          <Processor uploadedAfastFile={uploadedAfastFile} processedFiles={processedFiles} 
-                  handleAfastamentosFilesUpload={this.handleAfastamentosFilesUpload} processInputFiles={this.processInputFiles} deleteAfastamentosFile={this.deleteAfastamentosFile}
+          <Processor uploadedAfastFile={uploadedAfastFile} processedFiles={processedFiles} totalInputFiles={totalInputFiles}
+                  handleAfastamentosFilesUpload={this.handleAfastamentosFilesUpload} processInputFiles={this.processInputFiles} 
+                  deleteAfastamentosFile={this.deleteAfastamentosFile} downloadMessagesFile={this.downloadMessagesFile} getTotalInputFiles={this.getTotalInputFiles}
                   prevStep={this.prevStep} nextStep={this.nextStep} />
         );
       case 2: 
         return (
-          <h1>Step 2</h1>
+          <Output downloadMessagesFile={this.downloadMessagesFile} prevStep={this.prevStep} />
         );
       default: 
         return (
@@ -139,9 +141,30 @@ class App extends Component {
       .catch(err => toast('Erro ao processar arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
   }
 
+  getTotalInputFiles = () => {
+    httpGatewayFunctions.totalConvertInputFiles()
+      .then(res => res.json())
+      .then(x => console.log(x))
+      .then(res => this.setState( { totalInputFiles: res } ))
+      .catch(err => toast('Erro ao processar arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+  }
+
+  downloadMessagesFile = () => {
+    httpGatewayFunctions.downloadMessagesFile()
+      .then(res => res.blob())
+      .then(blob => {
+          let url = window.URL.createObjectURL(blob);
+          let a = document.createElement('a');
+          a.href = url;
+          a.download = 'mensagens.pdf';
+          a.click();          
+      })
+      .catch(err => toast('Erro ao baixar arquivo: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+  }
+
 
   render() {
-
+    
     return (
       
       <div className="App">

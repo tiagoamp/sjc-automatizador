@@ -34,7 +34,7 @@ public class PdfGeneratorHeaderAndFooter extends PdfPageEventHelper{
 		fontFooter.setColor(139, 139, 131);
 		footer = new PdfPTable(3);
         footer.setTotalWidth(580);
-        footer.addCell(new Phrase(new Chunk("(c) 2017-2018 tiagoamp",fontFooter)));
+        footer.addCell(new Phrase(new Chunk("(c) 2017-2019 tiagoamp",fontFooter)));
         footer.addCell(new Phrase(new Chunk("SJC-Automatizador",fontFooter)));
         footer.addCell(new Phrase(new Chunk("Data: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),fontFooter)));
     }
