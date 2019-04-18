@@ -38,7 +38,8 @@ class App extends Component {
         );
       case 2: 
         return (
-          <Output downloadMessagesFile={this.downloadMessagesFile} prevStep={this.prevStep} />
+          <Output totalInputFiles={totalInputFiles} 
+                  downloadMessagesFile={this.downloadMessagesFile} getTotalInputFiles={this.getTotalInputFiles} prevStep={this.prevStep} />
         );
       default: 
         return (
@@ -144,7 +145,6 @@ class App extends Component {
   getTotalInputFiles = () => {
     httpGatewayFunctions.totalConvertInputFiles()
       .then(res => res.json())
-      .then(x => console.log(x))
       .then(res => this.setState( { totalInputFiles: res } ))
       .catch(err => toast('Erro ao processar arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
   }

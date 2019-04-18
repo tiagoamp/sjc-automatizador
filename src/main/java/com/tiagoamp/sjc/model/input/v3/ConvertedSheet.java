@@ -1,5 +1,6 @@
 package com.tiagoamp.sjc.model.input.v3;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.tiagoamp.sjc.model.SjcGeneralCode;
@@ -11,9 +12,12 @@ public class ConvertedSheet {
 	private List<ConvRow> rows;
 	
 	
-	public ConvertedSheet() { }
+	public ConvertedSheet() { 
+		rows = new ArrayList<>();
+	}
 	
 	public ConvertedSheet(SjcGeneralCode code, ConvHeader header, List<ConvRow> rows) {
+		this();
 		this.code = code;
 		this.header = header;
 		this.rows = rows;
@@ -30,7 +34,7 @@ public class ConvertedSheet {
 	public String toString() {
 		return header.getFixedTitle() + " | " + 
 	           header.getYearMonthRef() + " [" + header.getYearRefAsStr() + " / " + header.getMonthRefAsStr()  + "]" + " | " + 
-	           "Qtd rows: " + " [" + (rows != null ? rows.size() : 0) + "]";			   
+	           "Qtd rows: " + " [" + rows.size() + "]";			   
 	}
 	
 	

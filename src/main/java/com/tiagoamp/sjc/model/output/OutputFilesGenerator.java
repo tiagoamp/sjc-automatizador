@@ -55,6 +55,7 @@ public class OutputFilesGenerator {
 		}
 	}
 	
+	@Deprecated
 	public void generateOutputMessageFile(Path outputFile, OutputSpreadsheet spreadsheet) throws FileNotFoundException, DocumentException {
 		PDFGenerator pdfGen = new PDFGenerator();
 		pdfGen.generateMessagesPdfFile(spreadsheet.getMessages(), outputFile);

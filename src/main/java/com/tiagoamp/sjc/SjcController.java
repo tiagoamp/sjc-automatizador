@@ -107,7 +107,7 @@ public class SjcController {
 	public String getNumberOfInputFiles() {
 		long total = 0;
 		try {
-			total = filesService.getNumberOfPdfFilesInInputDirectory(DIR_ENTRADA);
+			total = filesService.getNumberOfExistingConvertedFiles(DIR_ENTRADA);
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);

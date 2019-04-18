@@ -64,6 +64,10 @@ public class ExcelFileDao {
 		return convFilePath;
 	}
 	
+	public List<ConvertedSpreadsheet> loadFromDirectory(Path dir) throws FileNotFoundException, IOException {
+		
+	}
+	
 	public ConvertedSpreadsheet loadFrom(Path file) throws FileNotFoundException, IOException {
 		LOGGER.info("Carregando arquivo: " + file.getFileName());
 		

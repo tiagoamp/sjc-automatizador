@@ -21,7 +21,7 @@ export default class Converter extends Component {
                 <input {...getInputProps()} accept=".pdf" />
                 <span><strong>Relatórios</strong></span>
                 <p>Arraste aqui os arquivos de relatórios em 'pdf' ou click para selecioná-los</p>
-                <div className="arquivos">Arquivos para carregar [{uploadedFiles.length}]:  
+                <div className="arquivos">Arquivos feito upload [{uploadedFiles.length}]:  
                   <span>{ uploadedFiles.length > 0 ? uploadedFiles.map( f => ' [' + f.name + ']') : ' nenhum ' }</span></div>
               </div>
             </section>

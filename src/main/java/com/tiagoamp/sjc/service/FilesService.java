@@ -29,8 +29,10 @@ public class FilesService {
 		return Files.list(uploadDir).count();
 	}
 	
-	public long getNumberOfPdfFilesInInputDirectory(Path dir) throws IOException {
-		return Files.list(dir).filter(f -> f.getFileName().toString().toUpperCase().endsWith(".PDF")).count();
+	public long getNumberOfExistingConvertedFiles(Path dir) throws IOException {
+		long count = Files.list(dir).filter(f -> f.getFileName().toString().toLowerCase().endsWith(".xlsx")).count();
+		Optional<Path> pathAfast = findNewAfastamentoSpreadsheetPath(dir);
+		return pathAfast.isPresent() ? count-1 : count;
 	}
 	
 	public List<Path> getUploadedFilesPath(Path uploadDir) throws IOException {

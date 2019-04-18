@@ -133,12 +133,21 @@ public class SpreadsheetServices {
 		return spreadsheet.loadFromFile();
 	}
 	
-	public OutputSpreadsheet generateOutputSpreadSheet(List<InputSpreadsheet> inputSpreadSheets, Path histAfastamentoFilePath) throws IOException {
+	@Deprecated
+	public OutputSpreadsheet generateOutputSpreadSheet(List<InputSpreadsheet> inputSpreadsheets, Path histAfastamentoFilePath) throws IOException {
 		LOGGER.info("Gerando planilha de saída...");
 		HistoricoAfastamentos afastamentos = null;
 		if (histAfastamentoFilePath != null && Files.exists(histAfastamentoFilePath)) afastamentos = loadAfastamentosSpreadsheet(histAfastamentoFilePath);
 		OutputExcelSpreadsheet excelSheet = new OutputExcelSpreadsheet();		
-		return excelSheet.loadDataFromInputSpreadsheets(inputSpreadSheets, afastamentos);
+		return excelSheet.loadDataFromInputSpreadsheets(inputSpreadsheets, afastamentos);
+	}
+	
+	public OutputSpreadsheet generateOutputSpreadSheetFrom(List<ConvertedSpreadsheet> convSpreadsheets, Path histAfastamentoFilePath) throws IOException {
+		LOGGER.info("Gerando planilha de saída...");
+		HistoricoAfastamentos afastamentos = null;
+		if (histAfastamentoFilePath != null && Files.exists(histAfastamentoFilePath)) afastamentos = loadAfastamentosSpreadsheet(histAfastamentoFilePath);
+		OutputExcelSpreadsheet excelSheet = new OutputExcelSpreadsheet();		
+		return excelSheet.loadDataFromConvertedSpreadsheets(convSpreadsheets, afastamentos);
 	}
 	
 	public void generateOuputSpreadsheetFile(Path outputFile, OutputSpreadsheet spreadsheet) throws IOException {
