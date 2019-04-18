@@ -19,7 +19,7 @@ public class NumericFieldProcessor extends FieldProcessor {
     		value = value.replaceAll(nonNumericPattern.pattern(), "");
     		messages.add(new ProcessingMessage(MessageType.ALERT, "Planilha contém '" + fieldName + "' não numérico: '" + inputValue + "'. Valor corrigido pelo sistema: " + value + "."));
     	}
-		if (value.isEmpty()) value = "0";
+		if (value.isEmpty() || value.equals("")) value = "0";
     	return value;
 	}
     

@@ -10,8 +10,8 @@ export default class Processor extends Component {
   }
 
   render() {
-    const { uploadedAfastFile, processedFiles, totalInputFiles, 
-            handleAfastamentosFilesUpload, processInputFiles, deleteAfastamentosFile, downloadMessagesFile, prevStep, nextStep } = this.props;
+    const { uploadedAfastFile, processedFiles, totalInputFiles, handleAfastamentosFilesUpload, processInputFiles, 
+      deleteAfastamentosFile, downloadMessagesFile, prevStep, nextStep } = this.props;
     
     return (
     <section>

@@ -37,6 +37,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.itextpdf.text.DocumentException;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
+import com.tiagoamp.sjc.model.input.v3.ConvertedSpreadsheet;
 import com.tiagoamp.sjc.model.input.v3.to.ConvertedFileTO;
 import com.tiagoamp.sjc.model.input.v3.to.ProcessedFileTO;
 import com.tiagoamp.sjc.model.output.OutputSpreadsheet;
@@ -179,6 +180,7 @@ public class SjcController {
 		}
 	}
 	
+	@Deprecated
 	@RequestMapping(value = "output", method = RequestMethod.GET)
 	@Produces( {"application/vnd.ms-excel"} )
 	public ResponseEntity<InputStreamResource> generateOutputSpreadsheet() {
@@ -209,6 +211,36 @@ public class SjcController {
 			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
 		}		
+	}
+	
+	@RequestMapping(value = "output2", method = RequestMethod.GET)
+	@Produces( {"application/vnd.ms-excel"} )
+	public ResponseEntity<InputStreamResource> generateNewOutputSpreadsheet() {
+		try {
+			List<ConvertedSpreadsheet> convSpreadsheets = sjcService.loadConvertedSpreadsheetsFromDirectory(DIR_ENTRADA);
+			Optional<Path> histAfastamentoPath = filesService.findAfastamentoSpreadsheetPath(DIR_ENTRADA);
+			Path afastamentoSpreadsheetFile = histAfastamentoPath.orElse(null);		
+			OutputSpreadsheet spreadsheet = sjcService.generateOutputSpreadSheetFrom(convSpreadsheets, afastamentoSpreadsheetFile);
+			LocalDate now = LocalDate.now();
+			Path resultFile = DIR_SAIDA.resolve("Resultado_" + now.getDayOfMonth() + "_" + now.getMonthValue() + "_" + now.getYear() + ".xls");
+			sjcService.generateOuputSpreadsheetFile(resultFile, spreadsheet);
+			
+			HttpHeaders headers = new HttpHeaders();
+		    headers.setContentType(org.springframework.http.MediaType.parseMediaType("application/vnd.ms-excel"));
+		    headers.add("Access-Control-Allow-Origin", "*");
+		    headers.add("Access-Control-Allow-Methods", "GET, POST, PUT");
+		    headers.add("Access-Control-Allow-Headers", "Content-Type");
+		    headers.add("Content-Disposition", "filename=" + resultFile.getFileName());
+		    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		    headers.add("Pragma", "no-cache");
+		    headers.add("Expires", "0");
+		    
+		    ResponseEntity<InputStreamResource> response = new ResponseEntity<InputStreamResource>(new InputStreamResource(new FileInputStream(resultFile.toFile())), headers, HttpStatus.OK);
+		    return response;			
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage());
+			throw new ResponseProcessingException(Response.serverError().build(),e);
+		}
 	}
 	
 	@Deprecated

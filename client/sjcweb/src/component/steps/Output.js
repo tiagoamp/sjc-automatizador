@@ -8,7 +8,7 @@ export default class Output extends Component {
   }
 
   render() {
-    const { totalInputFiles, downloadMessagesFile, prevStep } = this.props;
+    const { totalInputFiles, downloadMessagesFile, downloadOutputFile, prevStep, resetFiles } = this.props;
     
     return (
     <section>
@@ -21,7 +21,8 @@ export default class Output extends Component {
         <div>
           <button onClick={prevStep}><i className="fa fa-angle-double-left fa-1x" aria-hidden="true"></i>VOLTAR</button>
           <button onClick={downloadMessagesFile}><i className="fa fa-download fa-1x" aria-hidden="true"></i>MENSAGENS</button>
-          <button onClick={() => alert('Implementar!!!')}><i className="fa fa-download fa-1x" aria-hidden="true"></i>PLANILHA</button>
+          <button onClick={downloadOutputFile}><i className="fa fa-download fa-1x" aria-hidden="true"></i>PLANILHA</button>
+          <button onClick={resetFiles}><i className="fa fa-repeat fa-1x" aria-hidden="true"></i>REINICIAR</button>
         </div>
      
       </div>

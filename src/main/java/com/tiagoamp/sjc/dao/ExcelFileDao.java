@@ -1,6 +1,22 @@
 package com.tiagoamp.sjc.dao;
 
-import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.*;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_ANO;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_LOTACAO;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_MES;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_TITLE_ANO;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_TITLE_LOTACAO;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.CELL_ADDRESS_TITLE_MES;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_ADICIONAL_NOTURNO;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_HORA_EXTRA;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_MATRICULA;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_NOME;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_01;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_02;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_03;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_04;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOESEXTRAS_05;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_COLUMN_PLANTOES_EXTRAS;
+import static com.tiagoamp.sjc.model.input.v3.InputLayoutConstants.INDEX_DATA_INIT_ROW;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -63,11 +79,7 @@ public class ExcelFileDao {
 			}
 		return convFilePath;
 	}
-	
-	public List<ConvertedSpreadsheet> loadFromDirectory(Path dir) throws FileNotFoundException, IOException {
 		
-	}
-	
 	public ConvertedSpreadsheet loadFrom(Path file) throws FileNotFoundException, IOException {
 		LOGGER.info("Carregando arquivo: " + file.getFileName());
 		

@@ -1,6 +1,14 @@
 package com.tiagoamp.sjc.model.input;
 
-import static com.tiagoamp.sjc.model.input.InputLayoutConstants.*;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_AFAST_DATA_FINAL;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_AFAST_DATA_INICIAL;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_AFAST_DATA_RETORNO;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_AFAST_MATRICULA;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_AFAST_MOTIVO;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_AFAST_NOME;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_AFAST_PERIODO;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_COLUMN_AFAST_TIPO;
+import static com.tiagoamp.sjc.model.input.InputLayoutConstants.INDEX_DATA_AFAST_INIT_ROW;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,16 +18,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.openxml4j.exceptions.OLE2NotOfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.tiagoamp.sjc.model.fieldprocessor.FieldProcessor;
 import com.tiagoamp.sjc.model.fieldprocessor.MatriculaFieldProcessor;
 
 public class AfastamentosExcelSpreadsheet {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AfastamentosExcelSpreadsheet.class);
 	
 	private HistoricoAfastamentos afastamentos;
 	private Path filePath; 
@@ -53,6 +66,10 @@ public class AfastamentosExcelSpreadsheet {
 			AfastamentoSheet sheet = loadSheetDataFrom(xssfsheet);
 			if (sheet.getRows().isEmpty()) return afastamentos;
 			afastamentos.setSheet(sheet);
+		} catch (OLE2NotOfficeXmlFileException e) {
+			String msg = "Arquivo de afastamentos não é um formato válido do MS-Office.";
+			LOGGER.error(msg);
+			throw new IOException(msg);
 		}
 		return afastamentos;		
 	}

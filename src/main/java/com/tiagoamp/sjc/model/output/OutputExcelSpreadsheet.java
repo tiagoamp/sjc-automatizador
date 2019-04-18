@@ -41,10 +41,7 @@ public class OutputExcelSpreadsheet {
 	}
 	
 	public OutputSpreadsheet loadDataFromConvertedSpreadsheets(List<ConvertedSpreadsheet> convSpreadsheets, HistoricoAfastamentos afastamentos) {
-		convSpreadsheets.forEach(convSpreadsheet -> {
-			loadDataFromConvertedInputSpreadsheet(convSpreadsheet, afastamentos);			
-			//spreadsheet.getMessages().put(convSpreadsheet.getConvertedFile(), convSpreadsheet.getMessages());
-		}); 
+		convSpreadsheets.forEach(convSpreadsheet -> loadDataFromConvertedInputSpreadsheet(convSpreadsheet, afastamentos)); 
 		return spreadsheet;
 	}
 	
@@ -73,8 +70,7 @@ public class OutputExcelSpreadsheet {
 	}
 	
 	private void loadDataFromConvertedInputSpreadsheet(ConvertedSpreadsheet convSpreadsheet, HistoricoAfastamentos afastamentos) {
-		if (convSpreadsheet.getConvertedSheets().isEmpty()) return;
-		
+		if (convSpreadsheet.getConvertedSheets().isEmpty()) return;		
 		for (SjcSpecificCode code : SjcSpecificCode.values()) {
 			OutSheet outSheet = new OutSheet(code);			
 			Optional<ConvertedSheet> optInSheet = Optional.ofNullable(convSpreadsheet.getConvertedSheets().get(code.getGenericCode()));
@@ -147,12 +143,16 @@ public class OutputExcelSpreadsheet {
 			try {
 				final LocalDate plantaoDate = LocalDate.of(Integer.parseInt(splitDateArr[2]), Integer.parseInt(splitDateArr[1]), Integer.parseInt(splitDateArr[0]));
 				long countOfAfastConflicts = afastamentosFromThisMatricula.stream()
-						.filter(afastRow -> (plantaoDate.isAfter(afastRow.getDataInicial())	|| plantaoDate.isEqual(afastRow.getDataInicial()))
-								         && (plantaoDate.isBefore(afastRow.getDataFinal()) || plantaoDate.isEqual(afastRow.getDataFinal())))
+						.filter(afastRow -> 
+									(plantaoDate.isAfter(afastRow.getDataInicial())	|| plantaoDate.isEqual(afastRow.getDataInicial()))
+								 && (plantaoDate.isBefore(afastRow.getDataFinal()) || plantaoDate.isEqual(afastRow.getDataFinal())))
 						.count();
 				
-				if (countOfAfastConflicts == 0) outRow.getDtPlantoesWithinAfastamentos()[i] = false;
-				else outRow.getDtPlantoesWithinAfastamentos()[i] = true;
+				if (countOfAfastConflicts == 0) {
+					outRow.getDtPlantoesWithinAfastamentos()[i] = false;
+				} else {
+					outRow.getDtPlantoesWithinAfastamentos()[i] = true;
+				}
 
 			} catch (Exception e) {
 				LOGGER.debug("Padrão de data não reconhecido: " + dateStr);

@@ -26,8 +26,8 @@ class App extends Component {
     switch(step) {
       case 0: 
         return (
-          <Converter uploadedFiles={uploadedFiles} convertedFiles={convertedFiles}
-                  handleInputFilesUpload={this.handleInputFilesUpload} resetFiles={this.resetFiles} convertInputFiles={this.convertInputFiles} nextStep={this.nextStep} />
+          <Converter uploadedFiles={uploadedFiles} convertedFiles={convertedFiles} handleInputFilesUpload={this.handleInputFilesUpload} 
+                     resetFiles={this.resetFiles} convertInputFiles={this.convertInputFiles} nextStep={this.nextStep} />
         );
       case 1: 
         return (
@@ -38,12 +38,12 @@ class App extends Component {
         );
       case 2: 
         return (
-          <Output totalInputFiles={totalInputFiles} 
-                  downloadMessagesFile={this.downloadMessagesFile} getTotalInputFiles={this.getTotalInputFiles} prevStep={this.prevStep} />
+          <Output totalInputFiles={totalInputFiles} downloadMessagesFile={this.downloadMessagesFile} downloadOutputFile={this.downloadOutputFile} 
+                  getTotalInputFiles={this.getTotalInputFiles} prevStep={this.prevStep} resetFiles={this.resetFiles} />
         );
       default: 
         return (
-          <Converter />
+          <p>Erro: Passo de processamento não identificado!</p>
         );
 
     }
@@ -110,7 +110,7 @@ class App extends Component {
     httpGatewayFunctions.cleanDirsRequest()
       .then(res => {
         toast('Arquivos de Entrada apagados!!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-        this.setState( { step: 0, uploadedFiles: [], uploadedAfastFile: null, convertedFiles: [], processedFiles: [] } )
+        this.setState( { step: 0, totalInputFiles: 0, uploadedFiles: [], convertedFiles: [], uploadedAfastFile: null, processedFiles: [] } )
       })
       .catch(err => toast('Erro ao limpar diretórios: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));    
   }
@@ -146,7 +146,7 @@ class App extends Component {
     httpGatewayFunctions.totalConvertInputFiles()
       .then(res => res.json())
       .then(res => this.setState( { totalInputFiles: res } ))
-      .catch(err => toast('Erro ao processar arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+      .catch(err => toast('Erro ao processar arquivos: ' + err.message, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
   }
 
   downloadMessagesFile = () => {
@@ -159,7 +159,20 @@ class App extends Component {
           a.download = 'mensagens.pdf';
           a.click();          
       })
-      .catch(err => toast('Erro ao baixar arquivo: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+      .catch(err => toast('Erro ao baixar arquivo: ' + err.message, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+  }
+
+  downloadOutputFile = () => {
+    httpGatewayFunctions.downloadOutputFile()
+      .then(res => res.blob())
+      .then(blob => {
+          let url = window.URL.createObjectURL(blob);
+          let a = document.createElement('a');
+          a.href = url;
+          a.download = 'saida.xls';
+          a.click();          
+      })
+      .catch(err => toast('Erro ao baixar arquivo: ' + err.message, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
   }
 
 

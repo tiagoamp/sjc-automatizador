@@ -8,7 +8,8 @@ const URL_DELETE_AFAST = URL_BASE + "upload/afast";
 const URL_CONVERT_INPUT_FILES = URL_BASE + "convert";
 const URL_CONVERT_TOTAL_INPUT_FILES = URL_BASE + "convert/total";
 const URL_PROCESS_INPUT_FILES = URL_BASE + "process";
-const URL_DOWNLOAD_MSGS_FILES = URL_BASE + "messages";
+const URL_DOWNLOAD_MSGS_FILE = URL_BASE + "messages";
+const URL_DOWNLOAD_OUTPUT_FILE = URL_BASE + "output2";
 
 
 const httpGatewayFunctions = {
@@ -43,7 +44,11 @@ const httpGatewayFunctions = {
     }, 
 
     downloadMessagesFile: () => {
-        return fetch(URL_DOWNLOAD_MSGS_FILES);
+        return fetch(URL_DOWNLOAD_MSGS_FILE);
+    },
+
+    downloadOutputFile: () => {
+        return fetch(URL_DOWNLOAD_OUTPUT_FILE);
     }
 
 }

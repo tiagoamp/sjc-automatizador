@@ -145,7 +145,7 @@ public class InputSpreadSheetProcessor {
 				}
 			}
 			if (row.getQtdPlantoesExtra() != null && !row.getQtdPlantoesExtra().isEmpty() && 
-				Integer.valueOf(row.getQtdPlantoesExtra()) != qtdDatasPlantInformadas) {
+				        Integer.valueOf(row.getQtdPlantoesExtra()) != qtdDatasPlantInformadas) {
 				String msg = String.format("Planilha contém 'Qtdade de Plantões Extras' diferente do número de datas. Cadastradas %s datas mas quantidade informada é %s (linha %d)", qtdDatasPlantInformadas, row.getQtdPlantoesExtra(), currRowNr);
         		rowsMsgs.add(new ProcessingMessage(ALERT, msg));
         	}			

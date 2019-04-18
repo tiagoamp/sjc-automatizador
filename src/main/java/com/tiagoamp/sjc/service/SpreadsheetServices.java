@@ -126,6 +126,22 @@ public class SpreadsheetServices {
 		return result;
 	}
 	
+	public List<ConvertedSpreadsheet> loadConvertedSpreadsheetsFromDirectory(Path dir) throws FileNotFoundException, IOException {
+		InputSpreadSheetProcessor processor = new InputSpreadSheetProcessor();
+		List<ConvertedSpreadsheet> result = new ArrayList<>();		
+		DirectoryStream<Path> stream = Files.newDirectoryStream(dir);				
+		for (Path file : stream) {
+			if (!file.getFileName().toString().endsWith(".xlsx")) continue;			
+			if (file.getFileName().toString().startsWith(NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME)) continue;
+			boolean isValidLayout = excelFileDao.verifySpreadSheetLayout(file);
+			if (!isValidLayout) continue;
+			ConvertedSpreadsheet spreadsheet = excelFileDao.loadFrom(file);
+			processor.process(spreadsheet);
+			result.add(spreadsheet);
+		}
+		return result;
+	}
+	
 	public HistoricoAfastamentos loadAfastamentosSpreadsheet(Path filepath) throws IOException {
 		LOGGER.info("Carregando planilha de afastamentos...");
 		if (Files.notExists(filepath)) throw new IllegalArgumentException("Arquivo inexistente!");
