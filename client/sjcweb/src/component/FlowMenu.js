@@ -12,7 +12,7 @@ export default class FlowMenu extends Component {
         
           <div className={step === 0 ? 'box' : 'box inactive'}>
             <div>
-                <i className="fa fa-files-o fa-2x" aria-hidden="true"></i>
+                <i className="fa fa-files-o fa-2x" aria-hidden="true"></i>                
                 <span className="phaseName">Converter Dados</span>
             </div>
             <p>Extrai dados dos arquivos no formato 'pdf' e gera as planilhas de entrada</p>            

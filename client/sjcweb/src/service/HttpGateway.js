@@ -1,7 +1,7 @@
 const hostname = window.location.hostname;
 const port = 8090 || window.location.port;
 
-const URL_BASE = "http://" + hostname + ":" + port + "/sjc/";
+const URL_BASE = "http://" + hostname + ":" + port + "/sjc/v3/";
 
 const URL_UPLOAD_INPUT_FILE = URL_BASE + "upload2";
 const URL_DELETE_AFAST = URL_BASE + "upload/afast";

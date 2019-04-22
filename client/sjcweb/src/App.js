@@ -8,7 +8,8 @@ import Output from './component/steps/Output';
 import { ToastContainer, toast } from 'react-toastify';
 
 import './App.css';
-import './font-awesome-4.7.0/css/font-awesome.min.css';
+import 'font-awesome/css/font-awesome.min.css';
+
 import 'react-toastify/dist/ReactToastify.min.css';
 
 import httpGatewayFunctions from './service/HttpGateway';
