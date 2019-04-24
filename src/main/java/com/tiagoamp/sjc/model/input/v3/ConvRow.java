@@ -44,6 +44,15 @@ public class ConvRow {
 		this.qtdHoraExtra = qtdHoraExtra;
 	}
 	public String getQtdPlantoesExtra() {
+		if (qtdPlantoesExtra == null || qtdPlantoesExtra.isEmpty()) {
+			int qtd = 0;
+			for (int i = 0; i < dtPlantoesExtras.length; i++) {
+				String dtPl = dtPlantoesExtras[i];
+				if (dtPl != null && !dtPl.isEmpty() && dtPl.matches("^\\d+$"))
+					qtd++;
+			}
+			qtdPlantoesExtra = String.valueOf(qtd);
+		}		
 		return qtdPlantoesExtra;
 	}
 	public void setQtdPlantoesExtra(String qtdPlantoesExtra) {
