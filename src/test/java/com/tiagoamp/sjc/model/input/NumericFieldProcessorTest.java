@@ -27,9 +27,9 @@ public class NumericFieldProcessorTest {
 	}
 
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test//(expected=IllegalArgumentException.class)
 	public void testProcess_nullValueArgument_shouldThrowException() {
-		inputFieldProcessor.process(null);
+		assertEquals("0",inputFieldProcessor.process(null));
 	}
 	
 	@Test

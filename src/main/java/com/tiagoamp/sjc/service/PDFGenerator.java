@@ -73,7 +73,7 @@ public class PDFGenerator {
     		table.addCell(filename);
         	
     		Font font = getFont(msg.getType());
-    		String typeText = msg.getType() == MessageType.ALERT ? "ALERTA" : "ERRO";
+    		String typeText = msg.getType() == MessageType.ALERT ? "ALERTA" : (msg.getType() == MessageType.ERROR ? "ERRO" : "INFO");
         	
     		Phrase pMsgType = new Phrase(typeText,font);
         	Phrase pMsgText = new Phrase(msg.getText(), font);
@@ -89,8 +89,10 @@ public class PDFGenerator {
     	font.setSize(14);
     	if (type == MessageType.ALERT) {
     		font.setColor(218, 165, 32);
-    	} else {
+    	} else if (type == MessageType.ERROR) {
     		font.setColor(255, 55, 0);
+    	} else {
+    		font.setColor(65, 105, 225);
     	}
     	return font;
     }

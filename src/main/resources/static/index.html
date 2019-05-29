@@ -3,38 +3,12 @@
 <head>
 
 	<meta charset="UTF-8">
+	<link rel="shortcut icon" type="image/png" href="favicon.ico"/>
 		
 	<title>SJC-Automatizador</title>
 	
-	<link href="css/bootstrap.min.css" rel="stylesheet">
-	<link href="vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-	<link href="vendors/nprogress/nprogress.css" rel="stylesheet">
-	<link href="vendors/dropzone/dist/min/dropzone.min.css" rel="stylesheet">
-	<link href="css/pnotify.custom.min.css" rel="stylesheet">
-		
-	<style>
-		.loader {
-		  border: 16px solid #f3f3f3;
-		  border-radius: 50%;
-		  border-top: 16px solid #3498db;
-		  width: 120px;
-		  height: 120px;
-		  -webkit-animation: spin 2s linear infinite;
-		  animation: spin 2s linear infinite;
-		  margin: auto;
-		}
-		
-		@-webkit-keyframes spin {
-		  0% { -webkit-transform: rotate(0deg); }
-		  100% { -webkit-transform: rotate(360deg); }
-		}
-		
-		@keyframes spin {
-		  0% { transform: rotate(0deg); }
-		  100% { transform: rotate(360deg); }
-		}
-	</style>
-
+	<link href="v2/css/bootstrap.min.css" rel="stylesheet">
+	
 </head>
 <body>
 
@@ -48,99 +22,25 @@
 		  </div><!-- /.navbar-collapse -->
 		</div><!-- /.container-fluid -->
 	</nav>
-
-	<div class="row">
-		<div class="col-xs-10 col-md-offset-1">
-		    <div class="panel panel-primary">
-				<div class="panel-heading text-center">
-			       <h4><strong>Entrada do Processamento</strong></h4>
-				</div>
-				<div class="panel-body">
-					<p>
-						Arraste os arquivos de relatórios e afastamentos para o quadro abaixo ou click para selecioná-los: <br/>
-						<small>* A planilha de Afastamentos deve conter a palavra <i>'afastamento'</i> no nome e ter extensão 'xlsx'.</small>
-					</p>					
-				    <form action="sjc/upload" class="dropzone" id="form-upload-dropzone" method="POST" style="background-color: #e6f9ff">
-												
-					</form>
-					<button type="button" class="btn" id="btn-clean-upload">Limpar uploads</button>										
-					<br />
-					<div class="text-center">
-						<button type="button" class="btn btn-info btn-lg" id="btn-processar" style="width: 300px">Processar</button>						
-					</div>
-				</div>
-			 </div>
-		</div>
-	</div>
-
-	<hr />
-
-	<div class="loader"> </div>
-
-	<br/>
 	
-	<div class="row" id="div-result">
-		<div class="col-xs-10 col-md-offset-1">
-			<div class="panel panel-primary">
-				<div class="panel-heading text-center">
-				   <h4><strong>Resultado</strong></h4>				   
-				</div>
-				<div class="panel-body">
-					<div class="text-center" id="div-result-buttons">
-						<button type="button" class="btn btn-info btn-lg" id="btn-salvar-pdf" style="width: 300px">Salvar Mensagens em PDF</button>
-						&nbsp;&nbsp;&nbsp;
-						<button type="button" class="btn btn-info btn-lg" id="btn-gerar-saida" style="width: 300px">Gerar Planilha de Saída</button>						
-					</div>
-					<hr />
-
-					<div class="alert alert-info text-center">
-						<strong>Mensagens de Informação</strong>
-					</div>
-
-					<div id="div-panel-infos">
-
-						<div class="panel panel-info">
-							<div class="panel-body">
-								<ul class="text-info">
-									<li>Não foi identificada planilha de afastamentos nos arquivos.</li>
-								</ul>
-							</div>
-						</div>							
-						
-					</div>
-
-					<div class="alert alert-danger text-center">
-						<strong>Mensagens de Erro</strong>
-					</div>
-
-					<div id="div-panel-errors">
-						
-					</div>
-
-					<div class="alert alert-warning text-center">
-						<strong>Mensagens de Alerta</strong>
-					</div>
-					<div id="div-panel-warnings">
-						
-					</div>
-
-				</div>
-			</div>
-		</div>
-	</div>	
-
+	<main class="container">
+	
+		<p>Escolha a versão do sistema:</p>
+	
+		<ul>
+			<li>SJC v1 (versão desktop - descontinuada)</li>
+			<li><a href="v2/sjc.html">SJC v2 (versão 2)</a></li>
+			<li><a href="v3/sjc.html">SJC v3 (versão 3)</a></li>
+		</ul>
+	
+	</main>
+	
 	<footer>
-		<p class="text-right text-muted"><small>SJC-Automtizador | by @tiagoamp | v.2.1.0 | 2017-2018 &nbsp;&nbsp;&nbsp;</small></p>		
+		<p class="text-right text-muted"><small>SJC-Automtizador | by @tiagoamp | 2017-2019 &nbsp;&nbsp;&nbsp;</small></p>		
 	</footer>
 
-<script src="js/jquery-3.2.1.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/download.js"></script>
-<script src="vendors/fastclick/lib/fastclick.js"></script>
-<script src="vendors/nprogress/nprogress.js"></script>
-<script src="vendors/dropzone/dist/min/dropzone.min.js"></script>
-<script src="js/pnotify.custom.min.js"></script>
-<script src="js/sjc.js"></script>
+<script src="v2/js/jquery-3.2.1.min.js"></script>
+<script src="v2/js/bootstrap.min.js"></script>
 
 </body>
 </html>

@@ -12,8 +12,7 @@ public class OutRow {
 	private boolean duplicates;
 	
 	
-	public OutRow() {		
-	}
+	public OutRow() { }
 	
 	public OutRow(String lotacao, String nome, String matricula) {
 		this.lotacao = lotacao;

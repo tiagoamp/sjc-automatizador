@@ -1,0 +1,73 @@
+.entrada-body {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    background-color: white;
+    color: #73879C;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.dropzone-div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: aliceblue;
+    margin: 10px;
+    padding: 15px;
+    border: 1px solid #73879C;
+    border-radius: 5px;
+}
+
+.dropzone-div p {
+    font-size: 0.9rem;
+    text-align: center;
+    font-style: italic;
+}
+
+.dropzone-div:hover {
+    border: 3px solid #73879C;
+}
+
+.dropzone-div .arquivos {
+    font-size: 0.8rem;
+}
+
+.dropzone-div .arquivos span {
+    color: darkcyan;
+}
+
+button {
+    background-color: white;
+    color: #73879C;
+    font-weight: bold;
+    font-size: 1rem;
+    width: 200px;
+    margin: 25px 10px;
+    padding: 15px;
+}
+
+button:hover {
+    color: white;
+    background-color: #73879C;
+}
+
+button i {
+    margin: 0px 5px;
+}
+
+.result-input {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    background-color: white;
+    color: #73879C;
+    align-items: center;
+    justify-content: space-around;    
+}
+
+.buttons-group {
+    display: flex;
+}

@@ -71,8 +71,21 @@
 		    <artifactId>itextpdf</artifactId>
 		    <version>5.5.10</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>org.eadge</groupId>
+		    <artifactId>extractpdfexcel</artifactId>
+		    <version>0.1</version>
+		</dependency>
 
 	</dependencies>
+
+	<repositories>
+		<repository>
+		    <id>Extract-PDF-Excel</id>
+		    <url>https://raw.githubusercontent.com/eadgyo/Extract-PDF-Excel/master/</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>

@@ -16,6 +16,9 @@ import com.tiagoamp.sjc.model.input.HistoricoAfastamentos;
 import com.tiagoamp.sjc.model.input.InRow;
 import com.tiagoamp.sjc.model.input.InSheet;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
+import com.tiagoamp.sjc.model.input.v3.ConvRow;
+import com.tiagoamp.sjc.model.input.v3.ConvertedSheet;
+import com.tiagoamp.sjc.model.input.v3.ConvertedSpreadsheet;
 
 public class OutputExcelSpreadsheet {
 	
@@ -37,7 +40,12 @@ public class OutputExcelSpreadsheet {
 		return spreadsheet;
 	}
 	
-		
+	public OutputSpreadsheet loadDataFromConvertedSpreadsheets(List<ConvertedSpreadsheet> convSpreadsheets, HistoricoAfastamentos afastamentos) {
+		convSpreadsheets.forEach(convSpreadsheet -> loadDataFromConvertedInputSpreadsheet(convSpreadsheet, afastamentos)); 
+		return spreadsheet;
+	}
+	
+	@Deprecated	
 	private void loadDataFromInputSpreadsheet(InputSpreadsheet inputSpreadsheet, HistoricoAfastamentos afastamentos) {
 		if (inputSpreadsheet.getSheets().isEmpty()) return;
 		
@@ -61,6 +69,26 @@ public class OutputExcelSpreadsheet {
 		}
 	}
 	
+	private void loadDataFromConvertedInputSpreadsheet(ConvertedSpreadsheet convSpreadsheet, HistoricoAfastamentos afastamentos) {
+		if (convSpreadsheet.getConvertedSheets().isEmpty()) return;		
+		for (SjcSpecificCode code : SjcSpecificCode.values()) {
+			OutSheet outSheet = new OutSheet(code);			
+			Optional<ConvertedSheet> optInSheet = Optional.ofNullable(convSpreadsheet.getConvertedSheets().get(code.getGenericCode()));
+			if (optInSheet.isPresent() && optInSheet.get().getRows().size() != 0) {
+				ConvertedSheet cnvSheet = optInSheet.get();				
+				List<OutRow> outRows = cnvSheet.getRows().stream()
+					.map(inrow -> fillOutputRow(inrow, convSpreadsheet.getHeader().getNomeUnidadePrisional(), code))
+					.filter(outrow -> outrow.getQuantidade() != 0)
+					.collect(Collectors.toList());
+				if (code == SjcSpecificCode.OPERACIONAL_PLANTOESEXTRA) {
+					outRows = outRows.stream().map(outrow -> this.fillAfastamentos(outrow, afastamentos)).collect(Collectors.toList());
+				}
+				outSheet.getRows().addAll(outRows);
+			}
+			this.updateOutputRows(outSheet);
+		}
+	}
+	
 	private OutRow fillOutputRow(InRow inRow, String lotacao, SjcSpecificCode code) {
 		OutRow outRow = new OutRow(lotacao, inRow.getNome(), inRow.getMatricula());
 		if (code.getType() == SjcItemType.HORA_EXTRA) {
@@ -70,6 +98,19 @@ public class OutputExcelSpreadsheet {
 		} else if (code.getType() == SjcItemType.PLANTAO_EXTRA) {
 			outRow.setQuantidade(inRow.getQtdPlantoesExtra());
 			outRow.setDtPlantoesExtras(inRow.getDtPlantoesExtras());
+		}
+		return outRow;
+	}
+	
+	private OutRow fillOutputRow(ConvRow cnvRow, String nomeUnidade, SjcSpecificCode code) {
+		OutRow outRow = new OutRow(nomeUnidade, cnvRow.getNome(), cnvRow.getMatricula());
+		if (code.getType() == SjcItemType.HORA_EXTRA) {
+			outRow.setQuantidade(Integer.valueOf(cnvRow.getQtdHoraExtra()));
+		} else if (code.getType() == SjcItemType.ADICIONAL_NOTURNO) {
+			outRow.setQuantidade(Integer.valueOf(cnvRow.getQtdAdicionalNoturno()));
+		} else if (code.getType() == SjcItemType.PLANTAO_EXTRA) {
+			outRow.setQuantidade(Integer.valueOf(cnvRow.getQtdPlantoesExtra()));
+			outRow.setDtPlantoesExtras(cnvRow.getDtPlantoesExtras());
 		}
 		return outRow;
 	}
@@ -102,12 +143,16 @@ public class OutputExcelSpreadsheet {
 			try {
 				final LocalDate plantaoDate = LocalDate.of(Integer.parseInt(splitDateArr[2]), Integer.parseInt(splitDateArr[1]), Integer.parseInt(splitDateArr[0]));
 				long countOfAfastConflicts = afastamentosFromThisMatricula.stream()
-						.filter(afastRow -> (plantaoDate.isAfter(afastRow.getDataInicial())	|| plantaoDate.isEqual(afastRow.getDataInicial()))
-								         && (plantaoDate.isBefore(afastRow.getDataFinal()) || plantaoDate.isEqual(afastRow.getDataFinal())))
+						.filter(afastRow -> 
+									(plantaoDate.isAfter(afastRow.getDataInicial())	|| plantaoDate.isEqual(afastRow.getDataInicial()))
+								 && (plantaoDate.isBefore(afastRow.getDataFinal()) || plantaoDate.isEqual(afastRow.getDataFinal())))
 						.count();
 				
-				if (countOfAfastConflicts == 0) outRow.getDtPlantoesWithinAfastamentos()[i] = false;
-				else outRow.getDtPlantoesWithinAfastamentos()[i] = true;
+				if (countOfAfastConflicts == 0) {
+					outRow.getDtPlantoesWithinAfastamentos()[i] = false;
+				} else {
+					outRow.getDtPlantoesWithinAfastamentos()[i] = true;
+				}
 
 			} catch (Exception e) {
 				LOGGER.debug("Padrão de data não reconhecido: " + dateStr);
