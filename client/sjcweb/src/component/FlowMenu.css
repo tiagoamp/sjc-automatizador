@@ -1,0 +1,39 @@
+nav {
+    display: flex;
+    margin: 10px;
+    align-items: center;
+    justify-content: space-around;
+    border: 2px solid white;    
+}
+
+.box {
+    color: #73879C;
+    border: 1px solid #73879C;
+    background-color: white;
+    margin: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 20%;
+    border-radius: 5px;
+}
+
+.box .phaseName {
+    font-weight: bold;
+    margin: 0px 10px;
+}
+
+.box p {
+    margin: 10px;
+    font-size: 0.8rem;    
+}
+
+.fa-angle-double-right {
+    color: #73879C;
+}
+
+.inactive {
+    opacity: 0.5;
+    -moz-opacity:0.5;
+    -webkit-opacity:0.5;
+}

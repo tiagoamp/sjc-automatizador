@@ -7,7 +7,7 @@ public class InRow {
 	private Integer qtdHoraExtra;
 	private Integer qtdAdicionalNoturno;
 	private Integer qtdPlantoesExtra;
-	private String[] dtPlantoesExtras = new String[5];
+	private String[] dtPlantoesExtras = new String[5];  
 	
 	
 	@Override

@@ -1,55 +1,40 @@
 package com.tiagoamp.sjc;
 
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.naming.ConfigurationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.tiagoamp.sjc.model.ExpirationManager;
-import com.tiagoamp.sjc.service.UploadService;
+import com.tiagoamp.sjc.service.FilesService;
 
 @SpringBootApplication
 public class SjcAutoApplication {
-
-	public static Path BASE_DIR = null;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(SjcAutoApplication.class);	
+	
+	public static Path BASE_DIR;
+	public static Path CONFIG_FILE;
+	public static Path DIR_ENTRADA;
+	public static Path DIR_SAIDA;
+	private static FilesService filesService;
 	
 	
 	public static void main(String[] args) {
-		
-		String userDirectory = System.getProperty("user.dir");
-		BASE_DIR = Paths.get(userDirectory);
-				
-		ExpirationManager config = new ExpirationManager();		
 		try {
-			boolean isValid = config.checkExpiration();
-			if (!isValid) {
-				System.out.println(" ==================================================== ");
-				System.out.println("             !!! SISTEMA EXPIRADO !!!");
-				System.out.println(" ==================================================== ");
-				System.out.println("   Entre em contato com o administrador do sistema. ");
-				System.out.println(" ==================================================== ");
-				System.exit(1);
-			}
-			System.out.println("Configuration ok!");
 			
-			createMissingDirectories(BASE_DIR.resolve("upload/"), BASE_DIR.resolve("resultado/"));
+			initializeWorkingDirectories();
+			doExpirationValidation();
+			filesService.createDirectories(DIR_ENTRADA, DIR_SAIDA);
+			filesService.cleanDirectories(DIR_ENTRADA, DIR_SAIDA);
 			
-			UploadService uploadService = new UploadService();
-			uploadService.cleanDirectory(BASE_DIR.resolve("upload/"));
-			
-		} catch (ConfigurationException e) {			
-			System.out.println(" =========================================== ");
-			System.out.println(" !!! Arquivo de configuração corrompido !!!");
-			System.out.println(" =========================================== ");
-			System.exit(1);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("Erro ao acessar diretórios ('uploads' e/ou 'resultados') !!!");
+		} catch (Exception e) {
 			System.exit(1);
 		}
 		
@@ -57,16 +42,41 @@ public class SjcAutoApplication {
 		SpringApplication.run(SjcAutoApplication.class, args);	
 		
 		System.out.println("---");
-		System.out.println("*** System deployed ==> http://localhost:8090/");
+		System.out.println("*** System deployed! URL ==> http://localhost:8090/");
+		System.out.println("---");
 	}
 	
 	
-	private static void createMissingDirectories(Path... paths) throws IOException {
-		for (int i = 0; i < paths.length; i++) {
-			if (Files.notExists(paths[i])) {
-				Files.createDirectories(paths[i]);
+	private static void initializeWorkingDirectories() {
+		String userDirectory = System.getProperty("user.dir");
+		BASE_DIR = Paths.get(userDirectory);
+		CONFIG_FILE = BASE_DIR.resolve("resources" + File.separator + "conf.dat");
+		DIR_ENTRADA = BASE_DIR.resolve("ENTRADA/");
+		DIR_SAIDA = BASE_DIR.resolve("SAIDA/");
+		filesService = new FilesService();
+	}
+	
+	private static void doExpirationValidation() throws Exception {
+		ExpirationManager expirationManager = new ExpirationManager();		
+		try {
+			Integer expirationValue = expirationManager.loadValueFromConfigFile(CONFIG_FILE);
+			boolean isValid = expirationManager.checkExpiration(expirationValue);
+			
+			if (!isValid) {
+				expirationManager.printExpiredMessage();
+				Thread.sleep(3 * 1000);
+				System.out.println("Encerrado!");
+				System.exit(1);
 			}
-		}		
+			expirationManager.printValidMessage();
+						
+		} catch (ConfigurationException e) {			
+			LOGGER.error("Application config error", e);
+			expirationManager.printConfigFileErrorMessage();
+			Thread.sleep(3 * 1000);
+			System.out.println("Encerrado!");
+			throw new Exception(e);
+		}
 	}
 	 
 }

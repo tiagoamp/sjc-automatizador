@@ -24,4 +24,15 @@ public abstract class InputLayoutConstants {
 	public static final String CELL_ADDRESS_ANO_OPERACIONAL = "K3";
 	public static final String CELL_ADDRESS_ANO_ADMISTRATIVO = "J3";
 	
+	
+	public static final int INDEX_DATA_AFAST_INIT_ROW = 8; // index starts at 0	
+	
+	public static final int INDEX_COLUMN_AFAST_DATA_INICIAL = 0;
+	public static final int INDEX_COLUMN_AFAST_DATA_FINAL = 1;
+	public static final int INDEX_COLUMN_AFAST_DATA_RETORNO = 2;
+	public static final int INDEX_COLUMN_AFAST_PERIODO = 4;
+	public static final int INDEX_COLUMN_AFAST_MATRICULA = 5;
+	public static final int INDEX_COLUMN_AFAST_NOME = 7;
+	public static final int INDEX_COLUMN_AFAST_MOTIVO = 10;
+	public static final int INDEX_COLUMN_AFAST_TIPO = 11;
 }
