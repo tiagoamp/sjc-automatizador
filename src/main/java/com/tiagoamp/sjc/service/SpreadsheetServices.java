@@ -1,6 +1,7 @@
 package com.tiagoamp.sjc.service;
 
-import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.*;
+import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.AFASTAMENTO_IDENTIFIED_FILE_NAME;
+import static com.tiagoamp.sjc.model.input.AfastamentosExcelSpreadsheet.NEW_AFASTAMENTO_IDENTIFIED_FILE_NAME;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,7 +28,6 @@ import com.tiagoamp.sjc.model.input.HistoricoAfastamentos;
 import com.tiagoamp.sjc.model.input.InputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.input.v3.ConvertedSpreadsheet;
-import com.tiagoamp.sjc.model.input.v3.InputConverter;
 import com.tiagoamp.sjc.model.input.v3.InputConverterNew;
 import com.tiagoamp.sjc.model.input.v3.InputSpreadSheetProcessor;
 import com.tiagoamp.sjc.model.input.v3.to.ConvertedFileTO;
