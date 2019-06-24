@@ -118,7 +118,7 @@ public class InputConverterNew {
 					List<String> values = loadDataFromColumn(col, arr, indexes.getDataIndexes());
 					for (int i = 0; i < rows.size(); i++) rows.get(i).setQtdHoraExtra( values.get(i) );
 					break;
-				} else if (text.toUpperCase().startsWith("ADICIONAL NOTURNO")) {
+				} else if (text.toUpperCase().matches("ADICIONAL( NOTURNO)*")) {
 					List<String> values = loadDataFromColumn(col, arr, indexes.getDataIndexes());
 					for (int i = 0; i < rows.size(); i++) rows.get(i).setQtdAdicionalNoturno( values.get(i) );
 					break;
@@ -161,18 +161,22 @@ public class InputConverterNew {
 		List<Integer> indexes = new ArrayList<>();
 		
 		while (hasMatriculaToScan) {
-			Block nextBlock = arr.get(col, ++currLine);
-			if (nextBlock != null) {
-				possibleMatricula = nextBlock.getOriginalText();
-				foundValidMatricula = isValidMatricula(possibleMatricula);
-				if (servidoresInitIndex == null && foundValidMatricula) servidoresInitIndex = currLine;
-				servidoresEndIndex = servidoresInitIndex != null ? (servidoresInitIndex + qtMatr) : null;
-				if (foundValidMatricula) {
-					qtMatr++;
-					indexes.add(currLine);
+			try {
+				Block nextBlock = arr.get(col, ++currLine);
+				if (nextBlock != null) {
+					possibleMatricula = nextBlock.getOriginalText();
+					foundValidMatricula = isValidMatricula(possibleMatricula);
+					if (servidoresInitIndex == null && foundValidMatricula) servidoresInitIndex = currLine;
+					servidoresEndIndex = servidoresInitIndex != null ? (servidoresInitIndex + qtMatr) : null;
+					if (foundValidMatricula) {
+						qtMatr++;
+						indexes.add(currLine);
+					}
 				}
-			}
-			hasMatriculaToScan = (currLine+1) < nrOfLines && !isStringOfEndOfFile(possibleMatricula);
+				hasMatriculaToScan = (currLine+1) < nrOfLines && !isStringOfEndOfFile(possibleMatricula);
+			} catch (IndexOutOfBoundsException e) {
+				break;
+			}			
 		}
 		
 		IndexesPairTO pairTO = new IndexesPairTO(servidoresInitIndex, servidoresEndIndex, indexes);
@@ -212,7 +216,7 @@ public class InputConverterNew {
 	}
 	
 	private ConvertedSheet groupSheetPagesFor(SjcGeneralCode code, List<ConvertedSheet> convertedPages) {
-		List<ConvertedSheet> convSheets = convertedPages.stream().filter(c -> c.getCode() == code).collect(Collectors.toList());
+		List<ConvertedSheet> convSheets = convertedPages.stream().filter(c -> c != null && c.getCode() == code).collect(Collectors.toList());
 		if (convSheets == null) return null;
 		
 		List<ConvRow> rows = new ArrayList<>();

@@ -145,11 +145,13 @@ public class ExcelFileDao {
 		}		
 		for (ConvRow row : cnvSheet.getRows()) {
 			if (code == SjcGeneralCode.ADMINISTRATIVO) {
-				data.put(++counter, new String[] {row.getMatricula(), row.getNome().toUpperCase(), row.getQtdHoraExtra(), row.getQtdAdicionalNoturno()});								
+				data.put(++counter, new String[] {row.getMatricula(), row.getNome() != null ? row.getNome().toUpperCase(): "nome não identificado",
+						row.getQtdHoraExtra(), row.getQtdAdicionalNoturno()});								
 			} else {
-				data.put(++counter, new String[] {row.getMatricula(), row.getNome().toUpperCase(), row.getQtdHoraExtra(), row.getQtdAdicionalNoturno(), 
-					    row.getDtPlantoesExtras()[0], row.getDtPlantoesExtras()[1], row.getDtPlantoesExtras()[2], row.getDtPlantoesExtras()[3], row.getDtPlantoesExtras()[4], 
-					    row.getQtdPlantoesExtra()});	
+				data.put(++counter, new String[] {row.getMatricula(), row.getNome() != null ? row.getNome().toUpperCase(): "nome não identificado", 
+						row.getQtdHoraExtra(), row.getQtdAdicionalNoturno(), 
+						row.getDtPlantoesExtras()[0], row.getDtPlantoesExtras()[1], row.getDtPlantoesExtras()[2], row.getDtPlantoesExtras()[3], row.getDtPlantoesExtras()[4], 
+					    row.getQtdPlantoesExtra()});
 			}			
     	}
 		return data;
