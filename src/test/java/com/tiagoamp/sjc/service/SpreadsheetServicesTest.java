@@ -58,23 +58,22 @@ public class SpreadsheetServicesTest {
 		assertNotNull("Must generate the 'afastamentos' spreadsheet.", result);
 	}
 
-	@Test
-	public void testGenerateOutputSpreadSheet_shouldGenerateValidOutput() throws IOException {
-		List<InputSpreadsheet> inputlist = service.loadInputSpreadsheetsFromDirectory(inputDir);
-		OutputSpreadsheet result = service.generateOutputSpreadSheet(inputlist, null);
-		assertNotNull("Must generate output spreadsheet.", result);		
-	}
-
-	@Test
-	public void testGenerateOuputSpreadsheetFile_shouldGenerateValidOutput() throws IOException {
-		// given
-		List<InputSpreadsheet> inputlist = service.loadInputSpreadsheetsFromDirectory(inputDir);
-		OutputSpreadsheet outspreadsheet = service.generateOutputSpreadSheet(inputlist, null);
-		Path outputfile = outputDir.resolve("testOutFromFacadeTest.xlsx");		
-		// when
-		service.generateOuputSpreadsheetFile(outputfile, outspreadsheet);		
-		//then
-		assertTrue("Must generate output spreadsheet file.", Files.exists(outputfile));
-	}
+	/*
+	 * @Test public void testGenerateOutputSpreadSheet_shouldGenerateValidOutput()
+	 * throws IOException { List<InputSpreadsheet> inputlist =
+	 * service.loadInputSpreadsheetsFromDirectory(inputDir); OutputSpreadsheet
+	 * result = service.generateOutputSpreadSheet(inputlist, null);
+	 * assertNotNull("Must generate output spreadsheet.", result); }
+	 * 
+	 * @Test public void
+	 * testGenerateOuputSpreadsheetFile_shouldGenerateValidOutput() throws
+	 * IOException { // given List<InputSpreadsheet> inputlist =
+	 * service.loadInputSpreadsheetsFromDirectory(inputDir); OutputSpreadsheet
+	 * outspreadsheet = service.generateOutputSpreadSheet(inputlist, null); Path
+	 * outputfile = outputDir.resolve("testOutFromFacadeTest.xlsx"); // when
+	 * service.generateOuputSpreadsheetFile(outputfile, outspreadsheet); //then
+	 * assertTrue("Must generate output spreadsheet file.",
+	 * Files.exists(outputfile)); }
+	 */
 	
 }
