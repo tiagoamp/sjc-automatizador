@@ -31,6 +31,7 @@ export default class Converter extends Component {
         <div>
           <button onClick={resetFiles}><i className="fa fa-trash-o fa-1x" aria-hidden="true"></i>LIMPAR</button>
           <button onClick={convertInputFiles}><i className="fa fa-file-pdf-o fa-1x" aria-hidden="true"></i>CONVERTER</button>
+          <button onClick={nextStep}>AVANÇAR<i className="fa fa-angle-double-right fa-1x" aria-hidden="true"></i></button>
         </div>
      
       </div>
