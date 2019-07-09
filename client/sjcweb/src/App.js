@@ -130,16 +130,24 @@ class App extends Component {
       toast('Nenhum arquivo feito upload!', { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }); 
       return;
     }
+    toast('Aguarde o processamento...', { type: toast.TYPE.INFO, autoClose: true, closeButton: false });
     httpGatewayFunctions.convertInputFiles()
       .then(res => res.json())
-      .then(res => this.setState( { convertedFiles: res } ))
+      .then(res => {
+        toast('Arquivos convertidos!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false });
+        this.setState( { convertedFiles: res } )
+       })
       .catch(err => toast('Erro ao converter arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
   }
 
   processInputFiles = () => {
+    toast('Aguarde o processamento...', { type: toast.TYPE.INFO, autoClose: true, closeButton: false });    
     httpGatewayFunctions.processInputFiles()
       .then(res => res.json())
-      .then(res => this.setState( { processedFiles: res } ))
+      .then(res => {
+        toast('Arquivos processados!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false });
+        this.setState( { processedFiles: res } )
+       })
       .catch(err => toast('Erro ao processar arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
   }
 
@@ -151,6 +159,7 @@ class App extends Component {
   }
 
   downloadMessagesFile = () => {
+    toast('Aguarde o processamento...', { type: toast.TYPE.INFO, autoClose: true, closeButton: false });
     httpGatewayFunctions.downloadMessagesFile()
       .then(res => res.blob())
       .then(blob => {
@@ -164,6 +173,7 @@ class App extends Component {
   }
 
   downloadOutputFile = () => {
+    toast('Aguarde o processamento...', { type: toast.TYPE.INFO, autoClose: true, closeButton: false });
     httpGatewayFunctions.downloadOutputFile()
       .then(res => res.blob())
       .then(blob => {
@@ -171,7 +181,7 @@ class App extends Component {
           let a = document.createElement('a');
           a.href = url;
           a.download = 'saida.xls';
-          a.click();          
+          a.click();                    
       })
       .catch(err => toast('Erro ao baixar arquivo: ' + err.message, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
   }

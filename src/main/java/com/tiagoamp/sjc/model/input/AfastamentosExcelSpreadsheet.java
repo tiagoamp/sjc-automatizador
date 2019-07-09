@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Iterator;
 
 import org.apache.commons.lang.StringUtils;
@@ -74,12 +75,10 @@ public class AfastamentosExcelSpreadsheet {
 		return afastamentos;		
 	}
 	
-	
 	private AfastamentoSheet loadSheetDataFrom(XSSFSheet excelsheet) {
 		AfastamentoSheet sheet = new AfastamentoSheet();
 		DataFormatter df = new DataFormatter();
         Boolean endOfData = false;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         
 		Iterator<Row> rowItr = excelsheet.iterator();
         if (!rowItr.hasNext()) return sheet;
@@ -101,20 +100,20 @@ public class AfastamentosExcelSpreadsheet {
                 		endOfData = true;
                 		break;
                 	}
-                	
-                	LocalDate date = formatter.parse(getDateSubstrFrom(value), LocalDate::from); 	
+                	                	
+                	LocalDate date = parseFromString(value);
                 	afastRow.setDataInicial(date);                	
                 } else if (cell.getColumnIndex() == INDEX_COLUMN_AFAST_DATA_FINAL) {
                 	String value = df.formatCellValue(cell);
                 	if (StringUtils.isNotEmpty(value)) {
-                		LocalDate date = formatter.parse(getDateSubstrFrom(value), LocalDate::from); 	
+                		LocalDate date = parseFromString(value);
                     	afastRow.setDataFinal(date);
                 	}                	                	
                 } else if (cell.getColumnIndex() == INDEX_COLUMN_AFAST_DATA_RETORNO) {
                 	String value = df.formatCellValue(cell); 
                 	if (StringUtils.isNotEmpty(value)) {
-                		LocalDate date = formatter.parse(getDateSubstrFrom(value), LocalDate::from); 	
-                    	afastRow.setDataPrevistaRetorno(date);
+                		LocalDate date = parseFromString(value);
+                		afastRow.setDataPrevistaRetorno(date);
                 	}                	              	
                 } else if (cell.getColumnIndex() == INDEX_COLUMN_AFAST_PERIODO) {
                 	String value = df.formatCellValue(cell);  
@@ -144,6 +143,29 @@ public class AfastamentosExcelSpreadsheet {
         return sheet;		
 	}
 
+	private LocalDate parseFromString(String value) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter_eng = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        DateTimeFormatter formatter_eng_short = DateTimeFormatter.ofPattern("M/dd/yy");
+        DateTimeFormatter formatter_eng_short2 = DateTimeFormatter.ofPattern("M/d/yy");
+        
+		LocalDate date = null;
+    	String valStr = getDateSubstrFrom(value);
+    	try {
+    		date = formatter.parse(valStr, LocalDate::from);
+    	} catch (DateTimeParseException e) {
+    		try {  // try american format
+    			date = formatter_eng.parse(getDateSubstrFrom(valStr), LocalDate::from);
+    		} catch (DateTimeParseException e2) {
+    			try {
+    				date = formatter_eng_short.parse(getDateSubstrFrom(valStr), LocalDate::from);
+    			} catch (DateTimeParseException e3) {
+    				date = formatter_eng_short2.parse(getDateSubstrFrom(valStr), LocalDate::from);
+    			}
+    		}                		
+    	}
+    	return date;
+	}
 	
 	private Row goToInitialDataRow(Iterator<Row> rowItr) {
 		Row row = rowItr.next();
@@ -158,7 +180,13 @@ public class AfastamentosExcelSpreadsheet {
 	}
 	
 	private String getDateSubstrFrom(String fullDateStr) {
-		return fullDateStr.substring(0, 10);  // cell content format = '31/05/2018 00:00:00
+		String result = "";
+		if (fullDateStr.length() >= 10) {
+			result = fullDateStr.substring(0, 10);  // cell content format = '31/05/2018 00:00:00
+		} else if (fullDateStr.length() < 10) {
+			result = fullDateStr;
+		}
+		return result;
 	}
 
 
