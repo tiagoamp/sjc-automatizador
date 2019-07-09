@@ -70,7 +70,11 @@ public class OutputExcelSpreadsheet {
 	}
 	
 	private void loadDataFromConvertedInputSpreadsheet(ConvertedSpreadsheet convSpreadsheet, HistoricoAfastamentos afastamentos) {
-		if (convSpreadsheet.getConvertedSheets().isEmpty()) return;		
+		if (convSpreadsheet.getConvertedSheets().isEmpty()) return;
+		String nmUnidPrisional = convSpreadsheet.getHeader().getNomeUnidadePrisional();
+		if ( nmUnidPrisional == null || nmUnidPrisional.isEmpty()) {
+			convSpreadsheet.getHeader().setNomeUnidadePrisional("(Não consta na planilha convertida). Arquivo: " + convSpreadsheet.getConvertedFile().getFileName().toString());
+		}
 		for (SjcSpecificCode code : SjcSpecificCode.values()) {
 			OutSheet outSheet = new OutSheet(code);			
 			Optional<ConvertedSheet> optInSheet = Optional.ofNullable(convSpreadsheet.getConvertedSheets().get(code.getGenericCode()));
