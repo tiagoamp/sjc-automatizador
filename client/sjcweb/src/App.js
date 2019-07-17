@@ -5,6 +5,7 @@ import FlowMenu from './component/FlowMenu';
 import Converter from './component/steps/Converter';
 import Processor from './component/steps/Processor';
 import Output from './component/steps/Output';
+import LoaderSpinner from './LoaderSpinner';
 import { ToastContainer, toast } from 'react-toastify';
 
 import './App.css';
@@ -18,7 +19,7 @@ class App extends Component {
 
   constructor() {
     super();
-    this.state = { step: 0, totalInputFiles: 0, uploadedFiles: [], convertedFiles: [], uploadedAfastFile: null, processedFiles: [] };
+    this.state = { step: 0, totalInputFiles: 0, uploadedFiles: [], convertedFiles: [], uploadedAfastFile: null, processedFiles: [], isLoading: false };
   }
 
   getComponentForStep = () => {
@@ -52,7 +53,7 @@ class App extends Component {
 
   nextStep = () => {
     const currStep = this.state.step;
-    this.setState( { step: currStep+1 } );
+    this.setState( { step: currStep+1} );
   }
 
   prevStep = () => {
@@ -77,15 +78,18 @@ class App extends Component {
     }
     if (newFiles.length === 0) return;
 
+    this.setState( { isLoading: true } );
     const promises = newFiles.map(f => httpGatewayFunctions.uploadFileRequest(f));
     Promise.all(promises)
       .then(res => {
+        if (res.status === 500) throw new Error("Falha no processamento no servidor!");
         const updatedFiles = currFiles.concat(newFiles);
         toast('Arquivos carregados!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-        this.setState( {uploadedFiles: updatedFiles, convertedFiles: []} );
+        this.setState( {uploadedFiles: updatedFiles, convertedFiles: [], isLoading: false} );
       })
       .catch(err => {
         toast('Erro ao fazer upload de arquivo: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }); 
+        this.setState( { isLoading: false } );
       });
   }
 
@@ -95,34 +99,51 @@ class App extends Component {
       toast('Extensão do arquivo inválida: ' + file.name, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false });
       return;          
     }
+    this.setState( { isLoading: true } );
     httpGatewayFunctions.deleteAfastamentoRequest()
       .then(res => {
+        if (res.status === 500) throw new Error("Falha no processamento no servidor!");
         file.isAfastamento = true;
-        httpGatewayFunctions.uploadFileRequest(file);
+        return httpGatewayFunctions.uploadFileRequest(file);
         })
       .then(res => {
-            toast('Arquivo carregado!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-            this.setState( { uploadedAfastFile: file, processedFiles: []} );
+        if (res.status === 500) throw new Error("Falha no processamento no servidor!");
+        toast('Arquivo carregado!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
+        this.setState( { uploadedAfastFile: file, processedFiles: [], isLoading: false} );
         })
-      .catch(err => toast('Erro ao fazer upload de arquivo: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+      .catch(err => {
+        toast('Erro ao fazer upload de arquivo: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false });
+        this.setState( { isLoading: false } );
+      });
   }
 
   resetFiles = () => {
+    this.setState( { isLoading: true } );
     httpGatewayFunctions.cleanDirsRequest()
       .then(res => {
+        if (res.status === 500) throw new Error("Falha no processamento no servidor!");
         toast('Arquivos de Entrada apagados!!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-        this.setState( { step: 0, totalInputFiles: 0, uploadedFiles: [], convertedFiles: [], uploadedAfastFile: null, processedFiles: [] } )
+        this.setState( { step: 0, totalInputFiles: 0, uploadedFiles: [], convertedFiles: [], uploadedAfastFile: null, processedFiles: [], isLoading: false } )
       })
-      .catch(err => toast('Erro ao limpar diretórios: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));    
+      .catch(err => { 
+        toast('Erro ao limpar diretórios: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false });
+        this.setState( { isLoading: false } )
+      });    
+      
   }
   
   deleteAfastamentosFile = () => {
+    this.setState( { isLoading: true } );
     httpGatewayFunctions.deleteAfastamentoRequest()
       .then(res => {
+        if (res.status === 500) throw new Error("Falha no processamento no servidor!");
         toast('Arquivos de Afastamento apagado!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false }); 
-        this.setState( { processedFiles: [], uploadedAfastFile: null } )
+        this.setState( { processedFiles: [], uploadedAfastFile: null, isLoading: false } )
       })
-      .catch(err => toast('Erro ao limpar diretórios: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));    
+      .catch(err => { 
+        toast('Erro ao limpar diretórios: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false })
+        this.setState( { isLoading: false } );
+      });    
   }
 
   convertInputFiles = () => {
@@ -131,59 +152,95 @@ class App extends Component {
       return;
     }
     toast('Aguarde o processamento...', { type: toast.TYPE.INFO, autoClose: true, closeButton: false });
+    this.setState( { isLoading: true } );
     httpGatewayFunctions.convertInputFiles()
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 500) throw new Error("Falha no processamento no servidor!");
+        return res.json();
+      })
       .then(res => {
         toast('Arquivos convertidos!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false });
-        this.setState( { convertedFiles: res } )
+        this.setState( { convertedFiles: res, isLoading: false } )
        })
-      .catch(err => toast('Erro ao converter arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+      .catch(err => {
+        toast('Erro ao converter arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false });
+        this.setState( { isLoading: false } );
+      });
   }
 
   processInputFiles = () => {
     toast('Aguarde o processamento...', { type: toast.TYPE.INFO, autoClose: true, closeButton: false });    
+    this.setState( { isLoading: true } );
     httpGatewayFunctions.processInputFiles()
-      .then(res => res.json())
+      .then(res => { 
+        if (res.status === 500) throw new Error("Falha no processamento no servidor!");
+        return res.json();
+      })
       .then(res => {
         toast('Arquivos processados!', { type: toast.TYPE.SUCCESS, autoClose: true, closeButton: false });
-        this.setState( { processedFiles: res } )
+        this.setState( { processedFiles: res, isLoading: false } )
        })
-      .catch(err => toast('Erro ao processar arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+      .catch(err => {
+        toast('Erro ao processar arquivos: ' + err, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false });
+        this.setState( { isLoading: false } );
+      });
   }
 
   getTotalInputFiles = () => {
     httpGatewayFunctions.totalConvertInputFiles()
-      .then(res => res.json())
-      .then(res => this.setState( { totalInputFiles: res } ))
-      .catch(err => toast('Erro ao processar arquivos: ' + err.message, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+      .then(res => { 
+        if (res.status === 500) throw new Error("Falha no processamento no servidor!");
+        return res.json();        
+      })
+      .then(res => this.setState( { totalInputFiles: res, isLoading: false } ))
+      .catch(err => { 
+        toast('Erro ao processar arquivos: ' + err.message, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false });
+        this.setState( { isLoading: false } );
+    });
   }
 
   downloadMessagesFile = () => {
     toast('Aguarde o processamento...', { type: toast.TYPE.INFO, autoClose: true, closeButton: false });
+    this.setState( { isLoading: true } );
     httpGatewayFunctions.downloadMessagesFile()
-      .then(res => res.blob())
+      .then(res => {
+        if (res.status === 500) throw new Error("Falha no processamento no servidor!");
+        return res.blob();
+      })
       .then(blob => {
           let url = window.URL.createObjectURL(blob);
           let a = document.createElement('a');
           a.href = url;
           a.download = 'mensagens.pdf';
-          a.click();          
+          a.click();
+          this.setState( { isLoading: false } );
       })
-      .catch(err => toast('Erro ao baixar arquivo: ' + err.message, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+      .catch(err => {
+        toast('Erro ao baixar arquivo: ' + err.message, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false });
+        this.setState( { isLoading: false } );
+      });
   }
 
   downloadOutputFile = () => {
     toast('Aguarde o processamento...', { type: toast.TYPE.INFO, autoClose: true, closeButton: false });
+    this.setState( { isLoading: true } );
     httpGatewayFunctions.downloadOutputFile()
-      .then(res => res.blob())
+      .then(res => { 
+        if (res.status === 500) throw new Error("Falha no processamento no servidor!");
+        return res.blob();
+      })
       .then(blob => {
           let url = window.URL.createObjectURL(blob);
           let a = document.createElement('a');
           a.href = url;
           a.download = 'saida.xls';
-          a.click();                    
+          a.click();               
+          this.setState( { isLoading: false } );     
       })
-      .catch(err => toast('Erro ao baixar arquivo: ' + err.message, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false }));
+      .catch(err => { 
+        toast('Erro ao baixar arquivo: ' + err.message, { type: toast.TYPE.ERROR, autoClose: true, closeButton: false });
+        this.setState( { isLoading: false } );
+      });
   }
 
 
@@ -202,9 +259,9 @@ class App extends Component {
         <ToastContainer autoClose={5000} />
                
         <main>
-          {
-            this.getComponentForStep()
-          }
+
+          { this.state.isLoading ? (<LoaderSpinner />) : this.getComponentForStep() }
+
         </main>
 
         <Footer />
