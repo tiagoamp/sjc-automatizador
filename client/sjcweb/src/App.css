@@ -2,3 +2,13 @@
   background-color: #F5F5F5;
   min-height: 100vh;
 }
+
+.spinner {
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  background-color: white;
+  color: #73879C;
+  align-items: center;
+  justify-content: space-around;
+}
