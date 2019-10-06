@@ -28,7 +28,8 @@ import com.tiagoamp.sjc.model.input.HistoricoAfastamentos;
 import com.tiagoamp.sjc.model.input.InputExcelSpreadsheet;
 import com.tiagoamp.sjc.model.input.InputSpreadsheet;
 import com.tiagoamp.sjc.model.input.v3.ConvertedSpreadsheet;
-import com.tiagoamp.sjc.model.input.v3.InputConverterNew;
+import com.tiagoamp.sjc.model.input.v3.IInputConverter;
+import com.tiagoamp.sjc.model.input.v3.InputConverterEadgyoLib;
 import com.tiagoamp.sjc.model.input.v3.InputSpreadSheetProcessor;
 import com.tiagoamp.sjc.model.input.v3.to.ConvertedFileTO;
 import com.tiagoamp.sjc.model.input.v3.to.ProcessedFileTO;
@@ -55,7 +56,7 @@ public class SpreadsheetServices {
 			String filename = file.getFileName().toString();
 			if (!filename.toUpperCase().endsWith("PDF")) continue;
 			//InputConverter converter = new InputConverter(file);
-			InputConverterNew converter = new InputConverterNew(file);
+			IInputConverter converter = new InputConverterEadgyoLib(file);
 			ConvertedSpreadsheet convertedSpreadsheet = converter.convert();				
 			String convFileName = convertedSpreadsheet.getOriginalFile().getFileName().toString().replaceAll("(.PDF|.pdf)$", ".xlsx");
 			Path convSpreadsheetFile = excelFileDao.createConvertedSpreadsheet(convertedSpreadsheet, convFileName);

@@ -11,6 +11,8 @@ public class ConvRow {
 	private String qtdPlantoesExtra;
 	private String[] dtPlantoesExtras = new String[5];  
 	
+	private boolean checkInfo = false;
+	
 	
 	@Override
 	public String toString() {
@@ -63,6 +65,12 @@ public class ConvRow {
 	}
 	public void setDtPlantoesExtras(String[] dtPlantoesExtras) {
 		this.dtPlantoesExtras = dtPlantoesExtras;
+	}
+	public void setCheckInfo(boolean checkInfo) {
+		this.checkInfo = checkInfo;
+	}
+	public boolean shouldCkeckInfo() {
+		return this.checkInfo;
 	}
 	
 }

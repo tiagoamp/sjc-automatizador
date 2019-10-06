@@ -26,14 +26,14 @@ import com.tiagoamp.sjc.model.SjcGeneralCode;
 import com.tiagoamp.sjc.model.fieldprocessor.MonthConverter;
 import com.tiagoamp.sjc.model.input.v3.to.IndexesPairTO;
 
-public class InputConverterNew {
+public class InputConverterEadgyoLib implements IInputConverter {
 	
 	private Path file;
 	
 	private final String AUTHENTICATION_TEXT_START = "PARA VERIFICAR A AUTENTICIDADE";
 	
 	
-	public InputConverterNew(Path file) {
+	public InputConverterEadgyoLib(Path file) {
 		this.file = file;
 	}
 	
@@ -85,6 +85,8 @@ public class InputConverterNew {
 					if (indexes.getDataIndexes().isEmpty()) return null;  // no 'matriculas' found!!!
 					List<String> matriculas = loadDataFromColumn(col, arr, indexes.getDataIndexes());
 					rows = generateRowsFromMatriculas(matriculas); // initializes rows
+					// always set last row to be checked
+					rows.get(rows.size()-1).setCheckInfo(true);
 					// load servidores names
 					List<String> values = loadDataFromColumn((col+1), arr, indexes.getDataIndexes());
 					if (values.get(0) != null && !values.get(0).isEmpty()) 
