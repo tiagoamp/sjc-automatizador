@@ -74,10 +74,12 @@ public class InputConverterITextLib implements IInputConverter {
 			
 			if (nomeUnidade == null) {
 				String[] pgHeader = line.split(" ");
-				yearStr = pgHeader[pgHeader.length-1];
-				monthStr = pgHeader[pgHeader.length-2];
-				nomeUnidade = line.replace(yearStr, "");
-				nomeUnidade = line.replace(monthStr, "");
+				if (pgHeader.length > 3) {
+					yearStr = pgHeader[pgHeader.length-1];
+					monthStr = pgHeader[pgHeader.length-2];
+					nomeUnidade = line.replace(yearStr, "");
+					nomeUnidade = line.replace(monthStr, "");	
+				}				
 			}
 			
 			if (line.matches("^\\D+.*"))  // non-numeric string start 
@@ -91,24 +93,24 @@ public class InputConverterITextLib implements IInputConverter {
 				String[] tokens = line.split(" ");
 				int t = 0;
 				row.setMatricula(tokens[t++]);
-				String token = t < tokens.length-1 ? tokens[t] : null;
+				String token = t <= tokens.length-1 ? tokens[t] : "";
 				String nome = "";
-				if (isFirstRowOfAdm) {
-					nome = lines[i-1];
-				} else {							
+//				if (isFirstRowOfAdm) {
+//					nome = lines[i-1];
+//				} else {							
 					while (token.matches("\\D.*")) {
 						nome += " " + token;
 						if (t+1 >= tokens.length) break;
 						token = tokens[++t];
 					}	
-				}
+//				}
 				row.setNome(nome.trim());
 				String[] dtPlantoesExtras = new String[5];
 				int p = 0;
 				if (t < tokens.length-1) {
 					for (; t < tokens.length; t++) {
 						token = tokens[t];
-						dtPlantoesExtras[p++] = token;
+						dtPlantoesExtras[p++] = token;						
 					}	
 				}				
 				String nextLine = i+1 <= lines.length-1 ? lines[i+1] : "";
@@ -163,7 +165,7 @@ public class InputConverterITextLib implements IInputConverter {
 	
 	public static void main(String[] args) throws IOException {
 		InputConverterITextLib converter = 
-				new InputConverterITextLib(Paths.get("/home/tiagoamp/PROJ/SJC/Arquivos prod/julho 2019/OK PRESIDIOS/PRES. MASC. FPOLIS NOVO.pdf"));
+				new InputConverterITextLib(Paths.get("/home/tiagoamp/PROJ/SJC/Arquivos prod/outubro 2019/CASA DO ALBERGADO.pdf"));
 		ConvertedSpreadsheet s = converter.convert();
 		Map<SjcGeneralCode, ConvertedSheet> convertedSheets = s.getConvertedSheets();
 		List<ConvRow> rows = convertedSheets.get(OPERACIONAL).getRows();
