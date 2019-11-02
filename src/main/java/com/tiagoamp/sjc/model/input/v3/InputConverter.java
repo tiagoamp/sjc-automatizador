@@ -26,6 +26,7 @@ import com.tiagoamp.sjc.model.SjcGeneralCode;
 import com.tiagoamp.sjc.model.fieldprocessor.MonthConverter;
 import com.tiagoamp.sjc.model.input.v3.to.IndexesPairTO;
 
+@Deprecated
 public class InputConverter {
 	
 	private Path file;

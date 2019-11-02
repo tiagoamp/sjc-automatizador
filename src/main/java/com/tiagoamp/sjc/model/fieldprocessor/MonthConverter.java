@@ -1,5 +1,6 @@
 package com.tiagoamp.sjc.model.fieldprocessor;
 
+import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.Optional;
@@ -26,6 +27,7 @@ public class MonthConverter {
 	}
 	
 	public static Optional<YearMonth> getYearMonthFrom(String month, String year) {
+		if (year == null) year = String.valueOf(LocalDate.now().minusMonths(1).getYear());
 		Optional<YearMonth> result = Optional.empty();
 		Optional<Month> convertedMonth = getConvertedMonth(month);
 		if ( convertedMonth.isPresent() && year.matches("^\\d+$")) {
