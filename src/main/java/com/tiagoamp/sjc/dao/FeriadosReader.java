@@ -1,4 +1,4 @@
-package com.tiagoamp.sjc.service;
+package com.tiagoamp.sjc.dao;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public class FeriadosReader {
 	
 	private List<String> lines;

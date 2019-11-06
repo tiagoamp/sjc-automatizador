@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.tiagoamp.sjc.dao.FeriadosReader;
+
 public class FeriadosReaderTest {
 
 	private FeriadosReader feriadosReader;
