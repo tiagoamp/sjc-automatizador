@@ -17,9 +17,9 @@ public class FeriadosReader {
 	private DateTimeFormatter fullDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		
 	
-	public List<String> loadFromFile(Path filePath) throws IOException {
+	public void loadFromFile(Path filePath) throws IOException {
 		List<String> lines = Files.lines(filePath).collect(Collectors.toList());
-		return lines;
+		this.lines = lines;
 	}
 	
 	public List<LocalDate> getHolidays() {
@@ -51,6 +51,7 @@ public class FeriadosReader {
 		 List<LocalDate> feriados = new ArrayList<>();
 		 feriados.addAll(feriadosMoveis);
 		 feriados.addAll(feriadosFixos);
+		 feriados.sort((d1,d2) -> d1.compareTo(d2));
 		 return feriados;
 	}
 	
