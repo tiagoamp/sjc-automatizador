@@ -43,11 +43,5 @@ public class SjcTimesheetController {
 			throw new ResponseProcessingException(Response.serverError().build(),e);
 		}		
 	}
-	
-	
-	@RequestMapping(value = "/hello", method = RequestMethod.GET)
-	public Response hello() {
-		return Response.ok("hello").build();				
-	}
-		
+			
 }
