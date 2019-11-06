@@ -1,10 +1,10 @@
 package com.tiagoamp.sjc;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Path;
 import java.time.YearMonth;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Response;
 
@@ -31,13 +31,15 @@ public class SjcTimesheetController {
 	
 	
 	@RequestMapping(value = "/generate", method = RequestMethod.POST)
-	public Response generateTimesheetSpreadsheet(@RequestParam(value="monthVal", required=true) String monthVal, 
-			@RequestParam(value="yearVal", required=true) String yearVal, @RequestParam(value="extraHoursVal", required=true) String extraHoursVal) {
+	public String generateTimesheetSpreadsheet(HttpServletRequest request, @RequestParam(value="monthVal", required=true) String monthVal, 
+			@RequestParam(value="yearVal", required=true) String yearVal, @RequestParam(value="extraHoursVal") String extraHoursVal) {
+		if (extraHoursVal == null || extraHoursVal.trim().isEmpty()) 
+			extraHoursVal = "0";
 		try {
 			int extraHoursAmount = Integer.valueOf(extraHoursVal);
 			YearMonth yearMonth = YearMonth.of(Integer.valueOf(yearVal), Integer.valueOf(monthVal));
 			Path file = timesheetService.generate(yearMonth, extraHoursAmount);
-			return Response.created(URI.create(file.getFileName().toString())).build();
+			return "Planilha de Ponto gerada: " + file.getFileName().toString();			
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());
 			throw new ResponseProcessingException(Response.serverError().build(),e);
