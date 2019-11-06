@@ -28,7 +28,7 @@ public class Timesheet {
 			date -> date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY;
 	
 	private Predicate<LocalDate> isNotHoliday =
-			date -> holidays.stream().filter(holiday -> holiday.isEqual(date)).findFirst().isEmpty();
+			date -> holidays.stream().filter(holiday -> holiday.isEqual(date)).count() == 0;
 	
 	
 	public Timesheet(YearMonth yearMonth, int totalExtraHours, List<LocalDate> holidays) { 
@@ -105,7 +105,10 @@ public class Timesheet {
 	}
 	
 	private Map<LocalDate, Integer> computeStandardHoursPerDay() {
-		Map<LocalDate, Integer> standardHoursPerDay = startDate.datesUntil(endDate.plusDays(1))
+		List<LocalDate> dateRange = new ArrayList<>();
+		for (LocalDate date = startDate; date.isBefore(endDate.plusDays(1)); date = date.plusDays(1))
+			dateRange.add(date);		
+		Map<LocalDate, Integer> standardHoursPerDay = dateRange.stream()
 			.filter(isWeekday)
 			.filter(isNotHoliday)
 			.collect(Collectors.toMap(date -> date, date -> HOURS_PER_DAY));
