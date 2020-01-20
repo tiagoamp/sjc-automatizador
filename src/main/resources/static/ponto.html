@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Ponto</title>
+	
+	<style type="text/css">
+    	.container {
+    		display: flex;
+    		flex-direction: column;
+    		align-items: center;
+    		color: #73879c;
+    	}
+    	form {
+    		display: flex;
+    		flex-direction: column;
+    		align-items: center;
+    	}
+    	.campo {
+    		margin: 10px 0px;
+    	}
+    	input, select {
+    		color: #2a3f54; 
+    	}
+    	.btn {
+    		margin-top: 15px;
+    		border-radius: 5px;
+    		width: 120px;
+    		height: 30px;
+    	}
+    	.btn:hover {
+    		font-weight: bold;
+    	}
+    		
+  	</style>
+  
+</head>
+
+<body>
+
+	<div class="container">
+	
+		<h1>Folha de Ponto</h1>
+	
+		<form action="sjc/ponto/generate" method="POST">
+			
+			<div class="campo">
+				<label for="month-selector">Mês:</label>
+				<select name="monthVal" id="month-selector">
+				  <option value="01">Janeiro</option>
+				  <option value="02">Fevereiro</option>
+				  <option value="03">Marco</option>
+				  <option value="04">Abril</option>
+				  <option value="05">Maio</option>
+				  <option value="06">Junho</option>
+				  <option value="07">Julho</option>
+				  <option value="08">Agosto</option>
+				  <option value="09">Setembro</option>
+				  <option value="10">Outubro</option>
+				  <option value="11">Novembro</option>
+				  <option value="12">Dezembro</option>
+				</select>
+			</div>
+			
+			<div class="campo">
+				<label for="year-selector">Ano:</label>
+				<select name="yearVal" id="year-selector">
+				  <option value="2020">2020</option>
+				  <option value="2019">2019</option>
+				  <option value="2018">2018</option>
+				  <option value="2017">2017</option>
+				</select>				
+			</div>
+			
+			<div class="campo">
+				<label for="horasextras-selector">Qtdade Horas Extras:</label>
+				<input type="number" name="extraHoursVal" id="horasextras-selector" value="0" /> 
+			</div>
+			
+			<div class="campo">		
+				<input type="submit" value="GERAR" class="btn" />
+			</div>
+		
+		</form>
+		
+	</div>
+
+</body>
+
+</html>

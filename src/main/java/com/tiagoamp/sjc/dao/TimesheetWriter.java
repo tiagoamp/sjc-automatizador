@@ -1,4 +1,4 @@
-package com.tiagoamp.sjc.service;
+package com.tiagoamp.sjc.dao;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,24 +19,16 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class TimesheetWriter {
 	
-	private Map<LocalDate, String[]> dataPontos;
-	private YearMonth yearMonth;
-	private Path template;
-	private Path filePath;
+	private final Path TEMPLATE_FILE = Paths.get("resources","ModeloPonto.xlsx");
 	
-	
-	public TimesheetWriter(Map<LocalDate, String[]> dataPontos, YearMonth yearMonth, Path template) {
-		this.dataPontos = dataPontos;
-		this.yearMonth = yearMonth;
-		this.template = template;
-	}
-	
-	
-	public void generateSpreadsheet() throws IOException {
-		copyFileFromTemplate();
+		
+	public Path generateSpreadsheet(Map<LocalDate, String[]> dataPontos, YearMonth yearMonth) throws IOException {
+		Path filePath = copyFileFromTemplate(yearMonth);
 		
 		FileInputStream fileIS = new FileInputStream(filePath.toFile());
 		XSSFWorkbook workbook = new XSSFWorkbook(fileIS);
@@ -46,7 +38,7 @@ public class TimesheetWriter {
         XSSFCell cellYearMonth = rowYearMonth.getCell(7);
         cellYearMonth.setCellValue(DateTimeFormatter.ofPattern("MM/yyyy").format(yearMonth));
         
-        TreeSet<LocalDate> sortedDays = getSortedKeyFromHours();
+        TreeSet<LocalDate> sortedDays = getSortedKeyFromHours(dataPontos);
         
         int beforeInitRow = 11;
         Iterator<LocalDate> iterator = sortedDays.iterator();
@@ -82,16 +74,19 @@ public class TimesheetWriter {
         
         fileOS.close();
         workbook.close();
+        
+        return filePath;
 	}
 	
-	private void copyFileFromTemplate() throws IOException {
-		filePath = Paths.get("folhaponto","ponto_" + DateTimeFormatter.ofPattern("yyyy_MM").format(yearMonth) + ".xlsx");
+	private Path copyFileFromTemplate(YearMonth yearMonth) throws IOException {
+		Path filePath = Paths.get("folhaponto","ponto_" + DateTimeFormatter.ofPattern("yyyy_MM").format(yearMonth) + ".xlsx");
 		Files.deleteIfExists(filePath);
 		Files.createDirectories(filePath);
-		Files.copy(template, filePath, StandardCopyOption.REPLACE_EXISTING);
+		Files.copy(TEMPLATE_FILE, filePath, StandardCopyOption.REPLACE_EXISTING);
+		return filePath;
 	}
 	
-	private TreeSet<LocalDate> getSortedKeyFromHours() {
+	private TreeSet<LocalDate> getSortedKeyFromHours(Map<LocalDate, String[]> dataPontos) {
 		Set<LocalDate> keys = dataPontos.keySet();
 		TreeSet<LocalDate> sorted = new TreeSet<>(keys);
 		return sorted;
