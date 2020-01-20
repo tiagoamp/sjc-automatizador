@@ -36,22 +36,38 @@ public class OutputFilesGenerator {
 				if (sheet == null || sheet.getRows() == null || sheet.getRows().size() == 0) continue;
 				
 				LOGGER.info("Ordenando linhas da planilha de saída [" + code.getCode().toString() + "] ...");
-				sheet.sortRows();
-				
-				Map<Integer, Object[]> data = this.createOutputDataMap(sheet);
-								
+				sheet.sortRows();				
+				Map<Integer, Object[]> data = this.createOutputDataMap(sheet);								
 				XSSFSheet xsheet = workbook.createSheet(String.valueOf(code.getCode()));
 				
 				LOGGER.info("Preenchendo linhas da planilha de saída [" + code.getCode().toString() + "] ...");
-				fillNewOuputRowsInExcelSheet(xsheet, data);				
+				boolean hasToMergeRows = false;
+				fillNewOuputRowsInExcelSheet(xsheet, data, hasToMergeRows);				
 								
 				int numberOfColumns = 11;
 				for (int i = 0; i < numberOfColumns; i++) {
 					xsheet.autoSizeColumn(i); // column adjusting
 				}
+				
+				if (code == SjcSpecificCode.OPERACIONAL_PLANTOESEXTRA) {
+					OutSheet sheetGroupMatriculas = new OutSheet(SjcSpecificCode.OPERACIONAL_PLANTOESEXTRA);
+					sheetGroupMatriculas.setRows(sheet.getRows());
+					LOGGER.info("Agrupando linhas da planilha de saída [" + code.getCode() + " Agrupado" + "] ...");
+					sheetGroupMatriculas.mergeRows();
+					Map<Integer, Object[]> data2 = this.createOutputDataMap(sheetGroupMatriculas);									
+					XSSFSheet xsheet2 = workbook.createSheet(String.valueOf(code.getCode() + "_agrupado"));
+					LOGGER.info("Preenchendo linhas da planilha de saída [" + code.getCode()+ " Agrupado" +  "] ...");
+					hasToMergeRows = true;
+					fillNewOuputRowsInExcelSheet(xsheet2, data2, hasToMergeRows);				
+									
+					for (int i = 0; i < numberOfColumns; i++) {
+						xsheet2.autoSizeColumn(i); // column adjusting
+					}
+				}
 			}
 			
 			workbook.write(fos);
+			LOGGER.info("Planilha de saída gravada!");
 		}
 	}
 	
@@ -75,7 +91,7 @@ public class OutputFilesGenerator {
 		return data;
 	}
 	
-	private void fillNewOuputRowsInExcelSheet(XSSFSheet xssfsheet, Map<Integer, Object[]> data) {
+	private void fillNewOuputRowsInExcelSheet(XSSFSheet xssfsheet, Map<Integer, Object[]> data, boolean hasToMergeRows) {
 		Set<Integer> newRows = data.keySet(); // Set to Iterate and add rows into XLS file
 		int rownum = xssfsheet.getLastRowNum(); // get the last row number to append new data   
 		
@@ -124,7 +140,8 @@ public class OutputFilesGenerator {
 				
 				if (i == repeatedMatriculaIndex) { // repeated matricula
 					boolean isRepeated = (boolean) obj;
-					obj = isRepeated ? "** Matrícula repete nesta planilha para outra lotação" : null;
+					String msg = hasToMergeRows ? "** Matrícula com Plantões Extras agrupados" : "** Matrícula repete nesta planilha para outra lotação";
+					obj = isRepeated ? msg : null;
 				}
 								
 				if (obj instanceof String) {
