@@ -44,7 +44,7 @@ public class ExpirationManager {
 	private Integer computeExpirationNumber() {
 		LocalDate now = LocalDate.now();
 		int sumOfYearAndMonth = now.getYear() + now.getMonthValue();		
-		return now.getMonthValue() % 2 == 0 ? sumOfYearAndMonth * 30 : sumOfYearAndMonth * 40;
+		return ???;
 	}
 	
 }
