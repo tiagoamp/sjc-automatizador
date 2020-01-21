@@ -85,7 +85,7 @@ public class OutputFilesGenerator {
 			data.put(counter, new Object[] {outRow.getLotacao(), outRow.getNome().toUpperCase(), outRow.getMatricula(), outRow.getQuantidade(), 
 				outRow.getDtPlantoesExtras()[0], outRow.getDtPlantoesExtras()[1], outRow.getDtPlantoesExtras()[2], outRow.getDtPlantoesExtras()[3], outRow.getDtPlantoesExtras()[4], 
 				outRow.getAfastamento(), outRow.getDtPlantoesWithinAfastamentos(),
-				outRow.hasDuplicates()});
+				outRow.getMessage()});
 			counter++;
     	}
 		return data;
@@ -94,11 +94,7 @@ public class OutputFilesGenerator {
 	private void fillNewOuputRowsInExcelSheet(XSSFSheet xssfsheet, Map<Integer, Object[]> data, boolean hasToMergeRows) {
 		Set<Integer> newRows = data.keySet(); // Set to Iterate and add rows into XLS file
 		int rownum = xssfsheet.getLastRowNum(); // get the last row number to append new data   
-		
-		int initPlantoesObjIndex = 4;
-		int afastamentoIndex = 9;
-		int dtPlantoesAfastIndex = 10;
-		int repeatedMatriculaIndex = 11;
+		final int initPlantoesObjIndex = 4, afastamentoIndex = 9, dtPlantoesAfastIndex = 10, rowMessageIndex = 11;
 		
 		for (Integer key : newRows) {
 			Row row = xssfsheet.createRow(rownum++); // Creating a new Row in existing XLSX sheet
@@ -109,7 +105,6 @@ public class OutputFilesGenerator {
 			Boolean[] dtPlantoesWithinAfastamentos = null;
 			
 			if (hasPlantoesExtrasWithAfastamentos) dtPlantoesWithinAfastamentos = (Boolean[]) objArr[dtPlantoesAfastIndex];
-			
 			
 			boolean isRowWithPlantaoExtra = objArr[initPlantoesObjIndex] != null;
 			
@@ -138,11 +133,12 @@ public class OutputFilesGenerator {
 					cell.setCellStyle(italicCellStyle);
 				}
 				
-				if (i == repeatedMatriculaIndex) { // repeated matricula
-					boolean isRepeated = (boolean) obj;
-					String msg = hasToMergeRows ? "** Matrícula com Plantões Extras agrupados" : "** Matrícula repete nesta planilha para outra lotação";
-					obj = isRepeated ? msg : null;
-				}
+				/*
+				 * if (i == rowMessageIndex) { // msgs for repeated matricula if (isRepeated &&
+				 * !hasToMergeRows) { //String m = (String) objArr[duplicatedMessageIndex];
+				 * String msg = "** Matrícula repete nesta planilha para outra lotação"; obj =
+				 * msg; } else { obj = null; } }
+				 */
 								
 				if (obj instanceof String) {
 					cell.setCellValue((String) obj);

@@ -46,6 +46,7 @@ public class OutSheet {
 			samePersonRows.add(0, row);			
 			samePersonRows.forEach(filteredRow -> {
 				filteredRow.setDuplicates(hasDuplicates);
+				if (hasDuplicates) filteredRow.setMessage("** Matrícula repete nesta planilha para outra lotação");
 				if (!groupedRows.contains(filteredRow)) 
 					groupedRows.add(filteredRow);
 			});			
@@ -77,6 +78,13 @@ public class OutSheet {
 				if (duplicatedMatriculas.contains(row.getMatricula()))
 					return;
 				OutRow mergedRow = new OutRow(row.getLotacao(), row.getNome(), row.getMatricula());
+				
+				String msg = "Agrupado plantões de : ";
+				for (int i = 1; i < samePersonRows.size(); i++) {  // do not get index '0'
+					OutRow r = samePersonRows.get(i);
+					msg += "(+" + r.getQuantidade() + ") " + r.getLotacao() + "  ";
+				}
+				mergedRow.setMessage(msg);
 				mergedRow.setAfastamento(row.getAfastamento());
 				mergedRow.setDuplicates(hasDuplicates);
 				int qtd = samePersonRows.stream().mapToInt(r -> r.getQuantidade()).sum();
