@@ -142,6 +142,8 @@ public class InputSpreadSheetProcessor {
 	        			rowsMsgs.add(new ProcessingMessage(ERROR, msg));	        			
 	        		}
 					
+				} else {
+					dtPlantoesExtras[i] = null;
 				}
 			}
 			if (row.getQtdPlantoesExtra() != null && !row.getQtdPlantoesExtra().isEmpty() && 

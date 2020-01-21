@@ -151,13 +151,7 @@ public class OutputExcelSpreadsheet {
 									(plantaoDate.isAfter(afastRow.getDataInicial())	|| plantaoDate.isEqual(afastRow.getDataInicial()))
 								 && (plantaoDate.isBefore(afastRow.getDataFinal()) || plantaoDate.isEqual(afastRow.getDataFinal())))
 						.count();
-				
-				if (countOfAfastConflicts == 0) {
-					outRow.getDtPlantoesWithinAfastamentos()[i] = false;
-				} else {
-					outRow.getDtPlantoesWithinAfastamentos()[i] = true;
-				}
-
+				outRow.getDtPlantoesWithinAfastamentos()[i] = countOfAfastConflicts != 0;				
 			} catch (Exception e) {
 				LOGGER.debug("Padrão de data não reconhecido: " + dateStr);
 				outRow.getDtPlantoesWithinAfastamentos()[i] = null;

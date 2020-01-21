@@ -10,6 +10,7 @@ public class OutRow {
 	private String afastamento;	
 	private Boolean[] dtPlantoesWithinAfastamentos = new Boolean[5];
 	private boolean duplicates;
+	private String message;
 	
 	
 	public OutRow() { }
@@ -87,6 +88,12 @@ public class OutRow {
 	}
 	public boolean hasDuplicates() {
 		return this.duplicates;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 }
