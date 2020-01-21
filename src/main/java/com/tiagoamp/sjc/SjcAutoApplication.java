@@ -19,10 +19,7 @@ public class SjcAutoApplication {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SjcAutoApplication.class);	
 	
-	public static Path BASE_DIR;
-	public static Path CONFIG_FILE;
-	public static Path DIR_ENTRADA;
-	public static Path DIR_SAIDA;
+	public static Path BASE_DIR, CONFIG_FILE, DIR_ENTRADA, DIR_SAIDA;
 	private static FilesService filesService;
 	
 	
@@ -47,14 +44,7 @@ public class SjcAutoApplication {
 	}
 	
 	
-	private static void initializeWorkingDirectories() {
-		String userDirectory = System.getProperty("user.dir");
-		BASE_DIR = Paths.get(userDirectory);
-		CONFIG_FILE = BASE_DIR.resolve("resources" + File.separator + "conf.dat");
-		DIR_ENTRADA = BASE_DIR.resolve("ENTRADA/");
-		DIR_SAIDA = BASE_DIR.resolve("SAIDA/");
-		filesService = new FilesService();
-	}
+	
 	
 	private static void doExpirationValidation() throws Exception {
 		ExpirationManager expirationManager = new ExpirationManager();		
